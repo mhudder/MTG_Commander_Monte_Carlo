@@ -317,7 +317,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z262](#0z262) | BUILT | **Teferi's Protection's whole round** (shilgengar), on the owner's policy: a wrath worth it or a lethal kill, whichever comes first: +0.0033 ±0.0017 at T20 |
 | [0z263](#0z263) | FIXED | **The removal census missed "other target"** (queue item 53): Angel of Serenity the one card newly read; spot destroy share 0.46 -> 0.451; rendmaw's baseline moves (1 game in 2,000) |
 | [0z264](#0z264) | MEASURED | **Why the pod's boards outrun its mana** (queue item 53): only its turns 1-3 -- the gate's +0.118 is turn-1-3 costs 0.018, the answer reserve 0.037, pieces 0.008, and 0.054 real overcommitment |
-| [0z265](#0z265) | BUILT | **The cost cap taken; the growth rate a knob** (item 52): the cap's first cut reconciled the body pool -- fixed, its fits re-run; growth re-fit pending |
+| [0z265](#0z265) | BUILT | **The cost cap taken; the growth rate a knob** (item 52): the cap's first cut reconciled the body pool -- fixed; growth alone saturates at +0.032 over today, but moves the decks evenly |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -22880,9 +22880,50 @@ rewritten plainly; the sets unchanged). `tests/test_pod_spending.py` G and
 values; they run with the cap off now, their subject being the spending
 rule and the gate.
 
-**MEASUREMENT PENDING**: `diagnostics.fit_pod_knob pod_growth_rate
-0.7,1.0,1.3,1.6,2.0 --cand=pod_develop_gated=True` against today's pod,
-then the cap alone and §0z264's two-by-two again.
+### Measured (the corrected cap)
+
+`diagnostics.fit_pod_knob`, the six active decks, N=1,500 a deck, staged
+lists, seeds 5000..6499, python 3.11.18; today's pod (the cap ON) 0.4871,
+10.29 turns (`results/fit_item52_growth_rate_20261126.txt`,
+`fit_item53_cap_alone_...`, `..._split_reserve_...`,
+`..._split_noreserve_...`).
+
+**The cap alone moves today's mean by nothing**: 0.4871 -> 0.4871.
+
+**§0z264's split, re-measured** (the gate on, the cap on):
+
+| pod | mean T20 | against today |
+|---|---|---|
+| the gate alone, no cap (§0z264, stands) | 0.6052 | +0.118 |
+| gate + cap | 0.5959 | +0.109 |
+| gate + cap, pieces not gated | 0.5858 | +0.099 |
+| gate + cap, no reserve | 0.5507 | +0.064 |
+| gate + cap, neither | 0.5454 | +0.058 |
+
+So, corrected: the turn-1-3 costs **0.009** (not 0.018), the answer reserve
+**0.045** (not 0.037), the pieces **0.010**, and **0.058** of real
+overcommitment. The first cut's side effect had moved each by under 0.01.
+
+**The growth re-fit** (the gate on, the reserve kept):
+
+| `pod_growth_rate` | mean T20 | against today | turns |
+|---|---|---|---|
+| 0.7 (today's) | 0.5959 | +0.109 | 10.87 |
+| 1.0 | 0.5598 | +0.073 | 10.71 |
+| 1.3 | 0.5340 | +0.047 | 10.60 |
+| 1.6 | 0.5229 | +0.036 | 10.56 |
+| 2.0 | 0.5190 | +0.032 | 10.55 |
+
+**It saturates and never crosses**: about +0.03 over today is as close as
+growth comes. Once development is paid from real mana, faster growth only
+queues more bodies than the mana can cast -- the same wall
+`incidental_rate` hit (§0z247). **But it moves the decks EVENLY**: at 1.6
+every deck is +0.025 to +0.043 over today (rendmaw +0.037, lorehold +0.039,
+karlov +0.038, tivit +0.025, shilgengar +0.034, azusa +0.043), against
+`threat_clock_shift`'s -0.051 to +0.024 spread at its crossing (§0z247) --
+the reason to prefer growth for most of the re-fit. Closing the last ~0.036
+needs a second lever: a small kill-timing shift on top of growth, or the
+reserve (the owner's rule). Neither is run; the owner's call.
 
 ## How to read an ablation table
 

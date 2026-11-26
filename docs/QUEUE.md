@@ -443,3 +443,10 @@ cloud container has no scipy), `python -m edhmc.pending`, and
       of real overcommitment. Open, the owner's: take the cap; keep or
       drop the reserve before bodies; then re-fit what is left (+0.054 to
       +0.100), by growth or by kill timing.
+      **CAP TAKEN, GROWTH MEASURED (§0z265)**, the owner: "take the cost
+      cap and measure the growth re-fit". The cap is the default (it moves
+      today's mean by nothing). Growth alone saturates at about +0.03 over
+      today (0.7 -> 2.0: +0.109 -> +0.032) but moves the decks evenly.
+      Open: the second lever for the last ~0.036 -- a small kill-timing
+      shift on top of growth 1.6, or dropping the reserve -- then one
+      fresh-seed re-measure (§0z170) before the rebuild.

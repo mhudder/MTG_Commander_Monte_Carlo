@@ -1,13 +1,13 @@
-fit pod_gate_pieces over [True, False]: target pod DEFAULT_CFG + {}, candidates + {'pod_develop_gated': True, 'pod_body_mv_cap': True}; N=1500 a deck, staged lists, seeds 5000..6499, python 3.11.18
+fit pod_gate_pieces over [True, False]: target pod DEFAULT_CFG + {}, candidates + {'pod_develop_gated': True}; N=1500 a deck, staged lists, seeds 5000..6499, python 3.11.18
 target: mean T20 win rate over 6 active decks = 0.4871; mean turns 10.29
 
 deck        target T10     T20  turns | pod_gate_pieces=True   T20 (diff ±) | pod_gate_pieces=False  T20 (diff ±)
-rendmaw         0.1040  0.3373  10.61 | 0.4053 (+0.0680 ±0.0253) | 0.4000 (+0.0627 ±0.0242)
-lorehold        0.2620  0.4560   9.71 | 0.5900 (+0.1340 ±0.0252) | 0.5833 (+0.1273 ±0.0242)
-karlov          0.2727  0.5460  10.16 | 0.6460 (+0.1000 ±0.0233) | 0.6353 (+0.0893 ±0.0221)
-tivit           0.3180  0.5507  10.62 | 0.6667 (+0.1160 ±0.0231) | 0.6620 (+0.1113 ±0.0220)
-shilgengar      0.0600  0.4807  11.02 | 0.5700 (+0.0893 ±0.0245) | 0.5660 (+0.0853 ±0.0237)
-azusa           0.3420  0.5520   9.62 | 0.6440 (+0.0920 ±0.0225) | 0.6393 (+0.0873 ±0.0214)
+rendmaw         0.1040  0.3373  10.61 | 0.4340 (+0.0967 ±0.0252) | 0.4227 (+0.0853 ±0.0241)
+lorehold        0.2620  0.4560   9.71 | 0.5700 (+0.1140 ±0.0252) | 0.5620 (+0.1060 ±0.0240)
+karlov          0.2727  0.5460  10.16 | 0.6573 (+0.1113 ±0.0233) | 0.6447 (+0.0987 ±0.0222)
+tivit           0.3180  0.5507  10.62 | 0.6753 (+0.1247 ±0.0235) | 0.6693 (+0.1187 ±0.0223)
+shilgengar      0.0600  0.4807  11.02 | 0.5827 (+0.1020 ±0.0253) | 0.5707 (+0.0900 ±0.0243)
+azusa           0.3420  0.5520   9.62 | 0.6560 (+0.1040 ±0.0223) | 0.6453 (+0.0933 ±0.0212)
 
-mean T20: pod_gate_pieces=True: 0.5870 (10.86 turns), pod_gate_pieces=False: 0.5810 (10.82 turns)
+mean T20: pod_gate_pieces=True: 0.5959 (10.87 turns), pod_gate_pieces=False: 0.5858 (10.82 turns)
 crossing: not bracketed by these values
