@@ -1991,12 +1991,36 @@ def counter_hits(card_name, spell: str) -> bool:
     return False
 
 
+# §0z261: "If you control a commander, you may cast this spell without
+# paying its mana cost." Read from Scryfall (2026-11-25), held by hand.
+# BLIND to any other card in the lists with this text: nothing derives the
+# set, and none was searched for -- said, not checked.
+FREE_WITH_COMMANDER = frozenset({"Flawless Maneuver"})
+
+
+def free_with_commander(g, card) -> bool:
+    """Is `card` free now -- one of FREE_WITH_COMMANDER, with your commander
+    on the battlefield (`flawless_free`; False is the printed cost always)?"""
+    if card.name not in FREE_WITH_COMMANDER:
+        return False
+    if not g.cfg.get("flawless_free", True):
+        return False
+    cmd = getattr(g, "commander", None)
+    return cmd is not None and any(p.card is cmd for p in g.board)
+
+
 def _cast_response(g, card, kind) -> bool:
     """Pay for `card` from held mana and put it in the graveyard (or exile).
     False, and nothing moves, if the mana is not there."""
     pay = getattr(g, "response_pay", None)
-    if pay is None or not pay(dict(card.cost)):
+    cost = dict(card.cost)
+    free = free_with_commander(g, card)
+    if free:
+        cost = {}
+    if pay is None or not pay(cost):
         return False
+    if free:
+        g.m["free_with_commander"] += 1
     g.hand.remove(card)
     protection_life(g, card)                  # §0z251
     if not PROTECTION.get(card.name, {}).get("exile"):
@@ -2274,6 +2298,12 @@ def _spot_at_you(g, rolls, victim=None, opp=None) -> None:
         return
     pod_spend(g, opp, _removal.SPOT_SPELL_MV, "spot")       # §0z237
     if mother_protects(g, victim):        # her {T}, §0z118
+        return
+    # Optional protocol hook (§0z261): a creature that protects ITSELF at
+    # the cost the engine pays -- shilgengar's Cartel Aristocrat. Absent,
+    # nothing changes.
+    self_protects = getattr(g, "self_protects", None)
+    if self_protects is not None and self_protects(victim):
         return
     g.event_caster = opp                               # §0z241
     how = try_protect(g, rolls[5], "spot", victim)

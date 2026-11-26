@@ -312,7 +312,8 @@ Each row is a headline and its key number, at most 250 characters
 | [0z257](#0z257) | FIXED | **Terastodon's ETB fired on a cast only** (azusa): a tutor, Genesis Wave or a copy now answers too: +0.0005 ±0.0004 at T20 |
 | [0z258](#0z258) | FIXED | **Craterhoof pumped later creatures; Bane of Progress spared tokens and the pod's pieces** (azusa): both to their text: Craterhoof -0.0005 at T10 (its ceiling gone), Bane +0.0041 ±0.0015 at T20 |
 | [0z259](#0z259) | FIXED | **azusa's `crack_clues` paid every Clue with the same {2}**: `spend` leaves paid units in the pool: -0.0064 ±0.0022 at T20, 1.15 free cards a game |
-| [0z260](#0z260) | BUILT | **azusa's utility lands** (Strip Mine, Wasteland, Ghost Quarter, Tectonic Edge, Dust Bowl, Buried Ruin): each sacrifice a land death of yours; measurement pending |
+| [0z260](#0z260) | BUILT | **azusa's utility lands** (Strip Mine, Wasteland, Ghost Quarter, Tectonic Edge, Dust Bowl, Buried Ruin): each sacrifice a land death of yours; nulls but Buried Ruin +0.0009 |
+| [0z261](#0z261) | BUILT | **Fix 6, eight of shilgengar's missing clauses**: Flawless Maneuver free, Mind Stone, Viscera Seer, Priest's unearth, BMC's modes, Resplendent, Giada, Cartel Aristocrat; Teferi's Protection left; pending |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -22519,6 +22520,69 @@ BIT-IDENTICAL too. Only `azusa.py` changed, so the other caches did not move.
 
 **A smoke, 1,000 games**: 223 land-destroyer sacrifices (39 of them Ghost
 Quarter finding a Forest), 60 Dust Bowl sacrifices, 42 Buried Ruin returns.
+
+### Measured
+
+`diagnostics.run_knob_ab azusa <switch> <switch>_ready`, the staged list,
+N=15,000 paired, seeds 5000..19999, python 3.11.18
+(`results/knob_ab_azusa_strip_lands.txt`, `..._dust_bowl_sac.txt`,
+`..._buried_ruin.txt`):
+
+| switch | T10 | T20 | the identity | what moved a game |
+|---|---|---|---|---|
+| `strip_lands` | +0.0001 ±0.0013 | +0.0007 ±0.0017 | 2,188 reached, 0 of 12,812 differ | 0.22 sacrifices, 0.04 Ghost Quarter Forests |
+| `dust_bowl_sac` | +0.0001 ±0.0004 | -0.0003 ±0.0006 | 662 reached, 0 of 14,338 differ | 0.07 sacrifices |
+| `buried_ruin` | +0.0003 ±0.0005 | **+0.0009 ±0.0009** | 566 reached, 0 of 14,434 differ | 0.04 artifacts back |
+
+**What it supports**: the land-destroyers and Dust Bowl are nulls -- a
+land death pays only with Titania or the graveyard open, and both are
+rare; what they do to an opponent's land, the reason a pilot plays them,
+is the half not modelled. Buried Ruin is significant at its bar's edge
+(+0.0009 ±0.0009, the artifact back is Sol Ring or Horn of Greed). All
+kept: each now does what it prints, as far as the model sees.
+
+<a id="0z261"></a>
+
+## 0z261. BUILT -- fix 6: eight of shilgengar's missing clauses; Teferi's Protection left
+
+**The owner, 2026-11-25**: "Go for fix 6" -- §0z208's Tier 2 items 4-10,
+13 and 14. Oracle text from Scryfall (2026-11-25), quoted in each method.
+Each clause is its own switch, ON; False is the old rule:
+
+| card | switch | the clause, and THE POLICY said in its method |
+|---|---|---|
+| Flawless Maneuver | `flawless_free` | free with your commander ON THE BATTLEFIELD (`opponents.FREE_WITH_COMMANDER`, hand-held: any other card with the text is not searched for) |
+| Mind Stone | `mind_stone_draw` | {1}, {T}, sacrifice: draw -- after combat, at `mind_stone_min_lands` (6) |
+| Viscera Seer | `seer_scry` | scry 1 when it is the outlet (Shilgengar is preferred while out), by trostani's scry rule |
+| Priest of Fell Rites | `priest_unearth` | unearth {3}{W}{B}, haste: its own reanimation at once, and the sacrifice EXILES it -- on the Priest's rule (life over 10) |
+| Black Market Connections | `bmc_modes` | "one or more": the card, then the Treasure, then the 3/2 changeling (an Angel here), while life stays above `bmc_life_floor` (20) |
+| Resplendent Angel | `resplendent_pump` | {3}{W}{W}{W}: +2/+2 and lifelink as it attacks, from what the main phase left; ends at cleanup (`engine.EOT_EFFECTS`) |
+| Giada, Font of Hope | `giada_mana` | {T}: {W} for an Angel spell, in the main phase, she untapped and not sick |
+| Cartel Aristocrat | `cartel_protects` | sacrifice another creature for protection when the pod's spot removal is aimed at it (`opponents` hook `self_protects`); the removal assumed coloured; a blocker's colour NOT modelled -- it stays PARTLY |
+
+Seven move to SCRIPTED_SHILGENGAR (what is left is policy); Cartel
+Aristocrat stays PARTLY. **Teferi's Protection is NOT built**: "until your
+next turn, your life total can't change and you gain protection from
+everything; all permanents you control phase out" reaches every way the
+pod damages, drains, removes and kills, and when to cast it -- at a wipe,
+or at the round an opponent's kill fires -- is a policy for the owner.
+Its row stays PARTLY with that reason.
+
+**Pinned**: `tests/test_fix6.py`, ten cases, five mutations. Two misses
+on the way, both in the test and said in its docstring: N's first board
+paid Flawless Maneuver from the Mind Stone's Plains; and the first
+stand-in for "free_with_commander ignores the commander" dropped the
+switch too (§0z141's shape) and broke N. Both fixed; the expected sets
+unchanged, all five exact.
+
+**Only shilgengar moves**: `check_unchanged_decks --n=2000` against
+`23ac6bd`, every other active deck BIT-IDENTICAL; with all eight switches
+off, shilgengar BIT-IDENTICAL too.
+
+**A smoke, 1,000 games**: Flawless Maneuver free 103 times, Mind Stone
+cracked 143, Priest unearthed 53, BMC's card / Treasure / changeling 415 /
+201 / 161, Resplendent pumped 79, Giada's mana 203, Seer's scry 4, Cartel's
+save 5; life lost to your own cards +1.7 a game.
 
 **MEASUREMENT PENDING**: each switch alone, N=15,000.
 

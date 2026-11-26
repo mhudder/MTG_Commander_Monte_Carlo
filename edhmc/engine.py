@@ -4796,6 +4796,7 @@ EOT_EFFECTS = (
     "eot_pt",               # azusa: Glacier Godmaw, Racetrack Bird
     "eot_haste",            # azusa: Glacier Godmaw
     "eot_vigilance",        # azusa: Glacier Godmaw (§0z186)
+    "resplendent_pump",     # shilgengar: Resplendent Angel (§0z261)
 )
 
 

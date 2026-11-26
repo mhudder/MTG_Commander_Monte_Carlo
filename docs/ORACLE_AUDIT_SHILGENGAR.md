@@ -87,23 +87,23 @@ lifelinkers.
 evidence about the card." For each below the claim is false and the row is
 a floor read as evidence -- §0z206's Woe Strider, thirteen times.
 
-4. **Viscera Seer** -- "Sacrifice a creature: Scry 1." Read as a free
+4. **[FIXED 2026-11-26, §0z261: `seer_scry`.]** **Viscera Seer** -- "Sacrifice a creature: Scry 1." Read as a free
    outlet only; the scry is not modelled. Woe Strider's exact gap.
-5. **Cartel Aristocrat** -- "Sacrifice another creature: This creature
+5. **[FIXED 2026-11-26, §0z261: `cartel_protects; a blocker's colour still not`.]** **Cartel Aristocrat** -- "Sacrifice another creature: This creature
    gains protection from the color of your choice until end of turn." An
    outlet only; the protection (from removal, from a blocker's colour) is
    not modelled.
-6. **Priest of Fell Rites** -- unearth {3}{W}{B} is not modelled
+6. **[FIXED 2026-11-26, §0z261: `priest_unearth`.]** **Priest of Fell Rites** -- unearth {3}{W}{B} is not modelled
    (`activations` says so; §0z197 C lists it).
-7. **Resplendent Angel** -- "{3}{W}{W}{W}: Until end of turn, this creature
+7. **[FIXED 2026-11-26, §0z261: `resplendent_pump`.]** **Resplendent Angel** -- "{3}{W}{W}{W}: Until end of turn, this creature
    gets +2/+2 and gains lifelink." No code reads it. The end-step Angel
    is modelled, at each end step (§0z153).
-8. **Giada, Font of Hope** -- "{T}: Add {W}. Spend this mana only to cast an
+8. **[FIXED 2026-11-26, §0z261: `giada_mana`.]** **Giada, Font of Hope** -- "{T}: Add {W}. Spend this mana only to cast an
    Angel spell." The deck module gives her no mana ability. The counters
    are modelled (`giada_counters`).
-9. **Mind Stone** -- "{1}, {T}, Sacrifice this artifact: Draw a card." A
+9. **[FIXED 2026-11-26, §0z261: `mind_stone_draw`.]** **Mind Stone** -- "{1}, {T}, Sacrifice this artifact: Draw a card." A
    rock only.
-10. **Black Market Connections** -- "choose one or more" is always Buy
+10. **[FIXED 2026-11-26, §0z261: `bmc_modes`.]** **Black Market Connections** -- "choose one or more" is always Buy
     Information alone (`upkeep`: "this undercounts the card's ceiling"), at
     the upkeep, not "your first main phase" (§0z184 finding 7, item 37).
 11. **Voldaren Bloodcaster // Bloodbat Summoner** -- the transform at five
@@ -114,11 +114,11 @@ a floor read as evidence -- §0z206's Woe Strider, thirteen times.
     enters and at each upkeep, and "the survivors' smaller toughness is not
     modelled" (its docstring) -- nor their power. Since A1 and A2 a body's
     power and toughness are read in every block and every attack at you.
-13. **Teferi's Protection** -- modelled as one blanked event (`PROTECTION`:
+13. **[OPEN 2026-11-26, §0z261: built last, the owner's call on its timing policy.]** **Teferi's Protection** -- modelled as one blanked event (`PROTECTION`:
     spot, A/E, wipe). "Until your next turn, your life total can't change
     and you gain protection from everything" -- the pod's whole round of
     combat, drains and kills -- is not.
-14. **Flawless Maneuver** -- "If you control a commander, you may cast this
+14. **[FIXED 2026-11-26, §0z261: `flawless_free`.]** **Flawless Maneuver** -- "If you control a commander, you may cast this
     spell without paying its mana cost." Always paid at {2}{W}
     (`_cast_response`, no `alt_costs`). A floor on when it can be held up.
 15. **[FIXED 2026-11-25, §0z254: the three ETBs -- Wurm's, Titan's and

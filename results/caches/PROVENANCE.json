@@ -1482,6 +1482,18 @@
         "evidence": "2026-11-25: fingerprint moved with opponents.py (\u00a70z257-\u00a70z259: the ETB_ANSWERS comment, trample_of's optional craterhoof_reaches hook, the sweeper's artifacts_enchantments scope -- reached by azusa alone) and tools/ablation.py (Bane of Progress's azusa note). check_unchanged_decks --n=2000 BIT-IDENTICAL against 84c57b6 (modules), the table re-renders byte-identical from this cache, and the STAGED list (build_pending) played 2,000 seeds at both 84c57b6 and 84c57b6+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
         "fingerprint": "b416165a14dfdc40",
         "utc": "2026-11-25T22:27:53Z"
+      },
+      {
+        "commit": "23ac6bd",
+        "evidence": "2026-11-26: fingerprint moved with engine.py (\u00a70z261: EOT_EFFECTS gains resplendent_pump, an attribute only shilgengar sets), opponents.py (FREE_WITH_COMMANDER and free_with_commander in _cast_response, Flawless Maneuver only; the optional self_protects hook in spot removal) and tools/ablation.py (shilgengar's notes). check_unchanged_decks --n=2000 BIT-IDENTICAL against 23ac6bd (modules), the table re-renders byte-identical from this cache, and the STAGED list (build_pending) played 2,000 seeds at both 23ac6bd and 23ac6bd+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
+        "fingerprint": "0e438dbd5903b2a4",
+        "utc": "2026-11-26T00:06:23Z"
+      },
+      {
+        "commit": "23ac6bd",
+        "evidence": "2026-11-26: fingerprint moved again with tools/ablation.py only -- Teferi's Protection's shilgengar note reworded (\u00a70z261), minutes after the record above at the same code. The table re-renders byte-identical from this cache (tests.test_metrics_and_render C); the simulation is the code the record above checked (0 of 2,000 staged-list games differ against 23ac6bd).",
+        "fingerprint": "0b675b042e118608",
+        "utc": "2026-11-26T00:13:09Z"
       }
     ]
   },
@@ -2885,6 +2897,18 @@
         "evidence": "2026-11-25: fingerprint moved with opponents.py (\u00a70z257-\u00a70z259: the ETB_ANSWERS comment, trample_of's optional craterhoof_reaches hook, the sweeper's artifacts_enchantments scope -- reached by azusa alone) and tools/ablation.py (Bane of Progress's azusa note). check_unchanged_decks --n=2000 BIT-IDENTICAL against 84c57b6 (modules), the table re-renders byte-identical from this cache, and the STAGED list (build_pending) played 2,000 seeds at both 84c57b6 and 84c57b6+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
         "fingerprint": "2f04342c97f74490",
         "utc": "2026-11-25T22:27:53Z"
+      },
+      {
+        "commit": "23ac6bd",
+        "evidence": "2026-11-26: fingerprint moved with engine.py (\u00a70z261: EOT_EFFECTS gains resplendent_pump, an attribute only shilgengar sets), opponents.py (FREE_WITH_COMMANDER and free_with_commander in _cast_response, Flawless Maneuver only; the optional self_protects hook in spot removal) and tools/ablation.py (shilgengar's notes). check_unchanged_decks --n=2000 BIT-IDENTICAL against 23ac6bd (modules), the table re-renders byte-identical from this cache, and the STAGED list (build_pending) played 2,000 seeds at both 23ac6bd and 23ac6bd+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
+        "fingerprint": "3ae944ab2af48c9b",
+        "utc": "2026-11-26T00:06:23Z"
+      },
+      {
+        "commit": "23ac6bd",
+        "evidence": "2026-11-26: fingerprint moved again with tools/ablation.py only -- Teferi's Protection's shilgengar note reworded (\u00a70z261), minutes after the record above at the same code. The table re-renders byte-identical from this cache (tests.test_metrics_and_render C); the simulation is the code the record above checked (0 of 2,000 staged-list games differ against 23ac6bd).",
+        "fingerprint": "aa55f63b09266987",
+        "utc": "2026-11-26T00:13:09Z"
       }
     ]
   },
@@ -4263,6 +4287,18 @@
         "evidence": "2026-11-25: fingerprint moved with opponents.py (\u00a70z257-\u00a70z259: the ETB_ANSWERS comment, trample_of's optional craterhoof_reaches hook, the sweeper's artifacts_enchantments scope -- reached by azusa alone) and tools/ablation.py (Bane of Progress's azusa note). check_unchanged_decks --n=2000 BIT-IDENTICAL against 84c57b6 (modules), the table re-renders byte-identical from this cache, and the STAGED list (build_pending) played 2,000 seeds at both 84c57b6 and 84c57b6+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
         "fingerprint": "813e9b53653d0564",
         "utc": "2026-11-25T22:27:53Z"
+      },
+      {
+        "commit": "23ac6bd",
+        "evidence": "2026-11-26: fingerprint moved with engine.py (\u00a70z261: EOT_EFFECTS gains resplendent_pump, an attribute only shilgengar sets), opponents.py (FREE_WITH_COMMANDER and free_with_commander in _cast_response, Flawless Maneuver only; the optional self_protects hook in spot removal) and tools/ablation.py (shilgengar's notes). check_unchanged_decks --n=2000 BIT-IDENTICAL against 23ac6bd (modules), the table re-renders byte-identical from this cache, and the STAGED list (build_pending) played 2,000 seeds at both 23ac6bd and 23ac6bd+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
+        "fingerprint": "30694449889f501d",
+        "utc": "2026-11-26T00:06:23Z"
+      },
+      {
+        "commit": "23ac6bd",
+        "evidence": "2026-11-26: fingerprint moved again with tools/ablation.py only -- Teferi's Protection's shilgengar note reworded (\u00a70z261), minutes after the record above at the same code. The table re-renders byte-identical from this cache (tests.test_metrics_and_render C); the simulation is the code the record above checked (0 of 2,000 staged-list games differ against 23ac6bd).",
+        "fingerprint": "934715a19b7e718b",
+        "utc": "2026-11-26T00:13:09Z"
       }
     ]
   },

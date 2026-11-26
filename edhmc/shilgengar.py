@@ -145,7 +145,7 @@ from edhmc.engine import (cycle_step, cleanup_step, late_land_drop, remove_card,
                           damage_you, midnight_reaper, sun_titan_pick,
                           vault_active, castle_locthwain, begin_game, Snapshots, BaseGame, finish, lookahead_pick, cast_rank, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, play_land, engine_cfg, choose_mode_cost, tithe_treasures, land_types,
-                          lazy_pay_of, can_afford as afford,
+                          lazy_pay_of, can_afford as afford, draw_is_safe,
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng,
                           enter_loyalty, thomil_step, lord_of_the_pit_card,
@@ -276,6 +276,7 @@ class ShilgengarGame(BaseGame):
         # the battlefield this turn (cleared by take_turn), and ids of
         # Shepherds that have persisted once.
         self.to_yard_this_turn: set[int] = set()
+        self.resplendent_pump = {}      # id -> perm, §0z261: +2/+2, lifelink
         self.persisted: dict = {}
         # Avacyn, Angel of Horror (candidate, 2026-10-23): the cards her
         # trigger returns "at the beginning of the next end step".
@@ -343,7 +344,7 @@ class ShilgengarGame(BaseGame):
 
     def power_of(self, perm):
         base = perm.base_p if perm.is_token else perm.card.power
-        p = base + perm.counters
+        p = base + perm.counters + self.pumped(perm)
         if id(perm) in self.bloodbat_flipped:
             p += BLOODBAT_PT[0]           # the back face, 3/3 (§0z229)
         # Elesh Norn: "OTHER creatures you control get +2/+2" -- the
@@ -364,9 +365,15 @@ class ShilgengarGame(BaseGame):
             p += 2
         return p
 
+    def pumped(self, perm) -> int:
+        """§0z261: Resplendent Angel's "+2/+2 and lifelink until end of
+        turn", read by power, toughness and lifelink alike."""
+        e = self.resplendent_pump.get(id(perm))
+        return 2 if e is not None and e is perm else 0
+
     def toughness_of(self, perm):
         base = perm.base_t if perm.is_token else perm.card.toughness
-        t = base + perm.counters
+        t = base + perm.counters + self.pumped(perm)
         if id(perm) in self.bloodbat_flipped:
             t += BLOODBAT_PT[1]
         # Elesh Norn: "OTHER creatures you control get +2/+2" -- the
@@ -388,7 +395,7 @@ class ShilgengarGame(BaseGame):
         return t
 
     def lifelink_of(self, perm):
-        if perm.card.lifelink or vault_active(self):
+        if perm.card.lifelink or vault_active(self) or self.pumped(perm):
             return True
         # Pearl Collector's "perpetually gains lifelink" (§0z74).
         if perpetual_lifelink(self, perm):
@@ -767,6 +774,7 @@ class ShilgengarGame(BaseGame):
                        for q in self.board):
                 break                        # nobody is watching any more
             self.sacrifice(p, to_shilgengar=self.commander_cast)
+            self.seer_scry()                         # §0z261
             self.m["avacyn_fed"] += 1
 
     def exiled_instead_of_dying(self, perm) -> bool:
@@ -804,6 +812,156 @@ class ShilgengarGame(BaseGame):
         self.on_creature_death(1, perm)
         if not perm.is_token:
             self.after_died(perm)
+
+    # -- §0z261: six clauses of fix 6 --------------------------------------
+
+    def seer_scry(self) -> None:
+        """VISCERA SEER: "Sacrifice a creature: Scry 1." Only when Seer is
+        the outlet -- Shilgengar is preferred while it is out (its Blood),
+        so Seer's sacrifices are the ones made without it. Scry 1 by
+        trostani's rule (`scry1`): bottom a land once there are
+        `scry_land_bottom` (5) lands out, a spell two over the land count
+        while there are few. `seer_scry=False`: an outlet only."""
+        if (self.commander_cast or not self.has("Viscera Seer")
+                or not self.cfg.get("seer_scry", True) or not self.library):
+            return
+        self.m["seer_scrys"] += 1
+        top = self.library[-1]
+        lands = sum(1 for p in self.board if p.card.is_land)
+        if (top.is_land and lands >= self.cfg.get("scry_land_bottom", 5)) or \
+                (not top.is_land and top.mv > lands + 2):
+            self.library.insert(0, self.library.pop())
+            self.m["scry_bottomed"] += 1
+
+    def mind_stone_crack(self) -> None:
+        """MIND STONE: "{1}, {T}, Sacrifice this artifact: Draw a card."
+        THE POLICY, said: after combat, from spare mana, once the lands are
+        `mind_stone_min_lands` (6) -- a rock given up only when the mana is
+        no longer short -- and the draw safe. `mind_stone_draw=False`: a rock
+        only."""
+        if not self.cfg.get("mind_stone_draw", True):
+            return
+        stone = next((p for p in self.board if p.card.name == "Mind Stone"
+                      and not p.tapped), None)
+        if stone is None or not draw_is_safe(self, 1):
+            return
+        lands = sum(1 for p in self.board if p.card.is_land)
+        if lands < self.cfg.get("mind_stone_min_lands", 6):
+            return
+        stone.tapped = True                  # its {T}; it cannot pay itself
+        if not self.pay({"gen": 1}):
+            stone.tapped = False
+            return
+        self.board.remove(stone)
+        self.graveyard.append(stone.card)
+        self.draw(1)
+        self.m["mind_stone_draws"] += 1
+
+    def priest_unearth(self) -> None:
+        """PRIEST OF FELL RITES' UNEARTH {3}{W}{B}: "Return this card from
+        your graveyard to the battlefield. It gains haste. Exile it at the
+        beginning of the next end step or if it would leave the battlefield.
+        Unearth only as a sorcery." With haste its own ability -- "{T}, Pay 3
+        life, Sacrifice this creature: Return target creature card from your
+        graveyard to the battlefield" -- is live at once, and that sacrifice
+        EXILES it (no death trigger). Taken on the Priest's own rule (life
+        over 10, a creature card to return), after its battlefield copy.
+        `priest_unearth=False`: the graveyard Priest is a blank."""
+        if not self.cfg.get("priest_unearth", True) or self.your_life <= 10:
+            return
+        priest = next((c for c in self.graveyard
+                       if c.name == "Priest of Fell Rites"
+                       and id(c) not in self.finality), None)
+        if priest is None:
+            return
+        pool = [c for c in self.yard_creatures() if c is not priest]
+        if not pool or not self.pay({"gen": 3, "W": 1, "B": 1}):
+            return
+        remove_card(self.graveyard, priest)
+        self.m["priest_unearths"] += 1
+        best = max(pool, key=lambda c: c.mv)
+        remove_card(self.graveyard, best)
+        self.your_life -= 3
+        self.m["life_lost_to_own_cards"] += 3
+        # exiled as it leaves -- it never touches the battlefield's
+        # payoffs for a sacrifice or a death
+        perm = self.make_permanent(best, sick=True)
+        if perm.card.is_creature:
+            self.creature_entered(perm)
+        self.m["single_reanimations"] += 1
+
+    def bmc_modes(self) -> None:
+        """BLACK MARKET CONNECTIONS, "choose one or more": Sell Contraband (a
+        Treasure, 1 life), Buy Information (a card, 2 life), Hire a
+        Mercenary (a 3/2 changeling -- EVERY creature type, so an Angel to
+        this deck's Angel payoffs -- 3 life). THE POLICY, said: each mode in
+        that order of cheapness while your life stays above `bmc_life_floor`
+        (20) after paying it -- the card first, then the Treasure, then the
+        body -- and Buy Information always when nothing else is taken, the
+        old rule's one mode. `bmc_modes=False`: Buy Information alone."""
+        floor = self.cfg.get("bmc_life_floor", 20)
+        took = 0
+        for mode, life in (("draw", 2), ("treasure", 1), ("mercenary", 3)):
+            if took and self.your_life - life <= floor:
+                continue
+            if not took and mode != "draw":
+                break
+            self.your_life -= life
+            self.m["life_lost_to_own_cards"] += life
+            if mode == "draw":
+                self.draw(1)
+            elif mode == "treasure":
+                self.treasures += 1
+                self.m["treasures_made"] += 1
+            else:
+                tok = Card(name="Shapeshifter token",
+                           types=frozenset({"Creature"}), power=3,
+                           toughness=2, tags=frozenset({"angel", "cleric"}))
+                perm = self.make_permanent(tok, sick=True, is_token=True)
+                self.creature_entered(perm)
+                self.m["bmc_mercenaries"] += 1
+            self.m[f"bmc_{mode}"] += 1
+            took += 1
+
+    def self_protects(self, victim) -> bool:
+        """CARTEL ARISTOCRAT: "Sacrifice another creature: This creature
+        gains protection from the color of your choice until end of turn."
+        `opponents.spot_removal`'s hook (§0z261): the pod's spot removal is
+        aimed at the Aristocrat, so sacrifice another creature -- a token
+        first, then the lowest threat, never the commander -- and name the
+        removal's colour: it loses its target. THE JUDGEMENTS, said: the
+        pod's removal is assumed coloured (a colourless one would not be
+        stopped -- a small ceiling); a wrath is not targeted and is not
+        stopped; the sacrifice is made only when it saves the Aristocrat,
+        not for its other uses. `cartel_protects=False`: an outlet only."""
+        if (not self.cfg.get("cartel_protects", True)
+                or victim not in self.board
+                or victim.card.name != "Cartel Aristocrat"):
+            return False
+        fodder = [p for p in self.board if p.card.is_creature
+                  and p is not victim and p.card is not self.commander]
+        if not fodder:
+            return False
+        sac = min(fodder, key=lambda p: (not p.is_token,
+                                         OPP.threat_of(self, p)))
+        self.sacrifice(sac, to_shilgengar=False)
+        self.m["cartel_protects"] += 1
+        return True
+
+    def resplendent_step(self, attackers) -> None:
+        """RESPLENDENT ANGEL: "{3}{W}{W}{W}: Until end of turn, this creature
+        gets +2/+2 and gains lifelink." THE POLICY, said: as combat begins,
+        on an attacking Resplendent, from what the main phase left -- the
+        lifelink also feeds its own end-step Angel (5 life). Once a turn
+        each. `resplendent_pump=False`: no code reads the ability."""
+        if not self.cfg.get("resplendent_pump", True):
+            return
+        for p in attackers:
+            if (p.card.name == "Resplendent Angel"
+                    and id(p) not in self.resplendent_pump
+                    and self.pay({"gen": 3, "W": 3})):
+                self.resplendent_pump[id(p)] = p
+                self.m["resplendent_pumps"] += 1
 
     def aristocrats_step(self):
         """Once a turn: feed spare TOKENS (never real cards, never the 4/4
@@ -843,6 +1001,7 @@ class ShilgengarGame(BaseGame):
                     self.trigger_gain(1)
                 continue
             self.sacrifice(p, to_shilgengar=self.commander_cast)
+            self.seer_scry()                         # §0z261
         # Vampiric Rites: paid outlet, worth using on whatever fodder is left
         # even without a payoff on board, since it draws a card on its own.
         if self.has("Vampiric Rites"):
@@ -908,6 +1067,37 @@ class ShilgengarGame(BaseGame):
              # a Bat is Blood already: fed, it nets nothing (§0z229)
              and id(p) not in self.blood_bats),
             key=lambda p: (not self.returns_if_fed(p), -self.blood_yield(p)))
+
+    def giada_ready(self):
+        """§0z261: an untapped Giada whose {T} is live (not summoning sick),
+        or None -- off with `giada_mana=False`."""
+        if not self.cfg.get("giada_mana", True):
+            return None
+        return next((p for p in self.board
+                     if p.card.name == "Giada, Font of Hope"
+                     and not p.tapped and not p.sick), None)
+
+    def giada_cost(self, card, cost):
+        """GIADA, FONT OF HOPE: "{T}: Add {W}. Spend this mana only to cast
+        an Angel spell." (Scryfall, 2026-11-25.) The Angel's cost with one
+        {W} paid by her -- a {W} pip if it has one, else {1} -- while she is
+        ready; `cost` unchanged otherwise. With `cost=None`, only whether
+        she would pay (None if not). Applied in the main phase only, where
+        she taps for the one spell cast (§0z261); the Angels a response or a
+        free cast puts in never ask."""
+        giada = self.giada_ready()
+        if giada is None or "angel" not in card.tags:
+            return cost if cost is not None else None
+        if cost is None:
+            return card.cost
+        cost = dict(cost)
+        if cost.get("W", 0) > 0:
+            cost["W"] -= 1
+        elif cost.get("gen", 0) > 0:
+            cost["gen"] -= 1
+        else:
+            return cost
+        return cost
 
     def herald_cost(self, card):
         """Herald of War: "Angel spells and Human spells you cast cost {1}
@@ -1456,7 +1646,8 @@ class ShilgengarGame(BaseGame):
                 # §1b: the best affordable MODE, not just the printed cost.
                 # Only the card cast is priced (§0z149).
                 _m = choose_mode_cost(c, OPP.wipe_mode_cost(
-                    self, c, self.herald_cost(c), pool), pool)
+                    self, c, self.giada_cost(c, self.herald_cost(c)), pool),
+                    pool)
                 # THE RESERVE COUNTS THE WHOLE POOL, Treasures included: what
                 # it exists to protect is the three mana the ultimate needs
                 # after combat, and a Treasure pays that as well as a land
@@ -1491,6 +1682,10 @@ class ShilgengarGame(BaseGame):
                 # reach, counted as it is paid (countered or not).
                 self.m["agadeem_blank_casts"] += 1
             remove_card(self.hand, card)
+            giada = self.giada_ready()
+            if giada is not None and self.giada_cost(card, None) is not None:
+                giada.tapped = True          # §0z261: her {W} paid for it
+                self.m["giada_mana"] += 1
             idx = self.spells_this_turn
             self.spells_this_turn += 1
             if OPP.countered(self, card, idx):
@@ -1532,6 +1727,9 @@ class ShilgengarGame(BaseGame):
                 if perm.card.is_creature:
                     self.creature_entered(perm)
                 self.m["single_reanimations"] += 1
+
+        self.priest_unearth()                    # §0z261
+        self.mind_stone_crack()                  # §0z261
 
         # Wayfarer's Bauble: "{2}, {T}, Sacrifice this artifact: search for a
         # basic land, put it onto the battlefield tapped." An activated
@@ -1587,6 +1785,7 @@ class ShilgengarGame(BaseGame):
         attackers = [p for p in self.board if p.card.is_creature
                     and not p.tapped and not p.sick]
         attackers = OPP.hold_back(self, attackers)   # for the pod, §0z186
+        self.resplendent_step(attackers)             # §0z261
         if not attackers:
             self.damage_by_turn.append(0.0)
             return
@@ -1739,9 +1938,12 @@ class ShilgengarGame(BaseGame):
         mode is still always Buy Information, said out loud as it was."""
         if self.cfg.get("bmc_main1", True) \
                 and self.has("Black Market Connections"):
+            self.m["bmc_turns"] += 1                  # either rule: reach
+            if self.cfg.get("bmc_modes", True):
+                self.bmc_modes()
+                return
             self.draw(1)
             self.your_life -= 2
-            self.m["bmc_turns"] += 1                  # either rule: reach
 
     def end_step(self):
         self.avacyn_returns()
@@ -1936,6 +2138,7 @@ def take_turn(g):
     g.turn += 1
     g.spells_this_turn = 0
     g.to_yard_this_turn.clear()          # Twilight Shepherd's "this turn"
+    g.resplendent_pump = {}              # §0z261, if the cleanup did not
     g.life_gained_this_turn = 0.0
     for p in g.board:
         p.tapped = False

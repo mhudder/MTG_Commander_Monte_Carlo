@@ -143,7 +143,10 @@ def run_cases():
     check("F lifelink at the powers dealt: 3 + 1",
           g.m["life_gained"] - gained, 4)
 
-    g = fresh()
+    # bmc_modes=False (§0z261): G pins the TIMING; the modes are
+    # tests/test_fix6.py's B1/B2. At 40 life the modes take all three for
+    # 6 life, which G's 2 was the old one-mode rule's.
+    g = fresh(bmc_modes=False)
     put(g, "Black Market Connections")
     hand, life = len(g.hand), g.your_life
     g.upkeep()

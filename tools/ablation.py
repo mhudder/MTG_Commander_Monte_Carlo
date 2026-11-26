@@ -584,6 +584,17 @@ SCRIPTED_SHILGENGAR = {
     # regrowth of this turn's dead, and persist (`shepherd_persists`, reached
     # through the `after_died` hook on both death paths).
     "Herald of War", "Twilight Shepherd",
+    # BACK from PARTLY 2026-11-26 (§0z261, fix 6): the one clause each note
+    # named is modelled, each behind its switch, and what is left is
+    # POLICY, said in its method: Viscera Seer's scry (`seer_scry`), Priest
+    # of Fell Rites' unearth (`priest_unearth`), Resplendent Angel's pump
+    # (`resplendent_pump`), Giada's Angel mana in the main phase
+    # (`giada_mana`), Mind Stone's draw (`mind_stone_draw`), Black Market
+    # Connections' modes (`bmc_modes`), Flawless Maneuver's free cast with
+    # the commander out (`flawless_free`).
+    "Viscera Seer", "Priest of Fell Rites", "Resplendent Angel",
+    "Giada, Font of Hope", "Mind Stone", "Black Market Connections",
+    "Flawless Maneuver",
     # BACK from PARTLY 2026-11-25 (§0z254): Massacre Wurm's and Sun Titan's
     # ETBs, and Twilight Shepherd's, fire on every entry, not a cast alone
     # (`returned_etb`; `wurm_etb_returns`, `titan_etb_returns`,
@@ -599,7 +610,9 @@ SCRIPTED_SHILGENGAR = {
     # Priest of Fell Rites, Sun Titan, Massacre Wurm, Black Market
     # Connections, Mind Stone, Flawless Maneuver, Teferi's Protection --
     # each with a clause nothing implements. (Sun Titan and Massacre Wurm
-    # came back on 2026-11-25, §0z254, above.)
+    # came back on 2026-11-25, §0z254, above; seven more on 2026-11-26,
+    # §0z261. Left: Elesh Norn, Voldaren Bloodcaster, Cartel Aristocrat,
+    # Teferi's Protection.)
     # Angels tribal
     "Archangel of Thune", "Righteous Valkyrie",
     # Staged 2026-09-26 (§0z69), from preview text; the printed text is
@@ -1439,38 +1452,12 @@ PARTLY_MODELLED = {
             "the return tapped and its ETB again. A floor.",
         # --- LEFT SCRIPTED 2026-11-15, the oracle re-audit (§0z208, whose
         # item numbers these cite; docs/ORACLE_AUDIT_SHILGENGAR.md). ---
-        "Viscera Seer":
-            "MODELLED: 'Sacrifice a creature' -- a free outlet for the "
-            "aristocrats step. NOT: 'Scry 1' (item 4; Woe Strider's gap, "
-            "§0z206). A floor.",
         "Cartel Aristocrat":
-            "MODELLED: 'Sacrifice another creature' -- a free outlet. NOT: "
-            "'this creature gains protection from the color of your choice "
-            "until end of turn', from removal or from a blocker (item 5). A "
-            "floor.",
-        "Priest of Fell Rites":
-            "MODELLED: '{T}, Pay 3 life, Sacrifice this creature: Return "
-            "target creature card from your graveyard to the battlefield', "
-            "sorcery speed, above 10 life (a floor nobody derived). NOT: "
-            "unearth {3}{W}{B} (item 6, §0z197 C). A floor.",
-        "Resplendent Angel":
-            "MODELLED: the 3/3 flier, and the 4/4 flying vigilance Angel at "
-            "EACH end step after 5 life gained (§0z153). NOT: '{3}{W}{W}{W}: "
-            "this creature gets +2/+2 and gains lifelink' (item 7). A floor.",
-        "Giada, Font of Hope":
-            "MODELLED: the 2/2 flying vigilance body and the counters each "
-            "other Angel enters with (`giada_counters`, §0z118). NOT: '{T}: "
-            "Add {W}. Spend this mana only to cast an Angel spell' -- no mana "
-            "ability in the deck module (item 8). A floor.",
-        "Mind Stone":
-            "MODELLED: '{T}: Add {C}.' NOT: '{1}, {T}, Sacrifice this "
-            "artifact: Draw a card' (item 9). A floor.",
-        "Black Market Connections":
-            "MODELLED: Buy Information alone -- draw a card, lose 2 life -- "
-            "at the beginning of your first main phase, after the draw "
-            "(§0z215; it was taken in the upkeep). NOT: 'choose one or more' "
-            "(Sell Contraband's Treasure, Hire a Mercenary's 3/2), a POLICY "
-            "that undercounts (item 10). A floor.",
+            "MODELLED: 'Sacrifice another creature' -- a free outlet -- and "
+            "the protection against the pod's spot removal aimed at it "
+            "(§0z261, `cartel_protects`: a token or the lowest threat "
+            "sacrificed, the removal assumed coloured). NOT: the protection "
+            "from a blocker's colour in combat. A floor.",
         "Voldaren Bloodcaster // Bloodbat Summoner":
             "MODELLED: the flier, and a Blood token when it or another "
             "nontoken creature you control dies; the transform at five Blood "
@@ -1491,13 +1478,9 @@ PARTLY_MODELLED = {
             "artifact removal or wrath (`PROTECTION`), cast from held mana. "
             "NOT: 'until your next turn, your life total can't change and "
             "you gain protection from everything', the pod's whole round of "
-            "combat, drains and kills (item 13). A floor.",
-        "Flawless Maneuver":
-            "MODELLED: 'Creatures you control gain indestructible until end "
-            "of turn' against a spot removal or a wrath, cast from held "
-            "mana. NOT: 'If you control a commander, you may cast this spell "
-            "without paying its mana cost' -- always paid at {2}{W} (item "
-            "14). A floor.",
+            "combat, drains and kills (item 13) -- left by §0z261: it reaches "
+            "every pod path, and when to cast it (a wipe, or the round a kill "
+            "fires) is the owner's policy to set. A floor.",
     },
 }
 
