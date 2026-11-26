@@ -823,7 +823,10 @@ class ShilgengarGame(BaseGame):
         `scry_land_bottom` (5) lands out, a spell two over the land count
         while there are few. `seer_scry=False`: an outlet only."""
         if (self.commander_cast or not self.has("Viscera Seer")
-                or not self.cfg.get("seer_scry", True) or not self.library):
+                or not self.library):
+            return
+        self.m["seer_scry_ready"] += 1           # either rule: the reach
+        if not self.cfg.get("seer_scry", True):
             return
         self.m["seer_scrys"] += 1
         top = self.library[-1]
@@ -839,14 +842,15 @@ class ShilgengarGame(BaseGame):
         `mind_stone_min_lands` (6) -- a rock given up only when the mana is
         no longer short -- and the draw safe. `mind_stone_draw=False`: a rock
         only."""
-        if not self.cfg.get("mind_stone_draw", True):
-            return
         stone = next((p for p in self.board if p.card.name == "Mind Stone"
                       and not p.tapped), None)
         if stone is None or not draw_is_safe(self, 1):
             return
         lands = sum(1 for p in self.board if p.card.is_land)
         if lands < self.cfg.get("mind_stone_min_lands", 6):
+            return
+        self.m["mind_stone_ready"] += 1          # either rule: the reach
+        if not self.cfg.get("mind_stone_draw", True):
             return
         stone.tapped = True                  # its {T}; it cannot pay itself
         if not self.pay({"gen": 1}):
@@ -867,7 +871,7 @@ class ShilgengarGame(BaseGame):
         EXILES it (no death trigger). Taken on the Priest's own rule (life
         over 10, a creature card to return), after its battlefield copy.
         `priest_unearth=False`: the graveyard Priest is a blank."""
-        if not self.cfg.get("priest_unearth", True) or self.your_life <= 10:
+        if self.your_life <= 10:
             return
         priest = next((c for c in self.graveyard
                        if c.name == "Priest of Fell Rites"
@@ -875,7 +879,11 @@ class ShilgengarGame(BaseGame):
         if priest is None:
             return
         pool = [c for c in self.yard_creatures() if c is not priest]
-        if not pool or not self.pay({"gen": 3, "W": 1, "B": 1}):
+        if not pool:
+            return
+        self.m["priest_unearth_ready"] += 1      # either rule: the reach
+        if (not self.cfg.get("priest_unearth", True)
+                or not self.pay({"gen": 3, "W": 1, "B": 1})):
             return
         remove_card(self.graveyard, priest)
         self.m["priest_unearths"] += 1
@@ -934,13 +942,14 @@ class ShilgengarGame(BaseGame):
         stopped -- a small ceiling); a wrath is not targeted and is not
         stopped; the sacrifice is made only when it saves the Aristocrat,
         not for its other uses. `cartel_protects=False`: an outlet only."""
-        if (not self.cfg.get("cartel_protects", True)
-                or victim not in self.board
-                or victim.card.name != "Cartel Aristocrat"):
+        if victim not in self.board or victim.card.name != "Cartel Aristocrat":
             return False
         fodder = [p for p in self.board if p.card.is_creature
                   and p is not victim and p.card is not self.commander]
         if not fodder:
+            return False
+        self.m["cartel_ready"] += 1              # either rule: the reach
+        if not self.cfg.get("cartel_protects", True):
             return False
         sac = min(fodder, key=lambda p: (not p.is_token,
                                          OPP.threat_of(self, p)))
@@ -954,10 +963,11 @@ class ShilgengarGame(BaseGame):
         on an attacking Resplendent, from what the main phase left -- the
         lifelink also feeds its own end-step Angel (5 life). Once a turn
         each. `resplendent_pump=False`: no code reads the ability."""
-        if not self.cfg.get("resplendent_pump", True):
-            return
         for p in attackers:
-            if (p.card.name == "Resplendent Angel"
+            if p.card.name != "Resplendent Angel":
+                continue
+            self.m["resplendent_ready"] += 1     # either rule: the reach
+            if (self.cfg.get("resplendent_pump", True)
                     and id(p) not in self.resplendent_pump
                     and self.pay({"gen": 3, "W": 3})):
                 self.resplendent_pump[id(p)] = p
@@ -1073,6 +1083,9 @@ class ShilgengarGame(BaseGame):
         or None -- off with `giada_mana=False`."""
         if not self.cfg.get("giada_mana", True):
             return None
+        return self.giada_untapped()
+
+    def giada_untapped(self):
         return next((p for p in self.board
                      if p.card.name == "Giada, Font of Hope"
                      and not p.tapped and not p.sick), None)
@@ -1628,6 +1641,9 @@ class ShilgengarGame(BaseGame):
             xs = {}              # item 45: the X each option pays
             if any(c.name == MALAKIR for c in self.hand):
                 self.m["malakir_seen"] += 1    # §0z251: either rule's reach
+            if (self.giada_untapped() is not None
+                    and any("angel" in c.tags for c in self.hand)):
+                self.m["giada_seen"] += 1    # §0z261, either rule: the reach
             for c in self.hand:
                 if c.is_land:
                     continue

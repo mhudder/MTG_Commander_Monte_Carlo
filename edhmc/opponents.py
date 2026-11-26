@@ -2003,10 +2003,11 @@ def free_with_commander(g, card) -> bool:
     on the battlefield (`flawless_free`; False is the printed cost always)?"""
     if card.name not in FREE_WITH_COMMANDER:
         return False
-    if not g.cfg.get("flawless_free", True):
-        return False
     cmd = getattr(g, "commander", None)
-    return cmd is not None and any(p.card is cmd for p in g.board)
+    if cmd is None or not any(p.card is cmd for p in g.board):
+        return False
+    g.m["free_with_commander_offered"] += 1    # either rule: the reach
+    return bool(g.cfg.get("flawless_free", True))
 
 
 def _cast_response(g, card, kind) -> bool:

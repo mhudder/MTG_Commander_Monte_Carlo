@@ -1494,6 +1494,12 @@
         "evidence": "2026-11-26: fingerprint moved again with tools/ablation.py only -- Teferi's Protection's shilgengar note reworded (\u00a70z261), minutes after the record above at the same code. The table re-renders byte-identical from this cache (tests.test_metrics_and_render C); the simulation is the code the record above checked (0 of 2,000 staged-list games differ against 23ac6bd).",
         "fingerprint": "0b675b042e118608",
         "utc": "2026-11-26T00:13:09Z"
+      },
+      {
+        "commit": "ed9eebe",
+        "evidence": "2026-11-26: fingerprint moved with opponents.py only -- free_with_commander counts its reach before its switch (\u00a70z261), a counter. The STAGED list (build_pending) played 2,000 seeds against the hashes taken at 23ac6bd: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
+        "fingerprint": "7ec457381b410205",
+        "utc": "2026-11-26T00:25:22Z"
       }
     ]
   },
@@ -2909,6 +2915,12 @@
         "evidence": "2026-11-26: fingerprint moved again with tools/ablation.py only -- Teferi's Protection's shilgengar note reworded (\u00a70z261), minutes after the record above at the same code. The table re-renders byte-identical from this cache (tests.test_metrics_and_render C); the simulation is the code the record above checked (0 of 2,000 staged-list games differ against 23ac6bd).",
         "fingerprint": "aa55f63b09266987",
         "utc": "2026-11-26T00:13:09Z"
+      },
+      {
+        "commit": "ed9eebe",
+        "evidence": "2026-11-26: fingerprint moved with opponents.py only -- free_with_commander counts its reach before its switch (\u00a70z261), a counter. The STAGED list (build_pending) played 2,000 seeds against the hashes taken at 23ac6bd: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
+        "fingerprint": "0c2b8a90e9fba9fb",
+        "utc": "2026-11-26T00:25:22Z"
       }
     ]
   },
@@ -4299,6 +4311,12 @@
         "evidence": "2026-11-26: fingerprint moved again with tools/ablation.py only -- Teferi's Protection's shilgengar note reworded (\u00a70z261), minutes after the record above at the same code. The table re-renders byte-identical from this cache (tests.test_metrics_and_render C); the simulation is the code the record above checked (0 of 2,000 staged-list games differ against 23ac6bd).",
         "fingerprint": "934715a19b7e718b",
         "utc": "2026-11-26T00:13:09Z"
+      },
+      {
+        "commit": "ed9eebe",
+        "evidence": "2026-11-26: fingerprint moved with opponents.py only -- free_with_commander counts its reach before its switch (\u00a70z261), a counter. The STAGED list (build_pending) played 2,000 seeds against the hashes taken at 23ac6bd: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
+        "fingerprint": "831d99a8658bc3ef",
+        "utc": "2026-11-26T00:25:22Z"
       }
     ]
   },
