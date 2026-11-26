@@ -6,11 +6,11 @@ survives), 'other' is exile, bounce, tuck, shuffle, sacrifice or -X/-X
 (it does not). `opponents.destroy` prices indestructible with the two
 shares below (§0z87)."""
 
-# counted once per deck that runs the card: spot 23 of 50 destroy; wipe 16 of 28 destroy; ae 5 of 7 destroy
+# counted once per deck that runs the card: spot 23 of 51 destroy; wipe 16 of 28 destroy; ae 5 of 7 destroy
 # a kind with fewer than 10 cards takes the SPOT share (ae has 7)
-DESTROY_SHARE_SPOT = 0.4600
+DESTROY_SHARE_SPOT = 0.4510
 DESTROY_SHARE_WIPE = 0.5714
-DESTROY_SHARE_AE = 0.4600
+DESTROY_SHARE_AE = 0.4510
 
 # the median mana value of the spot-removal SPELLS (instants and sorceries), 35 counted
 # once per deck that runs one: what the pod's spot removal costs, read by
@@ -22,6 +22,7 @@ INTERACTION = {
     'Acidic Slime': ('spot', 'destroy', ')\nwhen this creature enters, destroy target artifact, enchantment, or land.'),
     'Angel of Despair': ('spot', 'destroy', 'flying\nwhen this creature enters, destroy target permanent.'),
     'Angel of Sanctions': ('spot', 'other', 'flying\nwhen this creature enters, you may exile target nonland permanent an opponent controls until this creature leaves'),
+    'Angel of Serenity': ('spot', 'other', 'flying\nwhen this creature enters, you may exile up to three other target creatures from the battlefield and/or creature '),
     'Angel of the Ruins': ('spot', 'other', 'flying\nwhen this creature enters, exile up to two target artifacts and/or enchantments.'),
     'Anguished Unmaking': ('spot', 'other', 'exile target nonland permanent.'),
     "Assassin's Trophy": ('spot', 'destroy', 'destroy target permanent an opponent controls.'),
@@ -85,7 +86,7 @@ RUN_BY = {
     'karlov': ['Anguished Unmaking', 'Austere Command', 'Damn', 'Damnation', 'Farewell', 'Fracture', 'Path to Exile', 'Return to Dust', 'Swords to Plowshares', 'Toxic Deluge', "Umezawa's Jitte"],
     'lorehold': ['Blasphemous Act', 'Chaos Warp', 'Farewell', 'Generous Gift', 'Immolating Gyre', 'Ondu Inversion', 'Path to Exile', 'Promise of Loyalty', 'Rise of the Eldrazi', 'Swords to Plowshares', 'Ultima'],
     'rendmaw': ["Assassin's Trophy", 'Beast Within', 'Bow of Nylea', 'Culling Ritual', 'Erebos, Bleak-Hearted', "Eyeblight's Ending", 'Grist, the Hunger Tide', 'Hagra Mauling', 'Haywire Mite', 'Massacre Wurm', 'Nameless Inversion', 'The Meathook Massacre', 'Toxic Deluge'],
-    'shilgengar': ['Angel of Despair', 'Angel of the Ruins', 'Anguished Unmaking', 'Damn', 'Despark', 'Elesh Norn, Grand Cenobite', 'Generous Gift', 'Massacre Wurm', 'Mortify', 'Path to Exile', 'Swords to Plowshares', 'Utter End', 'Vindicate', 'Wrath of God'],
+    'shilgengar': ['Angel of Despair', 'Angel of Serenity', 'Angel of the Ruins', 'Anguished Unmaking', 'Damn', 'Despark', 'Elesh Norn, Grand Cenobite', 'Generous Gift', 'Massacre Wurm', 'Mortify', 'Path to Exile', 'Swords to Plowshares', 'Utter End', 'Vindicate', 'Wrath of God'],
     'tivit': ['Bite of the Black Rose', 'Capital Punishment', 'Coercive Portal', "Council's Judgment", 'Damn', 'Farewell', 'Magister of Worth', 'Path to Exile', 'Promise of Loyalty', 'Swords to Plowshares', 'Trial of a Time Lord', "Tyrant's Choice", "Vault 11: Voter's Dilemma", 'Void Rend'],
     'trostani': ['Acidic Slime', 'Angel of Sanctions', 'Aura Shards', 'Beast Within', "Elspeth, Sun's Champion", 'Path to Exile', 'Selesnya Eulogist', 'Sundering Growth', 'Swords to Plowshares', 'Wrath of God'],
 }

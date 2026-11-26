@@ -419,7 +419,10 @@ cloud container has no scipy), `python -m edhmc.pending`, and
     STARTED; the owner's other fixes (§0z257 on) come first, then these,
     then one rebuild of every active deck -- each moves all of them, so
     doing either after the rebuild would cost a second one.
-    - **The census pattern** (§0z255): `tools/removal_census.py`'s spot
+    - **DONE 2026-11-26 (§0z263)**, the owner: "go ahead with the
+      removal census pattern fix". One card newly read (Angel of
+      Serenity), the spot share 0.46 -> 0.451, rendmaw's baseline moved.
+      **The census pattern** (§0z255): `tools/removal_census.py`'s spot
       exile rule reads "(another )?target" and misses "other target" --
       Angel of Serenity, read by hand since (`shilgengar.SERENITY_REACH`).
       Fixing it regenerates `decks/_removal.py`, so `DESTROY_SHARE_SPOT`

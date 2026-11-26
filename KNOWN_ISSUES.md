@@ -315,6 +315,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z260](#0z260) | BUILT | **azusa's utility lands** (Strip Mine, Wasteland, Ghost Quarter, Tectonic Edge, Dust Bowl, Buried Ruin): each sacrifice a land death of yours; nulls but Buried Ruin +0.0009 |
 | [0z261](#0z261) | BUILT | **Fix 6, eight of shilgengar's missing clauses**: Flawless Maneuver free, Mind Stone, Viscera Seer, Priest's unearth, BMC's modes, Resplendent, Giada, Cartel: BMC +0.0058, four more significant, three nulls |
 | [0z262](#0z262) | BUILT | **Teferi's Protection's whole round** (shilgengar), on the owner's policy: a wrath worth it or a lethal kill, whichever comes first: +0.0033 ±0.0017 at T20 |
+| [0z263](#0z263) | FIXED | **The removal census missed "other target"** (queue item 53): Angel of Serenity the one card newly read; spot destroy share 0.46 -> 0.451; rendmaw's baseline moves (1 game in 2,000) |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -22677,6 +22678,52 @@ one-event blank, though it is no longer spent at spot removal. A T20
 effect: the wrath it saves and the kill it survives are late-game events.
 `teferi_wipe_min` (2) and the lethality read (`kill_size` 40) are the
 knobs that could move it, neither swept.
+
+<a id="0z263"></a>
+
+## 0z263. FIXED -- the removal census missed "other target"; Angel of Serenity read by it
+
+**The owner, 2026-11-26**: "go ahead with the removal census pattern fix"
+-- queue item 53's first decision, recorded 2026-11-25.
+
+**The fix**: `tools/removal_census.py`'s two spot rules read
+`(an)?(other )?target` where they read `(another )?target`, and
+`opponents.answer_reach` reads "up to three" through the twenty
+characters before "target", not twelve -- "up to three OTHER target"
+pushed "up to" out of the old window, so the census would have read
+Serenity as ONE target. `_removal.py` and `_pod_mana.py` regenerated from
+Scryfall (2026-11-26).
+
+**What the fixed rule newly reads: one card.** Diffed against the
+census before the change: Angel of Serenity (spot, exile, shilgengar) is
+added, and nothing else moves -- no other card's class, no other derived
+reach (all 28 `ANSWERS` compared), `_pod_mana.py` unchanged. Shares:
+`DESTROY_SHARE_SPOT` 23 of 50 -> 23 of 51, **0.4600 -> 0.4510**, and
+`DESTROY_SHARE_AE`, which borrows the spot share, the same; wipes 0.5714
+unchanged.
+
+**§0z255's hand-read Serenity is retired**, as its own import check said
+to: `SERENITY_REACH`, `serenity_etb` and `check_serenity_reach` deleted;
+Serenity is in `ETB_RETURN_KNOBS` (`serenity_etb_returns`), its cast
+answered by `countered` and every other entry by `answer_on_entry`, as
+Angel of Despair's are. `serenity_text` is gone with it.
+
+**Pinned**: `tests/test_serenity.py` rewritten for the census path, six
+cases A-F (F the clause's derivation), four mutations, every expected set
+exact on the first run; `tests/test_etb_answer_returns.py` still exact.
+
+**What moved, split in two** (`check_unchanged_decks --n=2000` against
+`c4acc99`):
+- **the mechanism alone** (both shares pinned at 0.46,
+  `destroy_share_spot`, `destroy_share_ae`): every deck BIT-IDENTICAL,
+  shilgengar included -- the census's Serenity plays as the hand-read one
+  did, at 2,000 games;
+- **the shares** (default): rendmaw (2 of 8 metrics, not won), shilgengar
+  (2 of 8) and azusa (7 of 8, won -0.0005) move; lorehold, karlov and
+  tivit are BIT-IDENTICAL. On the STAGED lists at 2,000 seeds, whole
+  output hashed: karlov 0 and tivit 0 of 2,000 differ (VERIFIED), **rendmaw
+  1 of 2,000** -- its baseline moved, so its cache is SUSPECT until the
+  rebuild, with azusa's, lorehold's and shilgengar's. Not `--verified`.
 
 ## How to read an ablation table
 

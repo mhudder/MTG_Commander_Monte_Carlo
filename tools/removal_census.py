@@ -47,12 +47,15 @@ WIPE_RULES = (
     ("other", r"each (player|opponent) sacrifices (all|each)"),
 )
 SPOT_RULES = (
-    ("destroy", r"\bdestroy (up to (one|two|three) )?(another )?target "
+    # "(an)?other target" (§0z255, §0z262's queue item 53): "another target"
+    # and "other target" -- Angel of Serenity's "up to three other target
+    # creatures" was missed by "(another )?" alone.
+    ("destroy", r"\bdestroy (up to (one|two|three) )?(an)?(other )?target "
                 r"([\w-]+,? )*(permanent|creature|artifact|enchantment|planeswalker)"),
     # "any target" is left out on purpose: Aetherflux Reservoir's 50 damage
     # is a win, not an answer (the first census counted it).
     ("destroy", r"deals (\d+|x) damage to target (creature|planeswalker)"),
-    ("other", r"\bexile (up to (one|two|three) )?(another )?target "
+    ("other", r"\bexile (up to (one|two|three) )?(an)?(other )?target "
               r"([\w-]+,? )*(permanent|creature|artifact|enchantment|planeswalker)"),
     ("other", r"target creature gets [+-](\d+|x)/-(\d+|x)"),
     ("other", r"exile each permanent with the most votes"),

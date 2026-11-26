@@ -1512,6 +1512,12 @@
         "evidence": "2026-11-26: fingerprint moved with opponents.py only -- teferi_seen, a reach counter in try_protect and teferi_saves (\u00a70z262). The STAGED list (build_pending) played 2,000 seeds against the hashes taken at 23ac6bd: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
         "fingerprint": "95616b09cf54a13e",
         "utc": "2026-11-26T01:03:55Z"
+      },
+      {
+        "commit": "c4acc99",
+        "evidence": "2026-11-26: fingerprint moved with decks/_removal.py (\u00a70z263: the census reads Angel of Serenity; DESTROY_SHARE_SPOT and _AE 0.4600 -> 0.4510), opponents.py (answer_reach's 20-character window) and tools/ablation.py (shilgengar's Serenity note). check_unchanged_decks --n=2000 against c4acc99: BIT-IDENTICAL on all 8 metrics; the STAGED list (build_pending) played 2,000 seeds at both trees, every game's whole output hashed: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
+        "fingerprint": "32d9798d1ca9c06e",
+        "utc": "2026-11-26T03:35:04Z"
       }
     ]
   },
@@ -4353,6 +4359,12 @@
         "evidence": "2026-11-26: fingerprint moved with opponents.py only -- teferi_seen, a reach counter in try_protect and teferi_saves (\u00a70z262). The STAGED list (build_pending) played 2,000 seeds against the hashes taken at 23ac6bd: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
         "fingerprint": "81c564736afa5c33",
         "utc": "2026-11-26T01:03:55Z"
+      },
+      {
+        "commit": "c4acc99",
+        "evidence": "2026-11-26: fingerprint moved with decks/_removal.py (\u00a70z263: the census reads Angel of Serenity; DESTROY_SHARE_SPOT and _AE 0.4600 -> 0.4510), opponents.py (answer_reach's 20-character window) and tools/ablation.py (shilgengar's Serenity note). check_unchanged_decks --n=2000 against c4acc99: BIT-IDENTICAL on all 8 metrics; the STAGED list (build_pending) played 2,000 seeds at both trees, every game's whole output hashed: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
+        "fingerprint": "b4dc3c50db242cde",
+        "utc": "2026-11-26T03:35:04Z"
       }
     ]
   },

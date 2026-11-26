@@ -1305,7 +1305,9 @@ def answer_reach(clause: str) -> Reach:
         types = frozenset(t for t in PIECE_TYPES if t.lower() in seg)
     if not types:
         raise ValueError(f"no piece type in {clause!r}")
-    pre = c[max(0, at - 12):at]
+    # 20 characters, not 12 (§0z263): "up to three OTHER target" put "up to"
+    # outside the old window, so Angel of Serenity read as one target.
+    pre = c[max(0, at - 20):at]
     n = 3 if "up to three" in pre else 2 if "up to two" in pre else 1
     m = re.search(r"mana value (\d+) or greater", seg)
     min_mv = int(m.group(1)) if m else 0
@@ -1397,9 +1399,9 @@ def answer_pod_threat(g, card) -> int:
 def answer_pieces(g, name: str, reach: Reach) -> int:
     """Remove up to `reach.n` pieces, each aimed by `answer_target` -- the
     one loop a cast answer (`answer_pod_threat`), an answer creature
-    entering some other way (`answer_on_entry`) and an engine's hand-read
-    answer the census cannot read (shilgengar's Angel of Serenity, §0z255)
-    share, so none can aim differently."""
+    entering some other way (`answer_on_entry`) share, so the two cannot
+    aim differently. (Shilgengar's hand-read Angel of Serenity used it too,
+    §0z255, until the census read the card, §0z263.)"""
     done = 0
     for _ in range(reach.n):
         pick = answer_target(g, reach)

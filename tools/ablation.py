@@ -1402,12 +1402,14 @@ PARTLY_MODELLED = {
             "A floor, possibly a large one.",
         "Angel of Serenity":
             "MODELLED: the 5/6 flier, and its ETB at up to three of the "
-            "pod's creature route pieces, on every entry, cast or returned "
-            "(`serenity_etb`, §0z255; read by hand, as the census misses "
-            "'other target'), each back by the rebuild delay. NOT: a body "
-            "that is no route piece (the route answers' shared limit); the "
-            "graveyard half, never taken in a deck that reanimates (a "
-            "policy); the return to hand tied to the Angel leaving. A floor.",
+            "pod's creature route pieces -- a census route answer since "
+            "§0z263 (`opponents.ANSWERS`; §0z255 read it by hand), on its "
+            "cast and on every other entry (`serenity_etb_returns`), each "
+            "back by the rebuild delay. NOT: a body that is no route piece "
+            "(the route answers' shared limit); the graveyard half, never "
+            "taken in a deck that reanimates (a policy); the return to hand "
+            "tied to the Angel leaving. A floor.",
+
         "Angel of Despair":
             "MODELLED: the 5/5 flier, and 'When this creature enters, "
             "destroy target permanent' as a route answer (`opponents."

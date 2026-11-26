@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""§0z255: Angel of Serenity's ETB, read by hand -- the census misses it.
+"""§0z263 (was §0z255): Angel of Serenity's ETB, a census route answer.
 
     python -m tests.test_serenity
     python -m tests.test_serenity --mutate   # 4 mutations, exact sets
@@ -9,38 +9,40 @@
     When this creature leaves the battlefield, return the exiled cards to
     their owners' hands."            ({4}{W}{W}{W}; Scryfall 2026-11-25)
 
-The census's exile rule reads "another target", so `opponents.ANSWERS`
-has no entry for the card and `countered` answers nothing on its cast.
-`ShilgengarGame.make_permanent` fires `serenity_etb` on EVERY entry, cast
-or not, at up to three creature route pieces (`SERENITY_REACH`).
+The census missed the card -- its exile rule read "(another )?target" --
+and §0z255 read it by hand in shilgengar. Since §0z263 the rule reads
+"(an)?other target" and `answer_reach` reads "up to three" through twenty
+characters, not twelve, so `opponents.ANSWERS` has it: its cast answers
+from `countered` (`answer_pod_threat`), every other entry from
+`answer_on_entry` (shilgengar's `ETB_RETURN_KNOBS`, `serenity_etb_returns`).
 
 CASES (opponent 0 holds the pieces, out since round 0; the others none)
-  A  the cast (`resolve`), an artifact piece first and three creature
-     pieces: the three creatures leave, the artifact stays
+  A  the cast's answer, an artifact piece first and three creature pieces:
+     the three creatures leave, the artifact stays
   B  a return (`make_permanent`), one creature piece: it leaves
-  C  four creature pieces: exactly three leave
-  D  only an artifact piece: nothing leaves; the entry is still counted
-  E  NEIGHBOUR: serenity_text=False -- A's setup, nothing leaves, counted
-  F  `check_serenity_reach`: the real census passes; a census that reads
-     the card raises
+  C  four creature pieces, a return: exactly three leave
+  D  only an artifact piece, a return: nothing leaves; the entry counted
+  E  NEIGHBOUR: serenity_etb_returns=False -- B's return, nothing leaves
+  F  the census clause reads three creature targets (`answer_reach`)
 
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
-  serenity_text=False everywhere               -> A, B, C
-  SERENITY_REACH cut to one target             -> A, C
-  SERENITY_REACH reaches artifacts too         -> A, D
-  check_serenity_reach does nothing            -> F
+  serenity_etb_returns=False everywhere          -> B, C
+  Serenity's reach cut to one target             -> A, C
+  Serenity's reach reaches artifacts too         -> A, D
+  answer_reach misses "up to three other"        -> F
 
 UNMUTATED (§0z15): E is the switch's neighbour.
 """
 import sys
 
 import edhmc.opponents as OPP
-import edhmc.shilgengar as S
+from edhmc.decks import _removal
 from tests import test_oracle_remainder as B
 
 MUTATE = "--mutate" in sys.argv
 PASS, FAIL = [], []
 EXTRA_CFG = {}
+NAME = "Angel of Serenity"
 CREATURE = OPP.ThreatPiece("Creature", 3, 3, 1)
 ARTIFACT = OPP.ThreatPiece("Artifact", 0, 3, 1)
 
@@ -65,16 +67,8 @@ def out(g, o):
     return tuple(o.pieces[k].type for k in OPP.present_pieces(g, o))
 
 
-def raises(fn):
-    try:
-        fn()
-    except SystemExit:
-        return True
-    return False
-
-
 def angel():
-    return B.card("shilgengar", S.SERENITY)
+    return B.card("shilgengar", NAME)
 
 
 def run_cases():
@@ -82,9 +76,9 @@ def run_cases():
     FAIL.clear()
 
     g, o = game((ARTIFACT, CREATURE, CREATURE, CREATURE))
-    g.resolve(angel())
+    OPP.answer_pod_threat(g, angel())
     check("A the cast: three creature pieces leave, the artifact stays",
-          (out(g, o), g.m["serenity_exiled"]), (("Artifact",), 3))
+          out(g, o), ("Artifact",))
 
     g, o = game((CREATURE,))
     g.make_permanent(angel())
@@ -97,55 +91,54 @@ def run_cases():
     g, o = game((ARTIFACT,))
     g.make_permanent(angel())
     check("D only an artifact: nothing leaves, the entry counted",
-          (out(g, o), g.m["serenity_entries"]), (("Artifact",), 1))
+          (out(g, o), g.m["etb_answer_returns"]), (("Artifact",), 1))
 
-    g, o = game((ARTIFACT, CREATURE, CREATURE, CREATURE),
-                serenity_text=False)
-    g.resolve(angel())
-    check("E serenity_text=False: nothing leaves, counted",
-          (out(g, o), g.m["serenity_entries"]),
-          (("Artifact", "Creature", "Creature", "Creature"), 1))
+    g, o = game((CREATURE,), serenity_etb_returns=False)
+    g.make_permanent(angel())
+    check("E serenity_etb_returns=False: nothing leaves", out(g, o),
+          ("Creature",))
 
-    check("F the guard: the census passes; one that reads the card raises",
-          (not raises(S.check_serenity_reach),
-           raises(lambda: S.check_serenity_reach(
-               {**OPP.ANSWERS, S.SERENITY: S.SERENITY_REACH}))),
-          (True, True))
+    r = OPP.answer_reach(_removal.INTERACTION[NAME][2])
+    check("F the census clause: three creature targets",
+          (sorted(r.types), r.n), (["Creature"], 3))
     return set(FAIL)
 
 
 def main() -> int:
     if not MUTATE:
-        print("§0z255: Angel of Serenity\n")
+        print("§0z263: Angel of Serenity\n")
         run_cases()
         print(f"\n{len(PASS)} passed, {len(FAIL)} failed")
         return 1 if FAIL else 0
 
     print("MUTATION RUN -- exact sets\n")
-    real_reach = S.SERENITY_REACH
-    real_check = S.check_serenity_reach
+    real = OPP.ANSWERS[NAME]
+    real_reach = OPP.answer_reach
 
     def set_cfg(v):
         EXTRA_CFG.clear()
         EXTRA_CFG.update(v)
 
-    def set_reach(v):
-        S.SERENITY_REACH = v
+    def set_answer(v):
+        OPP.ANSWERS[NAME] = v
 
-    def set_check(v):
-        S.check_serenity_reach = v
+    def set_reach(v):
+        OPP.answer_reach = v
+
+    def twelve(clause):
+        r = real_reach(clause)
+        return r._replace(n=1) if "three other target" in clause.lower() else r
 
     muts = {
-        "serenity_text=False everywhere": (
-            {"A", "B", "C"}, set_cfg, {"serenity_text": False}, {}),
-        "SERENITY_REACH cut to one target": (
-            {"A", "C"}, set_reach, real_reach._replace(n=1), real_reach),
-        "SERENITY_REACH reaches artifacts too": (
-            {"A", "D"}, set_reach,
-            real_reach._replace(types=frozenset({"Creature", "Artifact"})),
-            real_reach),
-        "check_serenity_reach does nothing": (
-            {"F"}, set_check, lambda answers=None: None, real_check),
+        "serenity_etb_returns=False everywhere": (
+            {"B", "C"}, set_cfg, {"serenity_etb_returns": False}, {}),
+        "Serenity's reach cut to one target": (
+            {"A", "C"}, set_answer, real._replace(n=1), real),
+        "Serenity's reach reaches artifacts too": (
+            {"A", "D"}, set_answer,
+            real._replace(types=frozenset({"Creature", "Artifact"})), real),
+        "answer_reach misses 'up to three other'": (
+            {"F"}, set_reach, twelve, real_reach),
     }
     bad = 0
     for label, (want, setter, value, restore) in muts.items():
