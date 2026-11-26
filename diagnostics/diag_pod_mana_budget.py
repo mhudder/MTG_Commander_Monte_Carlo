@@ -3,6 +3,7 @@
 2026-11-26 question before item 52's re-fit; §0z264).
 
     python -m diagnostics.diag_pod_mana_budget [DECK] [--n=600] [--gated]
+                                               [--cfg=k=v,...]
 
 Measures a MECHANISM, changes nothing: it wraps `opponents.pod_untap`,
 `pod_spend` and `charge_growth` and tabulates, per opponent per pod turn
@@ -34,6 +35,15 @@ from edhmc.registry import DECKS
 TURNS = 12
 
 
+def quiet_mana_bodies(g, o) -> float:
+    """The mana `o`'s mana bodies make, read with NO side effect --
+    `opponents.mana_creature_mana` reconciles the body pool and counts a
+    metric, which a measurement must not do (§0z265)."""
+    if not (OPP.pod_knob(g.cfg, "pod_mana_creatures") and OPP.pod_bodies_on(g)):
+        return 0.0
+    return sum(1 for b in o.bodies if b.mana) * OPP.MANA_CREATURE_MANA
+
+
 def main() -> int:
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     deck_name = args[0] if args else "tivit"
@@ -59,7 +69,7 @@ def main() -> int:
         cnt[t] += 1
         acc[t, "supply"] += o.mana_left
         acc[t, "sources"] += (row.sources if row is not None else 0.0) \
-            + OPP.mana_creature_mana(g, o)
+            + quiet_mana_bodies(g, o)
         acc[t, "lands"] += row.lands if row is not None else 0.0
 
     def spend(g, o, amount, what, floor=0.0):
@@ -78,7 +88,7 @@ def main() -> int:
         arrivals = OPP._arrival_mvs(g, o, before)
         row = OPP.pod_mana_row(g, o)
         sources = ((row.sources if row is not None else 0.0)
-                   + OPP.mana_creature_mana(g, o))
+                   + quiet_mana_bodies(g, o))
         acc[t, "arrivals"] += len(arrivals)
         acc[t, "arrival_mv"] += sum(arrivals)
         acc[t, "over_sources"] += sum(1 for mv in arrivals if mv > sources)
@@ -107,6 +117,15 @@ def main() -> int:
     cfg = dict(DEFAULT_CFG, turns=20)
     if gated:
         cfg["pod_develop_gated"] = True
+    import ast
+    for arg in sys.argv[1:]:                 # --cfg=k=v,k=v
+        if arg.startswith("--cfg="):
+            for kv in filter(None, arg[6:].split(",")):
+                k, v = kv.split("=", 1)
+                try:
+                    cfg[k] = ast.literal_eval(v)
+                except (ValueError, SyntaxError):
+                    cfg[k] = v
     for s in range(5000, 5000 + n):
         sim(deck, cmd, cfg, s)
 

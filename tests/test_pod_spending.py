@@ -56,7 +56,10 @@ def check(label, got, want):
 def game(turn=6, on=True, **cfg):
     deck, cmd = RM.build()
     g = EN.Game(list(deck), cmd,
-                {**DEFAULT_CFG, "pod_mana": on, "held_answers": False, **cfg},
+                # pod_body_mv_cap off (§0z264): G pins a body charged its
+                # OWN mana value; the cap is tests/test_pod_cost_cap.py's.
+                {**DEFAULT_CFG, "pod_mana": on, "held_answers": False,
+                 "pod_body_mv_cap": False, **cfg},
                 random.Random(1), seed_for_pod=1)
     g.board = EN.Board()
     g.hand, g.graveyard = [], []

@@ -317,6 +317,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z262](#0z262) | BUILT | **Teferi's Protection's whole round** (shilgengar), on the owner's policy: a wrath worth it or a lethal kill, whichever comes first: +0.0033 ±0.0017 at T20 |
 | [0z263](#0z263) | FIXED | **The removal census missed "other target"** (queue item 53): Angel of Serenity the one card newly read; spot destroy share 0.46 -> 0.451; rendmaw's baseline moves (1 game in 2,000) |
 | [0z264](#0z264) | MEASURED | **Why the pod's boards outrun its mana** (queue item 53): only its turns 1-3 -- the gate's +0.118 is turn-1-3 costs 0.018, the answer reserve 0.037, pieces 0.008, and 0.054 real overcommitment |
+| [0z265](#0z265) | BUILT | **The cost cap taken; the growth rate a knob** (item 52): the cap's first cut reconciled the body pool -- fixed, its fits re-run; growth re-fit pending |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -22786,6 +22787,16 @@ transform -- no new roll, CRN intact.
 
 ### Where the gate's weakening comes from (the six active decks' mean)
 
+> **SUPERSEDED IN PART by §0z265**: every row below with the cap ON was
+> measured with a cap that read the opponent's mana bodies through
+> `mana_creature_mana`, which RECONCILES the body pool -- under the gate a
+> held body was then dropped and a different one arrived. The gate-alone
+> row (+0.118) had no cap and stands; the rest are re-measured in §0z265.
+> The gated per-turn table above was re-run with a side-effect-free
+> diagnostic: 0.02 / 0.19 / 0.57 bodies' mana on turns 1-3 (was 0.02 /
+> 0.20 / 0.61), held for no mana 0.12 / 0.38 / 0.39 (was 0.12 / 0.37 /
+> 0.35) -- the reading stands.
+
 `diagnostics.fit_pod_knob`, N=1,500 a deck, staged lists, seeds
 5000..6499, python 3.11.18, mean T20 against today's pod (0.4871, 10.29
 turns). Two diagnostic sub-switches, read only under the gate and True by
@@ -22827,6 +22838,51 @@ better than `threat_clock_shift`, which made kills 2.7 rounds sooner and
 moved the decks unevenly (§0z247). Neither re-fit is run.
 
 `tools.validate` after §0z263: +0.00 on all 21 metrics.
+
+<a id="0z265"></a>
+
+## 0z265. BUILT -- the cost cap taken, the growth rate a knob; a side effect found in the cap's first cut
+
+**The owner, 2026-11-26**: "take the cost cap and measure the growth
+re-fit". The reserve before bodies is kept: the owner did not drop it.
+
+**The cap is the default** (`pod_body_mv_cap` True in `POD_DEFAULTS`;
+`experiment.POD_PRE_0Z264` restores the uncapped cost). **The growth rate
+is a knob** (`pod_growth_rate`, 0.7 -- today's): `opponents.growth_rate`
+is the one read, by `grow_board` and by the two forecasts of later rounds
+(`_predicted_chip`, `_formula_chip`), which typed the 0.7 themselves.
+With the cap off, every active deck is BIT-IDENTICAL to `81ac71a` at 2,000
+games: the knob moves nothing at 0.7.
+
+**A side effect in the cap's first cut, found on the way.** Checking
+karlov's staged list for `--verified` showed `pod_mana_creature_mana`
+different in 1,181 of 2,000 games. The cap read the opponent's mana
+bodies through `mana_creature_mana`, which counts that metric AND calls
+`pod_bodies`, which reconciles the body list and advances `next_body` --
+inside `_arrival_mvs`, a function written to read without reconciling.
+Under the gate a held body was then dropped and a different one arrived.
+Fixed: the cap counts the mana bodies already on the battlefield
+(`o.bodies[:n0]`), with no side effect; `tests/test_pod_cost_cap.py` G
+pins that, and its mutation puts the first cut back. The diagnostic's
+wrappers had the same call and are fixed too (`quiet_mana_bodies`).
+**Every fit with the cap on (§0z264's last five rows) is re-run.**
+
+**What the cap moves**, as the default (`check_unchanged_decks --n=2000`
+against `81ac71a`, the first cut): rendmaw, lorehold, tivit, shilgengar and
+azusa move, karlov's metrics do not -- but its staged list's play differs
+in about 2 games of 2,000. Every active deck's baseline has moved; every
+cache is SUSPECT until the rebuild. Not `--verified`.
+
+**Pinned**: `tests/test_pod_cost_cap.py`, six cases A-G, four mutations
+(the stand-in for "the cap without its floor" first written convolutedly,
+rewritten plainly; the sets unchanged). `tests/test_pod_spending.py` G and
+`tests/test_pod_development.py` F and G pinned bodies at their OWN mana
+values; they run with the cap off now, their subject being the spending
+rule and the gate.
+
+**MEASUREMENT PENDING**: `diagnostics.fit_pod_knob pod_growth_rate
+0.7,1.0,1.3,1.6,2.0 --cand=pod_develop_gated=True` against today's pod,
+then the cap alone and §0z264's two-by-two again.
 
 ## How to read an ablation table
 

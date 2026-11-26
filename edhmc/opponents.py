@@ -424,7 +424,13 @@ POD_DEFAULTS = {
     "rearm_rule": "reland",
     "threat_clock_shift": 2.3,
     "pod_responses": True,
-    "pod_body_mv_cap": False,       # §0z264: built OFF, the owner's to flip
+    # §0z264, the owner, 2026-11-26: "take the cost cap". An arriving body
+    # costs at most its opponent's sources this turn. `experiment.
+    # POD_PRE_0Z264` restores the uncapped cost.
+    "pod_body_mv_cap": True,
+    # §0z265: the board's growth a turn, 0.7 x `board` (`growth_rate`) --
+    # the knob item 52's growth re-fit measures; 0.7 is today's.
+    "pod_growth_rate": 0.7,
     # ITEM 44'S COMBAT, THE DEFAULT SINCE §0z204 (the owner, 2026-11-14: "go
     # ahead and start on the flip and re-fit"). A1 your attackers die to the
     # pod's blockers (§0z198), A2 you block and the pod declares its attacks
@@ -1122,8 +1128,16 @@ def _arrival_mvs(g, o, before: float) -> list:
         # of `mv` (a wipe's "mana value 2 or less", Culling the Weak) are
         # unchanged: only the price. A deterministic transform, no new roll.
         row = pod_mana_row(g, o)
+        # The mana bodies ALREADY on its battlefield (`o.bodies[:n0]`,
+        # reconciled at its untap), read with no side effect: NOT
+        # `mana_creature_mana`, which reconciles the pool (advancing
+        # `next_body`) and counts a metric -- the first cut called it, and
+        # moved which bodies arrived (§0z265).
+        mana_bodies = (sum(1 for b in o.bodies[:n0] if b.mana)
+                       if pod_knob(g.cfg, "pod_mana_creatures")
+                       and pod_bodies_on(g) else 0)
         cap = max(1.0, (row.sources if row is not None else 1.0)
-                  + mana_creature_mana(g, o))
+                  + mana_bodies * MANA_CREATURE_MANA)
     out = []
     for p in range(n0, n1):
         body = (o.bodies[p] if p < have
@@ -3113,7 +3127,7 @@ def opponents_act(g):
             continue                      # an eliminated player has no turn
         pod_untap(g, i)                   # §0z237
         grown_from = opp.creatures
-        grow_board(opp)
+        grow_board(g, opp)
         charge_growth(g, opp, grown_from)
         if pod_turn(g) < 3:
             if g.cfg.get("pod_end_steps_early", True):     # §0z185
@@ -3124,10 +3138,18 @@ def opponents_act(g):
     goaded_combat(g)
 
 
-def grow_board(opp) -> None:
-    """An opponent develops its board: 0.7 of its archetype's `board` a turn,
-    capped at seven bodies' worth."""
-    opp.creatures = min(7.0, opp.creatures + 0.7 * opp.p["board"])
+def growth_rate(g) -> float:
+    """§0z265: bodies an opponent adds a turn per unit of its `board` --
+    `pod_growth_rate` (0.7). The ONE read: `grow_board` and the two
+    forecasts of later rounds (`_predicted_chip`, `_formula_chip`) ask it,
+    so a re-fit cannot move the growth and leave the forecast behind."""
+    return float(pod_knob(g.cfg, "pod_growth_rate"))
+
+
+def grow_board(g, opp) -> None:
+    """An opponent develops its board: `growth_rate` (0.7) of its
+    archetype's `board` a turn, capped at seven bodies' worth."""
+    opp.creatures = min(7.0, opp.creatures + growth_rate(g) * opp.p["board"])
 
 
 def held_answers_on(g) -> bool:
@@ -5883,7 +5905,7 @@ def _pod_seat_round(g, before_act=None) -> None:
             grow_first = g.cfg.get("pod_seat_grow", "main2") == "start"
             if grow_first:
                 grown_from = opp.creatures
-                grow_board(opp)               # before its kill and removal
+                grow_board(g, opp)            # before its kill and removal
                 charge_growth(g, opp, grown_from)
             # -- main phase 1 ---------------------------------------------------
             charge_pieces(g, opp)             # §0z237: cast before answered
@@ -5921,7 +5943,7 @@ def _pod_seat_round(g, before_act=None) -> None:
             # -- main phase 2, end step -----------------------------------------
             if not grow_first:
                 grown_from = opp.creatures
-                grow_board(opp)
+                grow_board(g, opp)
                 charge_growth(g, opp, grown_from)
             # THE END STEP IS EVERY TURN'S (§0z184 finding 3, §0z185). It sat
             # under removal's pod-turn-3 gate, so the pod's first two rounds
@@ -6250,7 +6272,7 @@ def predicted_from_bodies(g, rounds: int = 1) -> float:
         for r in range(rounds):
             if t0 + r < first:
                 continue
-            nr = min(7.0, n0 + 0.7 * opp.p["board"] * r)
+            nr = min(7.0, n0 + growth_rate(g) * opp.p["board"] * r)
             if n0 >= 1.0:
                 total += est * nr / n0
             else:
@@ -6317,7 +6339,7 @@ def _formula_chip(g, rounds: int = 1) -> float:
                 continue
             others = [o for j, o in enumerate(g.opponents)
                       if j != i and o.alive]
-            n = min(7.0, opp.creatures + 0.7 * opp.p["board"] * r)
+            n = min(7.0, opp.creatures + growth_rate(g) * opp.p["board"] * r)
             total += chip_amount(g, opp, chip_share(g, opp, others), n)
     return total
 

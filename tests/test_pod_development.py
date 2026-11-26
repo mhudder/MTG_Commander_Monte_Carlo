@@ -63,7 +63,11 @@ def check(label, got, want):
 def game(**cfg):
     deck, cmd = TV.build()
     g = EN.Game(list(deck), cmd,
-                {**DEFAULT_CFG, "pod_mana": True, **cfg},
+                # pod_body_mv_cap off (§0z264): F and G pin the gate on
+                # bodies at their OWN mana values; the cap is
+                # tests/test_pod_cost_cap.py's.
+                {**DEFAULT_CFG, "pod_mana": True, "pod_body_mv_cap": False,
+                 **cfg},
                 random.Random(1), seed_for_pod=1)
     g.board = EN.Board()
     g.hand, g.graveyard = [], []

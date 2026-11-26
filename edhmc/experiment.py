@@ -262,6 +262,13 @@ POD_PRE_ITEM52 = {
     "pod_mana_creatures": False,
 }
 
+# The pod before §0z264's cost cap (the owner, 2026-11-26: "take the cost
+# cap"): an arriving body charged its rolled mana value, 1..4, whatever the
+# opponent's sources.
+POD_PRE_0Z264 = {
+    "pod_body_mv_cap": False,
+}
+
 # The X spells before item 45's flip (§0z248, the owner, 2026-11-22: "flip
 # genesis wave, torment, meathook and debt"): `dict(DEFAULT_CFG,
 # **PRE_ITEM45)` plays each at its old fixed X, Meathook with no ETB and
