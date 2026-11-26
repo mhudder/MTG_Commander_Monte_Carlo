@@ -1912,6 +1912,8 @@ def teferi_saves(g, opp) -> bool:
     `kill_size`, a cautious read: your blocks are not counted), and paid
     from held mana. A saved kill re-arms its clock a round on, as one you
     survive does (`route_kill`)."""
+    if any(c.name == TEFERI for c in g.hand):
+        g.m["teferi_seen"] += 1              # §0z262, either rule: the reach
     if not teferi_full(g) or getattr(opp, "route", None) not in (
             "drain", "combat"):
         return False
@@ -1948,6 +1950,8 @@ def try_protect(g, roll: float, event=None, victim=None):
         if not keyed:
             return "blank"
         rule = PROTECTION.get(c.name, {})
+        if c.name == TEFERI:
+            g.m["teferi_seen"] += 1          # §0z262, either rule: the reach
         how = rule.get(event)
         if how is None:
             return None

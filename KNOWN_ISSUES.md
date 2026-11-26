@@ -313,8 +313,8 @@ Each row is a headline and its key number, at most 250 characters
 | [0z258](#0z258) | FIXED | **Craterhoof pumped later creatures; Bane of Progress spared tokens and the pod's pieces** (azusa): both to their text: Craterhoof -0.0005 at T10 (its ceiling gone), Bane +0.0041 ±0.0015 at T20 |
 | [0z259](#0z259) | FIXED | **azusa's `crack_clues` paid every Clue with the same {2}**: `spend` leaves paid units in the pool: -0.0064 ±0.0022 at T20, 1.15 free cards a game |
 | [0z260](#0z260) | BUILT | **azusa's utility lands** (Strip Mine, Wasteland, Ghost Quarter, Tectonic Edge, Dust Bowl, Buried Ruin): each sacrifice a land death of yours; nulls but Buried Ruin +0.0009 |
-| [0z261](#0z261) | BUILT | **Fix 6, eight of shilgengar's missing clauses**: Flawless Maneuver free, Mind Stone, Viscera Seer, Priest's unearth, BMC's modes, Resplendent, Giada, Cartel Aristocrat; Teferi's Protection left; pending |
-| [0z262](#0z262) | BUILT | **Teferi's Protection's whole round** (shilgengar), on the owner's policy: a wrath worth it or a lethal kill, whichever comes first; measurement pending |
+| [0z261](#0z261) | BUILT | **Fix 6, eight of shilgengar's missing clauses**: Flawless Maneuver free, Mind Stone, Viscera Seer, Priest's unearth, BMC's modes, Resplendent, Giada, Cartel: BMC +0.0058, four more significant, three nulls |
+| [0z262](#0z262) | BUILT | **Teferi's Protection's whole round** (shilgengar), on the owner's policy: a wrath worth it or a lethal kill, whichever comes first: +0.0033 ±0.0017 at T20 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -22585,7 +22585,37 @@ cracked 143, Priest unearthed 53, BMC's card / Treasure / changeling 415 /
 201 / 161, Resplendent pumped 79, Giada's mana 203, Seer's scry 4, Cartel's
 save 5; life lost to your own cards +1.7 a game.
 
-**MEASUREMENT PENDING**: each switch alone, N=15,000.
+### Measured
+
+`diagnostics.run_knob_ab shilgengar <switch> <reach>`, the staged list,
+N=15,000 paired, seeds 5000..19999, python 3.11.18, each reach counted in
+both legs (`results/knob_ab_shilgengar_<switch>.txt`). Giada's and
+Cartel's runs are on `teferi_full=False`, as the other six's code was --
+the six loaded before §0z262 was written, these two after it:
+
+| switch | T10 | T20 | the identity |
+|---|---|---|---|
+| `bmc_modes` | **+0.0064 ±0.0015** | **+0.0058 ±0.0024** | 0 of 12,973 differ |
+| `resplendent_pump` | +0.0005 ±0.0006 | **+0.0032 ±0.0012** | 0 of 12,769 |
+| `flawless_free` | **+0.0018 ±0.0008** | **+0.0028 ±0.0015** | 0 of 13,477 |
+| `giada_mana` | **+0.0021 ±0.0013** | **+0.0027 ±0.0020** | 0 of 12,820 |
+| `mind_stone_draw` | -0.0003 ±0.0007 | **+0.0020 ±0.0019** | 0 of 13,262 |
+| `priest_unearth` | -0.0005 ±0.0005 | +0.0005 ±0.0016 | 0 of 13,446 |
+| `cartel_protects` | +0.0000 ±0.0000 | +0.0001 ±0.0004 | 0 of 14,936 |
+| `seer_scry` | +0.0000 ±0.0000 | -0.0002 ±0.0002 | 0 of 14,947 |
+
+**What it supports.** Black Market Connections' modes are the largest, at
+both horizons: +0.24 Treasures a game and the changeling (an Angel to
+every Angel payoff), for +1.85 life lost to your own cards a game -- the
+life floor (`bmc_life_floor` 20) is the knob that could move it, not
+swept. Resplendent's pump, Flawless Maneuver's free cast and Giada's mana
+are significant and small; Mind Stone's draw sits at its bar's edge.
+**Three nulls, and why**: Viscera Seer is the outlet only when Shilgengar
+is not out (4 scries in 1,000 games); Cartel Aristocrat is rarely the
+pod's target (5 saves); Priest's unearth trades five mana and 3 life for
+a reanimation the deck has many other ways to make. All kept: each card
+does what it prints now. `tools.validate` +0.00 on all 21 metrics after
+the eight.
 
 <a id="0z262"></a>
 
@@ -22626,7 +22656,27 @@ kill), 11 events spared within them; a kill offered it 41 times, cast 7
 -- the rest over 40 life or without the mana held. The old rule's blanks
 fall 187 -> 144: it is no longer spent at a spot removal.
 
-**MEASUREMENT PENDING**: `run_knob_ab shilgengar teferi_full`, N=15,000.
+### Measured
+
+`diagnostics.run_knob_ab shilgengar teferi_full teferi_seen`, the staged
+list, N=15,000 paired, seeds 5000..19999, python 3.11.18
+(`results/knob_ab_shilgengar_teferi_full.txt`): **-0.0003 ±0.0005 at T10,
++0.0033 ±0.0017 at T20.**
+
+**The first run's identity FAILED**, on the reach: with
+`teferi_rounds,teferi_wipe_offered,teferi_kill_offered`, 351 of 13,797
+unreached games differed -- those counters count under the NEW rule only,
+and the old rule casts the card at spot removal, which none of them sees.
+The reach is `teferi_seen` (the card in hand at any pod event or kill at
+you, either rule); with it, 0 of 12,682 differ. The third reach this
+session that counted one leg only (§0z253, §0z256): a counter written
+inside the new rule's branch cannot be the reach.
+
+**What it supports**: the whole round is worth +0.0033 at T20 over the
+one-event blank, though it is no longer spent at spot removal. A T20
+effect: the wrath it saves and the kill it survives are late-game events.
+`teferi_wipe_min` (2) and the lethality read (`kill_size` 40) are the
+knobs that could move it, neither swept.
 
 ## How to read an ablation table
 
