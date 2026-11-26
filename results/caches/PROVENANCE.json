@@ -1524,6 +1524,12 @@
         "evidence": "2026-11-26: fingerprint moved with opponents.py only -- the pod_body_mv_cap switch (\u00a70z264), built OFF in POD_DEFAULTS. The STAGED list (build_pending) played 2,000 seeds against the hashes taken at c0cf409's code: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
         "fingerprint": "407df0118a3694d1",
         "utc": "2026-11-26T03:53:17Z"
+      },
+      {
+        "commit": "c6a0895",
+        "evidence": "2026-11-26: fingerprint moved with opponents.py only -- the diagnostic sub-switches pod_gate_pieces and pod_gate_reserve (\u00a70z264), read only under pod_develop_gated (OFF). The STAGED list played 2,000 seeds against the hashes taken at c0cf409's code: 0 of 2,000 differ. python 3.11.18.",
+        "fingerprint": "c900976c5cbfdad0",
+        "utc": "2026-11-26T04:00:41Z"
       }
     ]
   },
@@ -4377,6 +4383,12 @@
         "evidence": "2026-11-26: fingerprint moved with opponents.py only -- the pod_body_mv_cap switch (\u00a70z264), built OFF in POD_DEFAULTS. The STAGED list (build_pending) played 2,000 seeds against the hashes taken at c0cf409's code: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
         "fingerprint": "1ef68a900259366d",
         "utc": "2026-11-26T03:53:18Z"
+      },
+      {
+        "commit": "c6a0895",
+        "evidence": "2026-11-26: fingerprint moved with opponents.py only -- the diagnostic sub-switches pod_gate_pieces and pod_gate_reserve (\u00a70z264), read only under pod_develop_gated (OFF). The STAGED list played 2,000 seeds against the hashes taken at c0cf409's code: 0 of 2,000 differ. python 3.11.18.",
+        "fingerprint": "e02a2fb3cf9f15f7",
+        "utc": "2026-11-26T04:00:42Z"
       }
     ]
   },

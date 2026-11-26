@@ -1067,7 +1067,10 @@ def charge_pieces(g, o) -> None:
     if not pod_mana_on(g) or not o.pieces:
         return
     t = pod_turn(g)
-    gated = pod_knob(g.cfg, "pod_develop_gated")
+    # §0z264: `pod_gate_pieces` (True) splits the gate's piece half off its
+    # body half, for the decomposition; read only under the gate.
+    gated = (pod_knob(g.cfg, "pod_develop_gated")
+             and g.cfg.get("pod_gate_pieces", True))
     for k, lands in enumerate(o.piece_lands):
         if lands == t:
             mv = float(o.pieces[k].mv)
@@ -1158,6 +1161,8 @@ def charge_growth(g, o, before: float) -> None:
         for mv in _arrival_mvs(g, o, before):
             pod_spend(g, o, mv, "body", floor=keep)
         return
+    if not g.cfg.get("pod_gate_reserve", True):
+        keep = 0.0          # §0z264: the gate's bodies without the reserve
     if o.body_debt:
         o.creatures = min(7.0, o.creatures + o.body_debt)
         o.body_debt = 0
