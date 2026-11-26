@@ -1500,6 +1500,12 @@
         "evidence": "2026-11-26: fingerprint moved with opponents.py only -- free_with_commander counts its reach before its switch (\u00a70z261), a counter. The STAGED list (build_pending) played 2,000 seeds against the hashes taken at 23ac6bd: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
         "fingerprint": "7ec457381b410205",
         "utc": "2026-11-26T00:25:22Z"
+      },
+      {
+        "commit": "127c4d6",
+        "evidence": "2026-11-26: fingerprint moved with opponents.py (\u00a70z262: Teferi's Protection's round -- phased_out, teferi_saves and their hooks, every one reached only with Teferi's Protection cast or in hand) and tools/ablation.py (its shilgengar note). The STAGED list (build_pending) played 2,000 seeds against the hashes taken at 23ac6bd: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
+        "fingerprint": "46de59d9d5ae4995",
+        "utc": "2026-11-26T00:37:23Z"
       }
     ]
   },
@@ -2921,6 +2927,12 @@
         "evidence": "2026-11-26: fingerprint moved with opponents.py only -- free_with_commander counts its reach before its switch (\u00a70z261), a counter. The STAGED list (build_pending) played 2,000 seeds against the hashes taken at 23ac6bd: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
         "fingerprint": "0c2b8a90e9fba9fb",
         "utc": "2026-11-26T00:25:22Z"
+      },
+      {
+        "commit": "127c4d6",
+        "evidence": "2026-11-26: fingerprint moved with opponents.py (\u00a70z262: Teferi's Protection's round -- phased_out, teferi_saves and their hooks, every one reached only with Teferi's Protection cast or in hand) and tools/ablation.py (its shilgengar note). The STAGED list (build_pending) played 2,000 seeds against the hashes taken at 23ac6bd: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
+        "fingerprint": "f4f7d54806ca2b79",
+        "utc": "2026-11-26T00:37:23Z"
       }
     ]
   },
@@ -4317,6 +4329,12 @@
         "evidence": "2026-11-26: fingerprint moved with opponents.py only -- free_with_commander counts its reach before its switch (\u00a70z261), a counter. The STAGED list (build_pending) played 2,000 seeds against the hashes taken at 23ac6bd: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
         "fingerprint": "831d99a8658bc3ef",
         "utc": "2026-11-26T00:25:22Z"
+      },
+      {
+        "commit": "127c4d6",
+        "evidence": "2026-11-26: fingerprint moved with opponents.py (\u00a70z262: Teferi's Protection's round -- phased_out, teferi_saves and their hooks, every one reached only with Teferi's Protection cast or in hand) and tools/ablation.py (its shilgengar note). The STAGED list (build_pending) played 2,000 seeds against the hashes taken at 23ac6bd: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
+        "fingerprint": "13d4d881aafbbfba",
+        "utc": "2026-11-26T00:37:23Z"
       }
     ]
   },

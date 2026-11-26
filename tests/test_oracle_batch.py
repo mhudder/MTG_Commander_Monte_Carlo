@@ -193,8 +193,12 @@ def run_cases():
           (id(attacker) in OPP.unblockable_ids(g),
            perm(g, "Mother of Runes").tapped), (True, True))
 
+    # Two bodies (§0z262): the owner's policy casts Teferi's Protection at
+    # a wrath that kills two nontoken creatures, not one. U's subject is
+    # §0z118's -- your board phased out, the pod's creatures still dying.
     g = fresh("shilgengar",
-              board=lands("shilgengar", *["Plains"] * 5) + [body("Bear")],
+              board=lands("shilgengar", *["Plains"] * 5)
+              + [body("Bear"), body("Bear 2")],
               hand=[card("shilgengar", "Teferi's Protection")])
     g.turn = 10
     for o in g.opponents:
@@ -203,7 +207,7 @@ def run_cases():
     check("U Teferi's Protection: you phase out, the pod's creatures die",
           ([p.card.name for p in g.board if not p.card.is_land],
            [o.creatures for o in g.opponents]),
-          (["Bear"], [0.0, 0.0, 0.0]))
+          (["Bear", "Bear 2"], [0.0, 0.0, 0.0]))
 
     # -- 7: Damn is a wrath only at its overload -----------------------------
     damn = card("karlov", "Damn")

@@ -1474,13 +1474,16 @@ PARTLY_MODELLED = {
             "toughness every block and every attack at you reads since A1 "
             "and A2 (item 12). A floor.",
         "Teferi's Protection":
-            "MODELLED: one of the pod's events blanked -- its spot removal, "
-            "artifact removal or wrath (`PROTECTION`), cast from held mana. "
-            "NOT: 'until your next turn, your life total can't change and "
-            "you gain protection from everything', the pod's whole round of "
-            "combat, drains and kills (item 13) -- left by §0z261: it reaches "
-            "every pod path, and when to cast it (a wipe, or the round a kill "
-            "fires) is the owner's policy to set. A floor.",
+            "MODELLED (§0z262, `teferi_full`): its whole round -- your life "
+            "cannot change (the pod's kills by drain or combat, its attacks "
+            "and chip damage), and your permanents are phased out of its "
+            "removal and wraths -- on the owner's policy: cast at a wrath "
+            "that would kill two nontoken creatures or the commander, or at "
+            "a lethal drain or combat kill aimed at you, never at one spot "
+            "removal. NOT, each a small ceiling: your phased-out permanents' "
+            "own triggers that round still fire, and your life GAIN that "
+            "round is not stopped; a combo kill is not stopped, rightly.",
+
     },
 }
 

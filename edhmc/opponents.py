@@ -1865,6 +1865,72 @@ def protection_life(g, card) -> None:
         g.m["life_lost_to_own_cards"] += life
 
 
+# §0z262: TEFERI'S PROTECTION, by its text (Scryfall, 2026-11-25): "Until
+# your next turn, your life total can't change and you gain protection from
+# everything. All permanents you control phase out." THE OWNER'S POLICY
+# (2026-11-26): "whichever comes first ... Perhaps not avoiding a boardwipe
+# with just a single meaningless creature" -- cast at a pod wrath that would
+# kill `teferi_wipe_min` (2) of your nontoken creatures or your commander,
+# or at an opponent's drain or combat kill aimed at you that would be lethal;
+# never at one spot removal. `teferi_full=False` is the old rule: one event
+# of any kind blanked, nothing after it.
+TEFERI = "Teferi's Protection"
+
+
+def teferi_full(g) -> bool:
+    return bool(g.cfg.get("teferi_full", True))
+
+
+def phased_out(g) -> bool:
+    """Is Teferi's Protection's round live -- cast on the pod's round after
+    your turn `g.turn`, and over when your next turn begins?"""
+    t = getattr(g, "teferi_turn", None)
+    return t is not None and t == g.turn
+
+
+def start_teferi(g) -> None:
+    g.teferi_turn = g.turn
+    g.m["teferi_rounds"] += 1
+
+
+def teferi_wipe_worth(g) -> bool:
+    """The owner's bar: the wrath would kill at least `teferi_wipe_min` (2)
+    of your nontoken creatures, or your commander. Counted in both rules'
+    games when the card is in hand (`teferi_wipe_offered`)."""
+    dying = [p for p in g.board if is_creature_now(g, p) and not p.is_token
+             and not indestructible_of(g, p)]
+    cmd = getattr(g, "commander", None)
+    return (len(dying) >= g.cfg.get("teferi_wipe_min", 2)
+            or any(p.card is cmd for p in dying))
+
+
+def teferi_saves(g, opp) -> bool:
+    """An opponent's clock picked you. True if Teferi's Protection stops it:
+    its round is live already, or it is in hand and cast now -- the kill a
+    DRAIN or COMBAT route (your life cannot change; a combo route, which
+    ignores life, is not stopped), lethal (your life at or under
+    `kill_size`, a cautious read: your blocks are not counted), and paid
+    from held mana. A saved kill re-arms its clock a round on, as one you
+    survive does (`route_kill`)."""
+    if not teferi_full(g) or getattr(opp, "route", None) not in (
+            "drain", "combat"):
+        return False
+    if not phased_out(g):
+        card = next((c for c in g.hand if c.name == TEFERI), None)
+        if card is None:
+            return False
+        g.m["teferi_kill_offered"] += 1          # the reach, either rule
+        if (g.your_life > float(g.cfg.get("kill_size", 40))
+                or not responses_on(g)
+                or not _cast_response(g, card, "kill")):
+            return False
+        g.m["teferi_kill_cast"] += 1
+    g.m["teferi_kills_survived"] += 1
+    opp.kill_turn = pod_turn(g) + 1
+    opp.clock_fired = False
+    return True
+
+
 def try_protect(g, roll: float, event=None, victim=None):
     """A protection spell held up from hand against one event.
 
@@ -1885,6 +1951,12 @@ def try_protect(g, roll: float, event=None, victim=None):
         how = rule.get(event)
         if how is None:
             return None
+        if c.name == TEFERI and teferi_full(g):
+            if event != "wipe":
+                return None                   # §0z262: never one removal
+            g.m["teferi_wipe_offered"] += 1
+            if not teferi_wipe_worth(g):
+                return None
         if (rule.get("creature") and event == "spot" and victim is not None
                 and not is_creature_now(g, victim)):
             return None
@@ -1903,6 +1975,8 @@ def try_protect(g, roll: float, event=None, victim=None):
     # A blank before an indestructible grant: it answers more.
     hi, how = min(held, key=lambda ch: ch[1] != "blank")
     g.hand.remove(hi)
+    if hi.name == TEFERI and teferi_full(g):
+        start_teferi(g)                       # §0z262
     protection_life(g, hi)                    # §0z251
     if not (keyed and PROTECTION.get(hi.name, {}).get("exile")):
         g.graveyard.append(hi)            # an "Exile <this>" card is gone
@@ -2022,6 +2096,8 @@ def _cast_response(g, card, kind) -> bool:
         return False
     if free:
         g.m["free_with_commander"] += 1
+    if card.name == TEFERI and teferi_full(g):
+        start_teferi(g)                       # §0z262
     g.hand.remove(card)
     protection_life(g, card)                  # §0z251
     if not PROTECTION.get(card.name, {}).get("exile"):
@@ -2286,6 +2362,9 @@ def _spot_at_you(g, rolls, victim=None, opp=None) -> None:
     """The second half of `spot_removal`, at you: the victim is your most
     threatening legal target unless a held answer (A6) names one; a warded
     victim is paid for or re-aimed (§0z224)."""
+    if phased_out(g):
+        g.m["teferi_spared"] += 1             # §0z262: nothing to target
+        return
     targets = _spot_targets(g)
     if not targets:
         return
@@ -2335,6 +2414,9 @@ def ae_removal(g, opp, others, rolls):
     targets = [p for p in g.board
                if ("Artifact" in p.card.types or "Enchantment" in p.card.types)
                and not p.card.is_land and not p.is_token]
+    if targets and phased_out(g):
+        g.m["teferi_spared"] += 1             # §0z262: phased out
+        return
     if not targets:
         return
     if not can_cast(g, opp, AE_SPELL_MV, "ae", AE_READS_MANA):   # §0z240
@@ -2369,6 +2451,15 @@ def board_wipe(g, opp, rolls):
         return                                               # §0z240
     pod_spend(g, opp, WIPE_SPELL_MV, "wipe")                 # §0z237
     g.event_caster = opp                               # §0z241
+    if phased_out(g):
+        # §0z262: your permanents are phased out; the wrath resolves for
+        # everyone else, as the "blank" branch below has it.
+        g.m["teferi_spared"] += 1
+        for o in g.opponents:
+            pod_wipe_board(g, o)
+            o.goaded_birds = 0.0
+        g.m["wipes_suffered"] += 1
+        return
     how = try_protect(g, rolls[5], "wipe")
     if how == "countered":
         # A COUNTERED wrath never resolves (§0z134): unlike phasing out
@@ -4505,6 +4596,11 @@ def _attack_you(g, opp, bodies, sent, dead) -> None:
     """A2's attack at you (§0z199), from `seat_attack`. Adds the attacker's
     bodies your blocks kill to `dead`."""
     from edhmc.engine import damage_you
+    if phased_out(g):
+        # §0z262: your creatures are phased out (no blocks), and the damage
+        # cannot change your life total.
+        g.m["teferi_spared"] += 1
+        return
     blockers = your_blockers(g)
     floor = g.cfg.get("your_chump_floor", 10)
 
@@ -5949,7 +6045,10 @@ def _chip_seat(g, i, loss_scale) -> bool:
     # (`monarch_attack_share`, inside `chip_share`.)
     share = chip_share(g, opp, others)
     from edhmc.engine import damage_you            # Angel, §0z135
-    g.your_life -= damage_you(g, chip_amount(g, opp, share))
+    if phased_out(g):
+        g.m["teferi_spared"] += 1             # §0z262: life can't change
+    else:
+        g.your_life -= damage_you(g, chip_amount(g, opp, share))
     # GATED ON HOLDING THE CROWN, which is what keeps this change worth
     # ZERO to all six decks: nothing grants the monarch yet, so the roll is
     # never consumed and no existing stream can shift. `crn_random` is
@@ -6555,6 +6654,8 @@ def _clock_seat(g, i, rolls_t) -> bool:
     else:
         at_you = (rolls_t[i][6] < share
                   and not tax_deflects(g, i, opp, others))  # §0z138
+    if at_you and teferi_saves(g, opp):    # §0z262
+        return False
     if (at_you and pod_knob(g.cfg, "route_kills") and pod_threats_on(g)
             and getattr(opp, "route", None) in ("drain", "combat")):
         return route_kill(g, opp, force)  # §0z221, A3: life and blockers

@@ -114,7 +114,7 @@ a floor read as evidence -- §0z206's Woe Strider, thirteen times.
     enters and at each upkeep, and "the survivors' smaller toughness is not
     modelled" (its docstring) -- nor their power. Since A1 and A2 a body's
     power and toughness are read in every block and every attack at you.
-13. **[OPEN 2026-11-26, §0z261: built last, the owner's call on its timing policy.]** **Teferi's Protection** -- modelled as one blanked event (`PROTECTION`:
+13. **[FIXED 2026-11-26, §0z262: the whole round, on the owner's policy -- a wrath worth it or a lethal kill, whichever comes first (`teferi_full`).]** **Teferi's Protection** -- modelled as one blanked event (`PROTECTION`:
     spot, A/E, wipe). "Until your next turn, your life total can't change
     and you gain protection from everything" -- the pod's whole round of
     combat, drains and kills -- is not.

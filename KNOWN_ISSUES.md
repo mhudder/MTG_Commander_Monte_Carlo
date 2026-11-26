@@ -314,6 +314,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z259](#0z259) | FIXED | **azusa's `crack_clues` paid every Clue with the same {2}**: `spend` leaves paid units in the pool: -0.0064 ±0.0022 at T20, 1.15 free cards a game |
 | [0z260](#0z260) | BUILT | **azusa's utility lands** (Strip Mine, Wasteland, Ghost Quarter, Tectonic Edge, Dust Bowl, Buried Ruin): each sacrifice a land death of yours; nulls but Buried Ruin +0.0009 |
 | [0z261](#0z261) | BUILT | **Fix 6, eight of shilgengar's missing clauses**: Flawless Maneuver free, Mind Stone, Viscera Seer, Priest's unearth, BMC's modes, Resplendent, Giada, Cartel Aristocrat; Teferi's Protection left; pending |
+| [0z262](#0z262) | BUILT | **Teferi's Protection's whole round** (shilgengar), on the owner's policy: a wrath worth it or a lethal kill, whichever comes first; measurement pending |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -22585,6 +22586,47 @@ cracked 143, Priest unearthed 53, BMC's card / Treasure / changeling 415 /
 save 5; life lost to your own cards +1.7 a game.
 
 **MEASUREMENT PENDING**: each switch alone, N=15,000.
+
+<a id="0z262"></a>
+
+## 0z262. BUILT -- Teferi's Protection's whole round, on the owner's policy
+
+**The owner, 2026-11-26**, asked when it should be cast (at a wipe, at the
+round an opponent's kill fires, or whichever comes first): "I feel like
+whichever comes first is ideal. Perhaps not avoiding a boardwipe with just
+a single meaningless creature, but both use cases are very strong."
+
+    "Until your next turn, your life total can't change and you gain
+    protection from everything. All permanents you control phase out.
+    Exile Teferi's Protection."          ({2}{W}, Instant; Scryfall 2026-11-25)
+
+**What was there**: one of the pod's events blanked -- a spot removal, an
+artifact removal or a wrath -- and nothing after it.
+
+**The fix** (`teferi_full`, ON; False is the old one-event blank), in
+`opponents.py`: `phased_out(g)` is live from the cast until your next turn
+begins. While it is: the pod's spot and artifact removal find nothing,
+its wraths resolve for everyone else and spare you, its declared attacks
+and chip damage do not change your life, and a drain or combat kill aimed
+at you does nothing and re-arms its clock (`teferi_saves`). **The policy**:
+cast at a wrath that would kill `teferi_wipe_min` (2) of your nontoken
+creatures or your commander (`teferi_wipe_worth`), or at a drain or combat
+kill aimed at you that would be lethal -- your life at or under
+`kill_size` (40), a cautious read that does not count your blocks -- from
+held mana; never at one spot removal. **NOT, each said**: a combo kill
+ignores life and is not stopped (rightly); your phased-out permanents' own
+triggers that round still fire, and your life GAIN that round is not
+stopped -- two small ceilings.
+
+**Pinned**: `tests/test_teferi.py`, nine cases T1-T9, five mutations,
+every expected set exact on the first run.
+
+**A smoke, 1,000 games**: 21 protected rounds (14 at a wrath, 7 at a
+kill), 11 events spared within them; a kill offered it 41 times, cast 7
+-- the rest over 40 life or without the mana held. The old rule's blanks
+fall 187 -> 144: it is no longer spent at a spot removal.
+
+**MEASUREMENT PENDING**: `run_knob_ab shilgengar teferi_full`, N=15,000.
 
 ## How to read an ablation table
 
