@@ -1493,6 +1493,23 @@ def answer_pod_threat(g, card) -> int:
     return done
 
 
+def piece_exiled(g, o, k, name: str) -> None:
+    """§0z269: piece k of `o` just left the battlefield to `name`. If the
+    census clause of `name` EXILES and the piece is a creature, a creature
+    was exiled from the battlefield: the game's optional
+    `on_creature_exiled(n)` hook is told (tivit's Soulherder). A piece
+    countered on the stack never reaches here -- it was not on the
+    battlefield."""
+    hook = getattr(g, "on_creature_exiled", None)
+    if hook is None:
+        return
+    entry = _removal.INTERACTION.get(name)
+    if (entry is None or "exile" not in entry[2]
+            or o.pieces[k].type != "Creature"):
+        return
+    hook(1)
+
+
 def answer_pieces(g, name: str, reach: Reach) -> int:
     """Remove up to `reach.n` pieces, each aimed by `answer_target` -- the
     one loop a cast answer (`answer_pod_threat`), an answer creature
@@ -1505,6 +1522,7 @@ def answer_pieces(g, name: str, reach: Reach) -> int:
         if pick is None:
             break
         remove_threat_piece(g, *pick)
+        piece_exiled(g, *pick, name)                    # §0z269
         pod_gift(g, pick[0], name)                      # §0z241
         done += 1
     return done
@@ -2282,6 +2300,8 @@ def respond_to_pieces(g, seat=None) -> int:
                         else "answer_piece")
                 if _cast_response(g, c, kind):
                     remove_threat_piece(g, o, k)
+                    if kind == "answer_piece":
+                        piece_exiled(g, o, k, c.name)       # §0z269
                     pod_gift(g, o, c.name)                  # §0z241
                     n += 1
                     break
@@ -2323,6 +2343,7 @@ def end_step_answers(g) -> int:
             if pick is None:
                 break
             remove_threat_piece(g, *pick)
+            piece_exiled(g, *pick, c.name)                  # §0z269
             pod_gift(g, pick[0], c.name)                    # §0z241
             done += 1
         n += done

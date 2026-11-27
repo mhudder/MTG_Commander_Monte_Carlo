@@ -179,6 +179,7 @@ def judgment(g, name="Council's Judgment") -> bool:
         g.m["threat_answers_whiffed"] += 1
         return False
     OPP.remove_threat_piece(g, *pick)
+    OPP.piece_exiled(g, *pick, name)                  # §0z269
     g.m["vote_answers_won"] += 1
     return True
 

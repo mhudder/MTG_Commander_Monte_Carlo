@@ -159,7 +159,7 @@ each card below the claim is false, and the row is a floor read as evidence.
    `artifact_died`). Only tivit's own sacrifices and Coercive Portal's
    carnage call `_artifacts_left`. A floor on all three, and the comment
    is wrong.
-9. **Soulherder** — "Whenever a creature is exiled from the battlefield, put
+9. **[FIXED 2026-11-27, §0z269: `soulherder_counters`, every blink and exile answer; a null, +0.0008 at T20.]** **Soulherder** — "Whenever a creature is exiled from the battlefield, put
    a +1/+1 counter on this creature." Not implemented: every blink in the
    deck exiles a creature. Only the end-step blink is. A floor.
 10. **Tamiyo's Journal** — "{T}, Sacrifice three Clues: Search your library

@@ -180,6 +180,12 @@ class TivitGame(BaseGame):
             return can_pay(cost, mana_units(self)) is not None
         return pay(self, cost)
 
+    def on_creature_exiled(self, n):
+        """A creature exiled from the battlefield, from shared code
+        (`opponents.piece_exiled`: your exile answers on a creature route
+        piece): §0z269."""
+        soulherder_counters(self, n)
+
     def pod_tokens_enter(self, kind, n):
         """Tokens an opponent creates, from shared code (`opponents.
         pod_gift`'s Treasures, An Offer You Can't Refuse's): §0z267."""
@@ -770,9 +776,33 @@ def blink_tivit(g, source):
             return False
         g.greaves_on_tivit = False
     g.m["blinks"] += 1
+    soulherder_counters(g, 1)        # §0z269: every blink exiles Tivit
     venser_counters(g)
     tivit_dilemma(g)
     return True
+
+
+def soulherder_counters(g, n=1) -> None:
+    """SOULHERDER (§0z269; Scryfall 2026-11-27): "Whenever a creature is
+    exiled from the battlefield, put a +1/+1 counter on this creature."
+    Any creature, anyone's. Read where the model exiles one: every blink
+    (`blink_tivit` -- Ephemerate and its rebound, Soulherder's own end
+    step, Teleportation Circle, Conjurer's Closet, Displacer Kitten,
+    Deadeye Navigator, Venser's +1), and your exile answers on a creature
+    route piece (`opponents.piece_exiled`: Path to Exile, Swords to
+    Plowshares, Trial of a Time Lord, Council's Judgment). Blind: the pod's
+    removal exiling your creatures (it rolls destroy or not, never exile
+    as such), and Farewell, which exiles Soulherder with the rest.
+    `soulherder_counters=False` is the old rule (no counter)."""
+    if not g.has("Soulherder"):
+        return
+    g.m["soulherder_exiles_seen"] += n     # the reach, either rule
+    if not g.cfg.get("soulherder_counters", True):
+        return
+    for p in g.board:
+        if p.card.name == "Soulherder":
+            p.counters += n
+    g.m["soulherder_counters"] += n
 
 
 def venser_counters(g) -> None:

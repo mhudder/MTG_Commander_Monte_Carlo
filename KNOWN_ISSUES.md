@@ -321,6 +321,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z266](#0z266) | FLIPPED | **Item 52's gate on, no reserve before bodies, growth 0.91** (item 53): the re-fit crosses at 0.911; on fresh seeds +0.0083 against the old pod, every deck inside its bar |
 | [0z267](#0z267) | FIXED | **Kambal, Profiteering Mayor copies the pod's tokens** (tivit, §0z207 item 7): once a turn, tapped; +0.0012 ±0.0009 at T20, in 5.1% of games -- rare, not large |
 | [0z268](#0z268) | FIXED | **Elesh Norn's -2/-2 reaches the pod's survivors** (shilgengar, §0z208 item 12): a static shift read in `pod_bodies`; +0.0033 ±0.0014 at T20 |
+| [0z269](#0z269) | FIXED | **Soulherder's +1/+1 counter** (tivit, §0z207 item 9): every blink and every exile answer on a creature piece; a null, +0.0008 ±0.0011 -- 80% of the counters land in Deadeye loops already winning |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -18586,7 +18587,7 @@ copy of it"), implemented nowhere -- a floor; since §0z245 the pod's
 Treasures from Tempting Contract and Master of Ceremonies are made in code
 (`opponents.pod_gift`), the one place it could hook in. **Item 7 FIXED
 2026-11-27 (§0z267)**: hooked there and at tivit's own sites; +0.0012 at
-T20. Items 9-15's
+T20. **Item 9 FIXED 2026-11-27 (§0z269)**, a null. Items 9-15's
 missing clauses, under their PARTLY labels. Tier 4, items 23-29: seven
 piloting choices nobody argued.
 
@@ -23119,6 +23120,65 @@ there the rule is worth +0.021 at T20. The mechanism: `attackers_died`
 **Only shilgengar moved** (`tools.check_unchanged_decks`, N=2,000, against
 `b550154`): the other five active decks BIT-IDENTICAL on all 8 metrics.
 Its cache was SUSPECT already (§0z266).
+
+<a id="0z269"></a>
+
+## 0z269. FIXED -- Soulherder's +1/+1 counter (tivit, §0z207 item 9): a null, and why
+
+**The owner, 2026-11-27**: "go ahead with soulherder next".
+
+    "Whenever a creature is exiled from the battlefield, put a +1/+1
+    counter on this creature. At the beginning of your end step, you may
+    exile another target creature you control, then return that card to
+    the battlefield under its owner's control."  ({1}{W}{U} 1/1;
+                                                  Scryfall 2026-11-27)
+
+Only the end-step blink was modelled; the counter was not (§0z207 item 9,
+"a floor"). **Built** as `tivit.soulherder_counters`, behind
+`soulherder_counters` (True), read wherever the model exiles a creature:
+
+- **Every blink** (`blink_tivit`, all seven sources: Ephemerate and its
+  rebound, Soulherder's own end step, Teleportation Circle, Conjurer's
+  Closet, Displacer Kitten, Deadeye Navigator, Venser's +1) -- each exiles
+  Tivit.
+- **Your exile answers on a creature route piece**, through a new shared
+  `opponents.piece_exiled(g, o, k, name)`: the census clause of `name`
+  exiles and the piece is a Creature -> the game's optional
+  `on_creature_exiled(n)` hook (only tivit defines it). Called after
+  `answer_pieces`, a response's `answer_piece` (not a counterspell's: a
+  countered piece was never on the battlefield), the end-step answers,
+  and `voting.judgment` -- Path to Exile, Swords to Plowshares, Trial of a
+  Time Lord, Council's Judgment in this list.
+- **Blind**: the pod's removal exiling your creatures (the model rolls
+  destroy or not, never exile as such); Farewell exiles Soulherder with
+  everything else.
+
+**Pinned**: `tests/test_soulherder.py`, 9 cases, 5 mutations exact on the
+first run. Not driven by a case: the response and end-step sites
+(said in its docstring).
+
+**Measured** (`diagnostics.run_knob_ab tivit soulherder_counters
+soulherder_exiles_seen`, staged list, N=15,000 paired, seeds 5000..,
+`results/knob_ab_tivit_soulherder_counters_20261127.txt`):
+
+| | A - B |
+|---|---|
+| won T10 | +0.0005 ±0.0010 |
+| won T20 | +0.0008 ±0.0011 |
+
+**A null** (`--`). IDENTITY: the 12,832 games where
+`soulherder_exiles_seen` is 0 in both legs are bit-identical. Reach: 2,168
+games (14.5%); +0.0055 ±0.0079 at T20 there. `combat_damage` +0.19 a game.
+
+**Why so small, when the counters are many** (2.16 a game, ~15 a reached
+game): on 3,000 seeds, **80% of the counters come in the 76 games with a
+Deadeye Navigator loop** -- up to 527 in one -- the turn the loop's drain
+is already winning (§0z217). In the other reached games the median is 3
+counters: a 4/4 with no evasion. The engine sees the card; the card's
+counter is small where it is not redundant.
+
+**Only tivit moved** (`tools.check_unchanged_decks`, N=2,000, against
+`baf1675`): the other five active decks BIT-IDENTICAL on all 8 metrics.
 
 ## How to read an ablation table
 
