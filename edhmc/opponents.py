@@ -6316,6 +6316,38 @@ def combat_bodies(bodies) -> list:
     return [k for k, b in enumerate(bodies) if not b.utility and b.power > 0]
 
 
+def predicted_at_walker(g, loyalty: float) -> float:
+    """THE POD'S NEXT SWING AT ONE OF YOUR PLANESWALKERS (§0z278), read as
+    `predicted_from_bodies` reads it at you: for each opponent's combat
+    body, the chance it attacks your side (`pod_attack_rate` x
+    `chip_share`) times its power if your blocks for the walker would not
+    stop it alone (`plan_blocks`, the walker's `loyalty` as the life it
+    defends, no chump floor -- A5's rule, `_attack_walker`). An
+    EXPECTATION, never a roll. Next round only; the attack taxes are not
+    read (no deck with a walker runs one)."""
+    if g.result is not None or not you_block_on(g):
+        return 0.0
+    if pod_turn(g) + 1 < g.cfg.get("first_attack_turn", 3):
+        return 0.0
+    blockers = your_blockers(g)
+    total = 0.0
+    for i, opp in enumerate(g.opponents):
+        if not opp.alive:
+            continue
+        others = [o for j, o in enumerate(g.opponents) if j != i and o.alive]
+        bodies = pod_bodies(g, opp)
+        combat = combat_bodies(bodies)
+        p = pod_attack_rate(g, opp, sum(bodies[k].power for k in combat))
+        p *= chip_share(g, opp, others)
+        for k in combat:
+            atk = _body_facts(bodies, [k])
+            asg = plan_blocks(g, float(loyalty), atk, blockers,
+                              len(blockers), floor=0)
+            if k not in asg:
+                total += p * bodies[k].power
+    return total
+
+
 def predicted_from_bodies(g, rounds: int = 1) -> float:
     """THE POD'S NEXT SWING AS A PILOT READS IT UNDER A2 (§0z203,
     `predict_from_bodies`): for each opponent's combat body, the chance it

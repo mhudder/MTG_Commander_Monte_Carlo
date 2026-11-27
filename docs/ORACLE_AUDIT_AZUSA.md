@@ -208,7 +208,7 @@ pod's lands"; the self-sacrifice half is not the pod's.
 16. **[KEPT by the owner 2026-11-27.]** **Tireless Provisioner always makes a Treasure** (`provisioner_
     treasure`), never Food.
 17. **[KEPT by the owner 2026-11-27.]** **Annihilator's victim** is the opponent on the least life (item 12).
-18. **[MEASURED 2026-11-27, §0z276, the owner's rule (a): it loses, -0.0043 at T20; built, OFF.]** **Nissa, Sage Animist never uses her -2** (said in her docstring).
+18. **[FIXED 2026-11-27, §0z278: rule (a) with the expected swing at her (`predicted_at_walker`); a null, ON. §0z276's first predictor lost -0.0043.]** **Nissa, Sage Animist never uses her -2** (said in her docstring).
 19. **[FIXED 2026-11-27, §0z275: `quirion_block`; a null.]** **Quirion Ranger never untaps an attacker to block** (§0z206).
 20. **[KEPT by the owner 2026-11-27.]** **Horn of Greed's "that player draws"** is given to you only; the
     pod has no hand to draw into (§4), so the symmetric half -- the cost

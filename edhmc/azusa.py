@@ -4575,24 +4575,29 @@ class AzusaGame(BaseGame):
 
     def nissa_doomed(self, perm) -> bool:
         """Is Nissa predicted to die in the pod's next round, after a +1
-        (§0z276)? A5's attack at a walker (`opponents.split_for_walker`)
-        sends the fewest, biggest bodies whose power reaches its loyalty, so
-        the prediction is the pod's combat power, every living opponent's
-        combat bodies (`combat_bodies`) summed, against her loyalty + 1.
-        A JUDGEMENT, said: it counts no blocks of yours and no attack at you
-        that is lethal (A5 then sends everything at you), so it reads her
-        doomed a little more often than she is. Off under A5's switch: the
-        pod never attacks a walker there."""
-        if not (OPP.pod_knob(self.cfg, "pod_attacks_walkers")
-                and OPP.you_block_on(self)):
+        (§0z276, the owner's rule (a))? Since §0z278 the pilot's own read
+        of the pod's swing at her (`opponents.predicted_at_walker`): each
+        combat body's chance to attack your side times what it gets through
+        your blocks for her -- the expected damage reaching her loyalty
+        + 1. §0z276's first predictor summed the pod's combat power, no
+        attack rate and no blocks, and read her doomed seven times as often
+        as she died. Off under A5's switch: the pod never attacks a walker
+        there."""
+        if not OPP.pod_knob(self.cfg, "pod_attacks_walkers"):
             return False
-        if OPP.pod_turn(self) + 1 < self.cfg.get("first_attack_turn", 3):
-            return False
-        power = 0
-        for o in OPP.living(self):
-            bodies = OPP.pod_bodies(self, o)
-            power += sum(bodies[k].power for k in OPP.combat_bodies(bodies))
-        return power >= perm.counters + 1
+        if self.cfg.get("nissa_doom_rule", "expected") == "power":
+            # §0z276's first predictor, kept to reproduce its measure
+            if not OPP.you_block_on(self) or OPP.pod_turn(self) + 1 < \
+                    self.cfg.get("first_attack_turn", 3):
+                return False
+            power = 0
+            for o in OPP.living(self):
+                bodies = OPP.pod_bodies(self, o)
+                power += sum(bodies[k].power
+                             for k in OPP.combat_bodies(bodies))
+            return power >= perm.counters + 1
+        after = perm.counters + 1
+        return OPP.predicted_at_walker(self, after) >= after
 
     def _nissa_sage_animist(self, perm):
         """Nissa, Sage Animist, loyalty 3 — the back face. Verified 2026-09-07.
@@ -4626,10 +4631,10 @@ class AzusaGame(BaseGame):
             # round is predicted to kill Nissa anyway" -- a 4/4 kept instead
             # of a walker lost for nothing.
             self.m["nissa_doomed_seen"] += 1         # the reach, either rule
-            # OFF BY DEFAULT (§0z276): measured -0.0043 at T20 -- this
-            # prediction reads her doomed 0.45 times a game against 0.065
-            # real deaths, and every -2 gives up the march to the -7.
-            if self.cfg.get("nissa_minus_two", False):
+            # ON since §0z278, with the tighter predictor (`nissa_doomed`):
+            # a null, +0.0010 at T20. §0z276's first predictor lost -0.0043
+            # (`nissa_doom_rule="power"` reproduces it).
+            if self.cfg.get("nissa_minus_two", True):
                 perm.counters -= 2
                 self.make_tokens(1, 4, 4, "Ashaya, the Awoken World")
                 self.m["nissa_ashaya"] += 1

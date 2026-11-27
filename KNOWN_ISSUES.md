@@ -328,8 +328,9 @@ Each row is a headline and its key number, at most 250 characters
 | [0z273](#0z273) | FIXED | **Cyberdrive Awakener by its text** (tivit, §0z207 item 12): the old untapped tokens attack as real 4/4 fliers on its ETB turn, the static flying read; +0.0031 T10 / +0.0025 T20 |
 | [0z274](#0z274) | FIXED | **Havengul Laboratory transforms** (tivit, §0z207 item 11): three Clues sacrificed, the Mystery returns the best creature card and taps for {B} at 1 life; +0.0026 T10 / +0.0021 T20 |
 | [0z275](#0z275) | FIXED | **Quirion Ranger untaps a blocker on the pod's turn** (azusa, Tier 4 item 19): a tapped Forest for your toughest tapped creature; a null |
-| [0z276](#0z276) | MEASURED | **Nissa, Sage Animist's -2 when doomed** (azusa, Tier 4 item 18, the owner's rule (a)): -0.0043 at T20 -- the prediction overcalls 7x and costs the -7; built, OFF |
+| [0z276](#0z276) | MEASURED | **Nissa, Sage Animist's -2 when doomed** (azusa, Tier 4 item 18, the owner's rule (a)): -0.0043 at T20 -- the prediction overcalls 7x and costs the -7; superseded by §0z278 |
 | [0z277](#0z277) | FIXED | **Eternal Witness and Regrowth return the highest win-rate row** (azusa, Tier 4 item 15): generated from the table (`tools.return_rank`); a null -- regenerate after the rebuild |
+| [0z278](#0z278) | FIXED | **Nissa's -2 with a tighter predictor** (azusa, §0z276): the expected swing at her through your blocks (`opponents.predicted_at_walker`); a null, +0.0010 at T20; ON |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -23438,6 +23439,7 @@ reach 22.9%. **Why**: the prediction reads her doomed 0.45 times a game
 game -- and every -2 gives up the march to the -7: `pw_ultimates` 0.031
 -> 0.0015. **So `nissa_minus_two` is OFF by default**, the rule kept for a
 tighter predictor (the pod's attack rate, your blockers): the owner's call.
+**SUPERSEDED by §0z278**: that predictor, a null, and the rule ON.
 
 <a id="0z277"></a>
 
@@ -23461,6 +23463,37 @@ fixed BEFORE the first run). The neighbour `test_tutored_etb` B and C
 (when a tutored Witness's ETB resolves) read the old pick, and failed in
 the full suite: they pin `return_by_row=False` now, their subject being
 the timing.
+
+<a id="0z278"></a>
+
+## 0z278. FIXED -- Nissa's -2 with a tighter predictor: the pilot's expected swing at her; a null, ON
+
+**The owner, 2026-11-27**: "Let's go with a tighter predictor as you
+recommend" (§0z276's first one lost).
+
+`opponents.predicted_at_walker(g, loyalty)` (new, shared; nothing else
+calls it): the pod's next swing at one of your planeswalkers, read as
+`predicted_from_bodies` reads it at you -- for each opponent's combat body,
+the chance it attacks your side (`pod_attack_rate` x `chip_share`) times
+its power if your blocks for the walker (`plan_blocks`, its loyalty as the
+life it defends, no chump floor: A5's `_attack_walker` rule) would not stop
+it alone. An expectation, never a roll; the attack taxes are not read.
+`AzusaGame.nissa_doomed` is that against her loyalty after a +1;
+`nissa_doom_rule="power"` keeps §0z276's predictor. **`nissa_minus_two` is
+ON by default.**
+
+Pinned: `tests/test_nissa_minus_two.py`, rewritten -- 9 cases, 5 mutations
+exact (the first run's blocks mutation broke nothing: H's blocker also cut
+your share of the attention, which alone saved her; its body made 21 power,
+the sets as written).
+
+**Measured** (`run_knob_ab azusa nissa_minus_two nissa_doomed_seen`,
+N=15,000, `results/knob_ab_azusa_nissa_expected_20261127.txt`): won T10
+-0.0003 ±0.0010, T20 +0.0010 ±0.0012 -- **a null**, no longer a loss.
+IDENTITY clean (14,466 games); reach 3.6%. Doomed 0.041 times a game
+against 0.064 real deaths (it now under-calls a little, where the first
+over-called sevenfold); `pw_ultimates` -0.0035, not -0.030. Only azusa
+moved (`check_unchanged_decks`, N=2,000, against `a28ea92`).
 
 **Measured** (`run_knob_ab azusa return_by_row return_rule_differs`,
 N=15,000, `results/knob_ab_azusa_return_by_row_20261127.txt`): won T10
