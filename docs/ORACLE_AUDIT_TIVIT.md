@@ -13,8 +13,8 @@
 > label as audited. Tiers 1 and 4 are open.
 >
 > **STATUS 2026-11-22 (§0z207): Tier 1 is done** -- item 1 by the owner's
-> policy (§0z216), 2-6 by text (§0z214); item 8 too. Open: item 7
-> (Kambal's first ability), Tier 2's missing clauses under their PARTLY
+> policy (§0z216), 2-6 by text (§0z214); item 8 too. Item 7 FIXED
+> 2026-11-27 (§0z267). Open: Tier 2's missing clauses under their PARTLY
 > labels, and Tier 4.
 
 **Why a second audit.** §0z116 (2026-10-07) read every engine against the
@@ -136,7 +136,8 @@ card, and on a tie both. A CEILING under the default `opp_vote_policy`.
 IMPLEMENTS THE CARD'S TEXT, so a low score is evidence about the card." For
 each card below the claim is false, and the row is a floor read as evidence.
 
-7. **Kambal, Profiteering Mayor** — "Whenever one or more tokens your
+7. **[FIXED 2026-11-27, §0z267: `pod_tokens_enter`, once a turn,
+   tapped; +0.0012 at T20.]** **Kambal, Profiteering Mayor** — "Whenever one or more tokens your
    opponents control enter, for each of them, create a tapped token that's a
    copy of it. This ability triggers only once each turn." No code reads
    it (`tools.where --card` finds only the second ability, in

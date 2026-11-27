@@ -878,15 +878,24 @@ TREASURE_KEPT = True           # §0z241: an unspent Treasure stays
 GIFTS_GIVEN = True             # §0z241: a gift due is given (the seam)
 
 
-def pod_gift(g, o, card_name: str) -> None:
+def pod_gift(g, o, card_name: str, announce: bool = True) -> None:
     """Your `card_name` resolved against opponent `o`: the mana its text
     hands `o` (`_pod_mana.POD_GIFTS`, generated, §0z241). A basic land is a
     source from its next untap, and at once if untapped on `o`'s own turn;
     Treasure is mana at once and kept until spent. Counted
     (`pod_gifts_due`) whenever `pod_mana` is on, so a measurement reads
-    the reach in both legs; given only with `pod_gifts`."""
+    the reach in both legs; given only with `pod_gifts`.
+
+    A Treasure gift is a TOKEN the opponent creates, whatever the mana
+    model: `announce` hands it to the game's `pod_tokens_enter` (tivit's
+    Kambal, §0z267); a caller that gives a batch one opponent at a time
+    passes False and announces the batch itself."""
     from edhmc.decks._pod_mana import POD_GIFTS
     gift = POD_GIFTS.get(card_name)
+    if announce and gift is not None and gift[0] == "treasure":
+        hook = getattr(g, "pod_tokens_enter", None)
+        if hook is not None:
+            hook("Treasure", gift[1])
     if o is None or gift is None or not pod_mana_on(g):
         return
     g.m["pod_gifts_due"] += 1

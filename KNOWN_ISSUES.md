@@ -259,7 +259,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z204](#0z204) | **FLIPPED** | **Item 44's combat is the default; the pod re-fitted** (`incidental_rate` 0.78 -> 1.45): mean T20 0.4702 -> 0.4680 at N=15,000, out of sample 0.4616 vs 0.4612. T10 falls 0.229 -> 0.213. Six caches SUSPECT until the rebuild |
 | [0z205](#0z205) | MEASURED | **Item 44's policy re-read** (§0z5): every pilot policy's incumbent wins on the new pod; three knobs retired by the flip; the split plan keeps the formula's count. No default changed |
 | [0z206](#0z206) | FIXED | **Item 46's cheap half** (§0z197 C-E): Woe Strider to PARTLY; the stale statements fixed, with those the flip added; two karlov cards to SCRIPTED; haste and lifelink audited. Bit-identical; five floors named |
-| [0z207](#0z207) | PARTLY RESOLVED | **Tivit's oracle re-audit**: the behaviours fixed (1, §0z216; 2-6 and 8, §0z214), the labels and reasons fixed; left: 7, Kambal's first ability, implemented nowhere; 9-15's clauses; 23-29's piloting choices |
+| [0z207](#0z207) | PARTLY RESOLVED | **Tivit's oracle re-audit**: the behaviours fixed (1, §0z216; 2-6 and 8, §0z214), the labels and reasons fixed; 7, Kambal's first ability, fixed (§0z267); left: 9-15's clauses; 23-29's piloting choices |
 | [0z208](#0z208) | PARTLY RESOLVED | **Shilgengar's oracle re-audit**: the three behaviours fixed (§0z215, nulls), the 13 labels and 9 reasons fixed; left: items 4-15's missing clauses (under PARTLY) and 25-29's piloting choices |
 | [0z209](#0z209) | PARTLY RESOLVED | **Azusa's oracle re-audit**: Genesis Wave, Animist's Awakening, tutored ETBs and Chord fixed (§0z210-§0z213), labels and reasons fixed; left: 4-5's small ceilings, eight utility lands with no code, the fixed X |
 | [0z210](#0z210) | FIXED | **Genesis Wave by its text** (item 47): the top six revealed, the rest milled. Azusa -0.0034 / -0.0039 at T10 / T20: the old tutor took the mv-6 creatures; the mill costs nothing |
@@ -319,6 +319,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z264](#0z264) | MEASURED | **Why the pod's boards outrun its mana** (queue item 53): only its turns 1-3 -- the gate's +0.118 is turn-1-3 costs 0.018, the answer reserve 0.037, pieces 0.008, and 0.054 real overcommitment |
 | [0z265](#0z265) | BUILT | **The cost cap taken; the growth rate a knob** (item 52): the cap's first cut reconciled the body pool -- fixed; growth alone saturates at +0.032 over today, but moves the decks evenly |
 | [0z266](#0z266) | FLIPPED | **Item 52's gate on, no reserve before bodies, growth 0.91** (item 53): the re-fit crosses at 0.911; on fresh seeds +0.0083 against the old pod, every deck inside its bar |
+| [0z267](#0z267) | FIXED | **Kambal, Profiteering Mayor copies the pod's tokens** (tivit, §0z207 item 7): once a turn, tapped; +0.0012 ±0.0009 at T20, in 5.1% of games -- rare, not large |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -18582,7 +18583,9 @@ now also get their own Treasure, as the pod's mana (§0z245). The labels
 Kambal's first ability ("for each of them, create a tapped token that's a
 copy of it"), implemented nowhere -- a floor; since §0z245 the pod's
 Treasures from Tempting Contract and Master of Ceremonies are made in code
-(`opponents.pod_gift`), the one place it could hook in. Items 9-15's
+(`opponents.pod_gift`), the one place it could hook in. **Item 7 FIXED
+2026-11-27 (§0z267)**: hooked there and at tivit's own sites; +0.0012 at
+T20. Items 9-15's
 missing clauses, under their PARTLY labels. Tier 4, items 23-29: seven
 piloting choices nobody argued.
 
@@ -22983,6 +22986,69 @@ signature since §0z265's commit, which passed the commit unrun: fixed.
 
 **Every active baseline moved**: all six caches SUSPECT, trostani
 SUSPENDED, until the rebuild (item 53, the owner's call).
+
+<a id="0z267"></a>
+
+## 0z267. FIXED -- Kambal, Profiteering Mayor copies the pod's tokens (tivit, §0z207 item 7)
+
+**The owner, 2026-11-27**: "go ahead with kambal first" -- the first of
+the fixes before the rebuild.
+
+    "Whenever one or more tokens your opponents control enter, for each of
+    them, create a tapped token that's a copy of it. This ability triggers
+    only once each turn."                 ({1}{W}{B}; Scryfall 2026-11-27)
+
+No code read it (§0z207 item 7); only the second ability (the drain on
+your tokens entering) was modelled. **Built** as `tivit.pod_tokens_enter`,
+one call per batch, behind `kambal_copies` (True):
+
+- **The batches the pod gets in this list**: Tempting Contract's takers'
+  Treasures and Master of Ceremonies' choosers' Treasures (else Citizens),
+  in your upkeep, in that order; Tempt with Bunnies' takers' Rabbits; An
+  Offer You Can't Refuse's two Treasures, from shared code --
+  `opponents.pod_gift` now hands every Treasure gift to the game's
+  `pod_tokens_enter` hook (`announce=False` where a caller gives a batch
+  one opponent at a time). Only tivit defines the hook.
+- **Once each turn** keyed on your turn or the pod seat's
+  (`kambal_turn_key`): the turn's first batch is copied. Contract before
+  Ceremonies is the order `upkeep` resolves them -- a pilot's choice.
+- **The copies are tokens you create**: Anointed Procession doubles them;
+  Academy Manufactor replaces a copied Treasure with one of each (its
+  replacement applies to a token copy of a Treasure -- a reading, no
+  ruling says it either way); Kambal's second ability and Mirkwood Bats
+  see the batch.
+- **Tapped**: a copied Treasure is in the pile (an artifact for every
+  payoff) but no mana until your untap (`treasures_tapped`, new; a
+  sacrifice not for mana takes a tapped one first). Rabbits and Citizens
+  enter tapped, so they do not block on the pod's turns. A tapped Clue
+  cracks as any ({2}, no {T}); a tapped Food is not tracked, since nothing
+  in tivit taps a Food.
+- **Blind**: the pod's own token makers -- the model has none.
+
+**Pinned**: `tests/test_kambal_copies.py`, 12 cases, 5 mutations exact
+(the first run broke C with B under the first mutation -- C continued B's
+game; made its own game, the sets as written).
+
+**Measured** (`diagnostics.run_knob_ab tivit kambal_copies
+kambal_copy_seen`, staged list, N=15,000 paired, seeds 5000..,
+`results/knob_ab_tivit_kambal_copies_20261127.txt`):
+
+| | A - B |
+|---|---|
+| won T10 | **+0.0016 ±0.0009** |
+| won T20 | **+0.0012 ±0.0009** |
+
+IDENTITY: the 14,229 games where `kambal_copy_seen` is 0 in both legs are
+bit-identical. **The reach is small**: 771 games of 15,000 (5.1%) have
+Kambal on the battlefield when an opponent's tokens enter, and in those
+the rule is worth +0.023 at T20. 0.09 triggers a game, 1.46 copies each;
+`kambal_triggers` (the second ability) +0.063 a game. The audit's
+"possibly a large one" was the size per hit; the hits are rare -- Kambal
+has to be out with one of four cards.
+
+**Only tivit moved** (`tools.check_unchanged_decks`, N=2,000, against
+`27b7343`): the other five active decks BIT-IDENTICAL on all 8 metrics.
+Tivit's cache was SUSPECT already (§0z266).
 
 ## How to read an ablation table
 

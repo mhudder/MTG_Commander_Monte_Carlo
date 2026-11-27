@@ -107,6 +107,10 @@ class TivitGame(BaseGame):
         # `artifact_count`, Cyberdrive and Time Sieve's fuel all see them.
         self.tokens["Powerstone"] = 0
         self.powerstones_tapped = 0     # of the pile; they untap each turn
+        # §0z267: Treasures that entered TAPPED (Kambal's copies) -- in the
+        # pile, artifacts for every payoff, but no mana until your untap.
+        self.treasures_tapped = 0
+        self.kambal_copy_turn = None    # the turn Kambal last copied
         self.venser_return = False      # Tivit is in exile until end step
         self.soldier_tokens = 0         # Lieutenants / Vault 11, real bodies
         self.saga_lore = {}             # id -> [Saga permanent, lore] (§0z83)
@@ -175,6 +179,11 @@ class TivitGame(BaseGame):
         if dry:
             return can_pay(cost, mana_units(self)) is not None
         return pay(self, cost)
+
+    def pod_tokens_enter(self, kind, n):
+        """Tokens an opponent creates, from shared code (`opponents.
+        pod_gift`'s Treasures, An Offer You Can't Refuse's): §0z267."""
+        pod_tokens_enter(self, kind, n)
 
     def draw(self, n=1):
         """MR. SPOCK, SCIENCE OFFICER (candidate, 2026-10-23): "If you would
@@ -311,8 +320,13 @@ ROUTE_TIME_SIEVE = 6     # extra turns until the pod is dead
 # Tokens — the artifact engine
 # ---------------------------------------------------------------------------
 
-def make_token(g, kind, n=1):
+def make_token(g, kind, n=1, tapped=False):
     """Create n tokens of `kind`, honouring Academy Manufactor.
+
+    `tapped` (§0z267, Kambal's copies "create a TAPPED token"): every
+    Treasure it makes is counted in `treasures_tapped`, no mana until your
+    untap. A tapped Clue cracks as an untapped one ({2}, no {T}); a tapped
+    Food is not tracked -- nothing in tivit taps a Food.
 
     "If you would create a Clue, Food, or Treasure token, instead create one of
     each." It is a REPLACEMENT effect on the creation, so it applies once per
@@ -334,6 +348,8 @@ def make_token(g, kind, n=1):
         g.tokens[k] += n
         g.m[f"{k.lower()}s_made" if k != "Food" else "food_made"] += n
         made += n
+    if tapped and "Treasure" in kinds:
+        g.treasures_tapped += n
     g.m["artifacts_made"] += made
     on_tokens_created(g, made)
     return made
@@ -347,6 +363,52 @@ def on_pod_creature_deaths(g, o, n):
     k = int(n) * g.count("Revel in Riches")
     if k:
         g.m["revel_treasures"] += make_token(g, "Treasure", k)
+
+
+KAMBAL = "Kambal, Profiteering Mayor"
+
+
+def kambal_turn_key(g):
+    """Which turn it is, for "this ability triggers only once each turn":
+    your turn, or the pod seat whose turn it is (`pod_seat`)."""
+    return (g.turn, getattr(g, "pod_seat", None))
+
+
+def pod_tokens_enter(g, kind, n) -> None:
+    """KAMBAL, PROFITEERING MAYOR's first ability (§0z267; Scryfall
+    2026-11-27): "Whenever one or more tokens your opponents control enter,
+    for each of them, create a tapped token that's a copy of it. This
+    ability triggers only once each turn."
+
+    ONE CALL IS ONE EVENT: `n` tokens of `kind` an opponent created at
+    once -- Tempting Contract's takers' Treasures, Master of Ceremonies'
+    money (else friends) choosers', Tempt with Bunnies' takers' Rabbits,
+    An Offer You Can't Refuse's two (`opponents.pod_gift`). Only the turn's
+    FIRST batch is copied: Contract's upkeep trigger resolves before
+    Master of Ceremonies' (the order `upkeep` resolves them, a pilot's
+    choice), and of Ceremonies' two creations the Treasures come first.
+    A copy is a token YOU create, so Anointed Procession doubles it,
+    Academy Manufactor replaces a Treasure's (its replacement applies to
+    a token copy of a Treasure; the Clue and Food enter tapped too), and
+    Kambal's second ability and Mirkwood Bats see the batch. Blind: the
+    pod's own token makers, which the model does not have.
+    `kambal_copies=False` is the old rule (nothing)."""
+    if n <= 0 or not g.has(KAMBAL):
+        return
+    g.m["kambal_copy_seen"] += 1          # the reach, either rule
+    if not g.cfg.get("kambal_copies", True):
+        return
+    key = kambal_turn_key(g)
+    if g.kambal_copy_turn == key:
+        g.m["kambal_copy_once"] += 1      # held by "once each turn"
+        return
+    g.kambal_copy_turn = key
+    g.m["kambal_copy_triggers"] += 1
+    g.m["kambal_copies"] += n
+    if kind == "Treasure":
+        make_token(g, "Treasure", n, tapped=True)
+    else:
+        g.make_tokens(n, 1, 1, kind, tapped=True)
 
 
 def on_tokens_created(g, n):
@@ -380,13 +442,19 @@ def on_tokens_created(g, n):
             g.m["win_route"] = ROUTE_DRAIN
 
 
-def sacrifice_tokens(g, kind, n) -> int:
+def sacrifice_tokens(g, kind, n, tapped_first=True) -> int:
     """Remove n tokens of `kind` and fire everything that reads a token or an
-    artifact LEAVING the battlefield. Returns how many actually went."""
+    artifact LEAVING the battlefield. Returns how many actually went.
+    A Treasure sacrificed for anything but its mana is a tapped one first
+    (§0z267); `pay` passes `tapped_first=False` -- its Treasures were
+    untapped."""
     n = min(n, g.tokens[kind])
     if n <= 0:
         return 0
     g.tokens[kind] -= n
+    if kind == "Treasure":
+        g.treasures_tapped = (max(0, g.treasures_tapped - n) if tapped_first
+                              else min(g.treasures_tapped, g.tokens[kind]))
     per = 0.0
     if g.has("Nadier's Nightblade"):
         per += 1.0                     # "whenever a token you control leaves"
@@ -516,6 +584,10 @@ def untapped_powerstones(g) -> int:
     return max(0, g.tokens["Powerstone"] - g.powerstones_tapped)
 
 
+def untapped_treasures(g) -> int:
+    return max(0, g.tokens["Treasure"] - g.treasures_tapped)
+
+
 def mana_units(g, powerstones: bool = False) -> list[frozenset]:
     """One entry per point of mana available, Treasures included.
 
@@ -551,7 +623,7 @@ def mana_units(g, powerstones: bool = False) -> list[frozenset]:
     # the three apart. With no Powerstones this is the pool it always was.
     if powerstones:
         units.extend([frozenset({"C"})] * untapped_powerstones(g))
-    units.extend([any_col] * g.tokens["Treasure"])
+    units.extend([any_col] * untapped_treasures(g))     # §0z267
     return units
 
 
@@ -564,7 +636,7 @@ def pay(g, cost, powerstones: bool = False) -> bool:
     if idx is None:
         return False
     n_units = len(units)
-    n_treasure = g.tokens["Treasure"]
+    n_treasure = untapped_treasures(g)
     first_treasure = n_units - n_treasure
     used_treasures = sum(1 for i in idx if i >= first_treasure)
     n_stone = untapped_powerstones(g) if powerstones else 0
@@ -590,7 +662,7 @@ def pay(g, cost, powerstones: bool = False) -> bool:
 
     g.m["mana_spent"] += len(idx)
     if used_treasures:
-        sacrifice_tokens(g, "Treasure", used_treasures)
+        sacrifice_tokens(g, "Treasure", used_treasures, tapped_first=False)
         g.m["treasures_spent"] += used_treasures
     return True
 
@@ -1319,6 +1391,7 @@ def resolve(g, card):
         n = V.tempting_offer(g)
         g.draw(n)
         g.make_tokens(n, 1, 1, "Rabbit")
+        pod_tokens_enter(g, "Rabbit", n - 1)    # the takers' (§0z267)
     elif s == "vault11":
         # Chapter I only: "for each opponent, create a 1/1 Human Soldier".
         # Its two votes are chapters II and III, on later draw steps
@@ -1604,7 +1677,8 @@ def upkeep(g):
         # Treasure, mana for the pod since item 50 (§0z245).
         if g.cfg.get("pod_gifts_symmetric", True):
             for o in takers:
-                OPP.pod_gift(g, o, "Tempting Contract")
+                OPP.pod_gift(g, o, "Tempting Contract", announce=False)
+        pod_tokens_enter(g, "Treasure", len(takers))      # §0z267, one batch
     if g.has("Master of Ceremonies"):
         # "Each opponent chooses money, friends, or secrets. For each player
         # who chose X, you AND that player each get X." You MATCH them, so it
@@ -1620,7 +1694,13 @@ def upkeep(g):
         if g.cfg.get("pod_gifts_symmetric", True):
             for o, x in zip(living, pick):
                 if x == 0:
-                    OPP.pod_gift(g, o, "Master of Ceremonies")
+                    OPP.pod_gift(g, o, "Master of Ceremonies",
+                                 announce=False)
+        # §0z267: the choosers' tokens -- the Treasures enter first, so
+        # Kambal copies them; with no money chooser, the Citizens.
+        money = sum(1 for x in pick if x == 0)
+        pod_tokens_enter(g, "Treasure" if money else "Citizen",
+                         money or sum(1 for x in pick if x == 1))
         g.make_tokens(sum(1 for x in pick if x == 1), 1, 1, "Citizen")
         g.draw(sum(1 for x in pick if x == 2))
     # "Whenever an opponent casts their SECOND spell each turn, create a
@@ -2161,6 +2241,7 @@ def take_turn(g, extra=False):
         p.tapped = False
         p.sick = False
     g.powerstones_tapped = 0            # the Powerstone pile untaps (§0z74)
+    g.treasures_tapped = 0              # and Kambal's copies (§0z267)
     g.land_drops = 1
     g.land_drops_used = 0
 
