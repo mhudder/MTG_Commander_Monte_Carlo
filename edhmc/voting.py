@@ -255,5 +255,10 @@ def _vote_payoffs(g, votes_against: int):
             g.m["grudge_damage"] += 2.0 * votes_against
     if g.has("Model of Unity"):
         # "You and each opponent who voted for a choice you voted for may
-        # scry 2." Scry is modelled as a small draw-quality nudge, not a card.
-        g.m["unity_scrys"] += 1
+        # scry 2" -- you, always: you voted for your own choice. By the one
+        # scry rule (`engine.scry`, §0z271); `unity_scry=False` is the old
+        # count, nothing read it. The opponents' scry: the pod has no
+        # library order.
+        g.m["unity_scrys"] += 1               # the reach, either rule
+        if g.cfg.get("unity_scry", True):
+            ENG.scry(g, 2)

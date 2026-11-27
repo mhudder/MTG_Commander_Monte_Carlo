@@ -143,6 +143,7 @@ from edhmc.engine import (cleanup_step, begin_game, BaseGame, Board, Card, Perma
                           colours_of, convoke_pool as shared_convoke_pool,
                           x_plan as shared_x_plan)
 from edhmc import opponents as OPP
+from edhmc import engine as EN       # §0z271: the one scry rule
 from edhmc.decks._evasion import FOREST, PLAINS, LEGENDARY
 
 COMMANDER_NAME = "Trostani, Selesnya's Voice"
@@ -866,14 +867,7 @@ class TrostaniGame(BaseGame):
         """Scry 1: bottom a land once there are `scry_land_bottom` (5) lands
         out, a spell the deck cannot yet cast (two over the land count)
         while there are few."""
-        if not self.library:
-            return
-        top = self.library[-1]
-        lands = sum(1 for p in self.board if p.card.is_land)
-        if (top.is_land and lands >= self.cfg.get("scry_land_bottom", 5)) or \
-                (not top.is_land and top.mv > lands + 2):
-            self.library.insert(0, self.library.pop())
-            self.m["scry_bottomed"] += 1
+        EN.scry(self, 1)                      # the one rule (§0z271)
 
     def hideaway_etb(self, perm):
         """Hideaway 4: "look at the top four cards of your library, exile one

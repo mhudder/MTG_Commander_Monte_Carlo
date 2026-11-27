@@ -322,6 +322,9 @@ Each row is a headline and its key number, at most 250 characters
 | [0z267](#0z267) | FIXED | **Kambal, Profiteering Mayor copies the pod's tokens** (tivit, §0z207 item 7): once a turn, tapped; +0.0012 ±0.0009 at T20, in 5.1% of games -- rare, not large |
 | [0z268](#0z268) | FIXED | **Elesh Norn's -2/-2 reaches the pod's survivors** (shilgengar, §0z208 item 12): a static shift read in `pod_bodies`; +0.0033 ±0.0014 at T20 |
 | [0z269](#0z269) | FIXED | **Soulherder's +1/+1 counter** (tivit, §0z207 item 9): every blink and every exile answer on a creature piece; a null, +0.0008 ±0.0011 -- 80% of the counters land in Deadeye loops already winning |
+| [0z270](#0z270) | FIXED | **Mechanized Production by its text** (tivit, §0z207 item 15): it copies what it enchants and any eight of a name win; +0.0178 T10 / +0.0071 T20 -- most wins are eight Clues |
+| [0z271](#0z271) | FIXED | **One scry rule (`engine.scry`), and Model of Unity's scry 2** (tivit, §0z207 item 13): trostani's and shilgengar's copies merged, bit-identical; a null |
+| [0z272](#0z272) | FIXED | **Tamiyo's Journal's tutor** (tivit, §0z207 item 10): three idle Clues at the end step for the best card; +0.0287 T10 / +0.0157 T20 -- it fetches Time Sieve and Mirkwood Bats |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -18587,7 +18590,9 @@ copy of it"), implemented nowhere -- a floor; since §0z245 the pod's
 Treasures from Tempting Contract and Master of Ceremonies are made in code
 (`opponents.pod_gift`), the one place it could hook in. **Item 7 FIXED
 2026-11-27 (§0z267)**: hooked there and at tivit's own sites; +0.0012 at
-T20. **Item 9 FIXED 2026-11-27 (§0z269)**, a null. Items 9-15's
+T20. **Item 9 FIXED 2026-11-27 (§0z269)**, a null; **items 10, 13 and
+15 FIXED (§0z272, §0z271, §0z270)**; item 14 was fixed by §0z246 (Monologue
+Tax reads the pod's own second spells). Left: 11 and 12. Items 9-15's
 missing clauses, under their PARTLY labels. Tier 4, items 23-29: seven
 piloting choices nobody argued.
 
@@ -23179,6 +23184,106 @@ counter is small where it is not redundant.
 
 **Only tivit moved** (`tools.check_unchanged_decks`, N=2,000, against
 `baf1675`): the other five active decks BIT-IDENTICAL on all 8 metrics.
+
+<a id="0z270"></a>
+
+## 0z270. FIXED -- Mechanized Production by its text: any eight of a name win (tivit, §0z207 item 15)
+
+**The owner, 2026-11-27**: "go ahead with the smaller tivit fixes next".
+
+    "Enchant artifact you control. At the beginning of your upkeep, create
+    a token that's a copy of enchanted artifact. Then if you control eight
+    or more artifacts with the same name as one another, you win the
+    game."                               ({2}{U}{U}; Scryfall 2026-11-27)
+
+It was a Treasure each upkeep and a win at eight Treasures -- an enchanted
+Treasure assumed, never spent. **Built** behind `mech_text` (True):
+
+- **What it enchants, A POLICY** (`mech_enchant`, as it enters): the token
+  pile with the most copies, ties to the kind tivit spends least (Food,
+  Clue, Powerstone, Treasure); with no token, a real artifact by name.
+- **The copy** (`mech_upkeep`) is of that kind: a Treasure, Clue or Food
+  copy is that token created (Academy Manufactor, Anointed Procession
+  apply); a Powerstone copy enters untapped; a real artifact's copy counts
+  toward the eight, its abilities not modelled (a floor).
+- **The win** (`mech_wins_now`, also read by the pile dig and the old
+  alt-win timing): eight of ANY name -- Treasure, Clue, Food, Powerstone,
+  or the enchanted real artifact.
+- **The Aura falls off** when the enchanted kind's pile is empty (the
+  enchanted one is the last spent), read at the upkeep -- a floor.
+
+Pinned: `tests/test_mechanized_production.py`, 9 cases, 5 mutations exact.
+
+**Measured** (`run_knob_ab tivit mech_text mech_upkeeps`, N=15,000 paired,
+`results/knob_ab_tivit_mech_text_20261127.txt`): **won T10 +0.0178
+±0.0028, T20 +0.0071 ±0.0024**; IDENTITY clean (12,874 games); reach
+14.2%, and there +0.126 / +0.050. `turn_won` -3.9. **Why** (3,000 seeds,
+238 Mechanized wins): **169 by eight Clues**, 23 by eight Treasures, 32 by
+two or three piles at once, 3 by Food, 11 by an enchanted real artifact.
+Tivit investigates on every evidence vote and cracks Clues only from spare
+mana, so they pile up -- and eight Clues are eight artifacts of one name.
+The old rule saw only the pile the deck spends as mana. A pilot who held
+Clues back for the eight is not modelled (a floor).
+
+<a id="0z271"></a>
+
+## 0z271. FIXED -- one scry rule (`engine.scry`), and Model of Unity's scry 2 (tivit, §0z207 item 13): a null
+
+    "Whenever players finish voting, you and each opponent who voted for a
+    choice you voted for may scry 2."   (Model of Unity; Scryfall 2026-11-27)
+
+`voting._vote_payoffs` counted `unity_scrys` and nothing read it ("a small
+draw-quality nudge", and there was none). **The scry rule was written
+twice** -- trostani's `scry1`, shilgengar's `seer_scry` (§0u) -- and is one
+function now: `engine.scry_bottoms` (a land once `scry_land_bottom` (5)
+lands are out, a spell more than two over the land count) and
+`engine.scry(g, n)` (the top n by it; the kept stay in order). Both old
+sites call it -- shilgengar BIT-IDENTICAL at N=2,000 (trostani, SUSPENDED,
+the same one-line call). Model of Unity scries 2 for you on every vote,
+behind `unity_scry` (True); the opponents' scry has no library to order.
+
+Pinned: `tests/test_unity_scry.py`, 6 cases, 4 mutations exact (the first
+run's lands lacked `is_land`, a field -- the helper fixed, the sets as
+written).
+
+**Measured** (`run_knob_ab tivit unity_scry unity_scrys`, N=15,000,
+`results/knob_ab_tivit_unity_scry_20261127.txt`): won T10 +0.0013 ±0.0019,
+T20 -0.0006 ±0.0020 -- **a null**. IDENTITY clean (12,241 games); reach
+18.4%. 3.6 scries a game bottom 0.53 cards: the rule rarely finds a card
+to move.
+
+<a id="0z272"></a>
+
+## 0z272. FIXED -- Tamiyo's Journal's tutor (tivit, §0z207 item 10): idle Clues become the deck's best card
+
+    "At the beginning of your upkeep, investigate. {T}, Sacrifice three
+    Clues: Search your library for a card, put that card into your hand,
+    then shuffle."                          ({5}; Scryfall 2026-11-27)
+
+Only the investigate was modelled. **Built** as `tivit.journal_tutor`,
+behind `journal_tutor` (True), **A POLICY**, said: at your end step, the
+Journal untapped, with three Clues the turn's mana did not crack, for the
+card Demonic Tutor takes (`_tutor`, the highest priority); not while
+Mechanized Production enchants a Clue (§0z270: its eight is a win). The
+three are sacrificed (the leave payoffs fire); the library is shuffled.
+(Demonic Tutor's `_tutor` does not shuffle -- a gap of its own, not
+changed here.)
+
+Pinned: `tests/test_journal_tutor.py`, 7 cases, 4 mutations exact.
+
+**Measured** (`run_knob_ab tivit journal_tutor journal_tutor_ready`,
+N=15,000, `results/knob_ab_tivit_journal_tutor_20261127.txt`): **won T10
++0.0287 ±0.0029, T20 +0.0157 ±0.0023**; IDENTITY clean (13,237 games);
+reach 11.8%, and there **+0.245 / +0.133**. **Why** (3,000 seeds, 344
+games, 570 tutors): it fetches **Time Sieve** (237), **Mirkwood Bats**
+(146), Sol Ring (105), Deadeye Navigator (38), Academy Manufactor (34) --
+the deck's engine, for free, about 1.7 times a game once it is out with
+idle Clues; 83% of those games are won, by drain (153) and combat (103).
+The size is a fact about this policy and the deck's priority order, so
+**say the knob**: `journal_tutor`, and the priorities `_tutor` reads.
+
+**Only tivit moved** across §0z270-§0z272 (`check_unchanged_decks`,
+N=2,000, against `c7e994b`: the other five active decks BIT-IDENTICAL).
 
 ## How to read an ablation table
 

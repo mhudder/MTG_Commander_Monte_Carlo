@@ -154,6 +154,7 @@ from edhmc.engine import (cycle_step, cleanup_step, late_land_drop, remove_card,
                           pearl_collector_lifelink, perpetual_lifelink,
                           counts_as_land_in_hand, largest_x, x_cost)
 from edhmc import opponents as OPP
+from edhmc import engine as EN       # §0z271: the one scry rule
 from edhmc.decks._evasion import HUMAN   # Herald of War (§0z84)
 
 # Item 45 (§0z248): the MDFC whose front face `agadeem_x` casts.
@@ -798,12 +799,7 @@ class ShilgengarGame(BaseGame):
         if not self.cfg.get("seer_scry", True):
             return
         self.m["seer_scrys"] += 1
-        top = self.library[-1]
-        lands = sum(1 for p in self.board if p.card.is_land)
-        if (top.is_land and lands >= self.cfg.get("scry_land_bottom", 5)) or \
-                (not top.is_land and top.mv > lands + 2):
-            self.library.insert(0, self.library.pop())
-            self.m["scry_bottomed"] += 1
+        EN.scry(self, 1)                      # the one rule (§0z271)
 
     def mind_stone_crack(self) -> None:
         """MIND STONE: "{1}, {T}, Sacrifice this artifact: Draw a card."

@@ -111,6 +111,8 @@ class TivitGame(BaseGame):
         # pile, artifacts for every payoff, but no mana until your untap.
         self.treasures_tapped = 0
         self.kambal_copy_turn = None    # the turn Kambal last copied
+        self.mech_target = None         # §0z270: what Mechanized enchants
+        self.mech_real_copies = 0       # its copies of a real artifact
         self.venser_return = False      # Tivit is in exile until end step
         self.soldier_tokens = 0         # Lieutenants / Vault 11, real bodies
         self.saga_lore = {}             # id -> [Saga permanent, lore] (§0z83)
@@ -975,7 +977,7 @@ def convert_the_pile(g):
         if g.has("Revel in Riches") and g.tokens["Treasure"] >= 10:
             g.win(ROUTE_REVEL)
             return
-        if g.has("Mechanized Production") and g.tokens["Treasure"] >= 8:
+        if g.has("Mechanized Production") and mech_wins_now(g):
             g.win(ROUTE_MECHANIZED)
             return
     # BY THE TEXT (§0z214, §0z207 items 4-5; `pile_text=False` is the old
@@ -1081,7 +1083,8 @@ def dig_the_pile(g) -> None:
         return
     if g.has("Revel in Riches") and g.tokens["Treasure"] >= 10:
         return
-    if g.has("Mechanized Production") and max(g.tokens.values()) >= 8:
+    if g.has("Mechanized Production") and (
+            mech_wins_now(g) if mech_text(g) else max(g.tokens.values()) >= 8):
         return
     g.pile_digging = True
     try:
@@ -1642,8 +1645,117 @@ def _tutor(g, pred):
     g.hand.append(best)
 
 
+MECH = "Mechanized Production"
+# §0z270: the piles Mechanized Production can enchant, in the tie order --
+# the kind tivit spends least first (nothing taps a Food; a Clue costs {2};
+# a Powerstone is mana; a Treasure is the deck's mana).
+MECH_KINDS = ("Food", "Clue", "Powerstone", "Treasure")
+
+
+def mech_text(g) -> bool:
+    return bool(g.cfg.get("mech_text", True))
+
+
+def mech_enchant(g) -> None:
+    """MECHANIZED PRODUCTION's "Enchant artifact you control" (§0z270): the
+    pilot's choice as it enters, A POLICY -- the token pile with the most
+    copies (eight of a name is the win), ties to the kind spent least
+    (`MECH_KINDS`); with no token, a real artifact, by name."""
+    piles = [k for k in MECH_KINDS if g.tokens.get(k, 0) > 0]
+    if piles:
+        g.mech_target = max(piles, key=lambda k: (g.tokens[k],
+                                                  -MECH_KINDS.index(k)))
+        return
+    real = next((p.card.name for p in g.board if "Artifact" in p.card.types
+                 and not p.card.is_land), None)
+    g.mech_target = ("real", real) if real else None
+
+
+def mech_count(g) -> int:
+    """How many artifacts of the enchanted one's name you control."""
+    t = g.mech_target
+    if t is None:
+        return 0
+    if isinstance(t, tuple):
+        return g.board.names.get(t[1], 0) + g.mech_real_copies
+    return g.tokens.get(t, 0)
+
+
+def mech_wins_now(g) -> bool:
+    """"...if you control eight or more artifacts with the same name as one
+    another, you win the game." By the text (§0z270): any pile of eight --
+    Treasure, Clue, Food or Powerstone -- or eight of the enchanted real
+    artifact. `mech_text=False`: eight Treasures, the old rule."""
+    if not mech_text(g):
+        return g.tokens["Treasure"] >= 8
+    if any(g.tokens.get(k, 0) >= 8 for k in MECH_KINDS):
+        return True
+    t = g.mech_target
+    return isinstance(t, tuple) and mech_count(g) >= 8
+
+
+def mech_upkeep(g) -> bool:
+    """"At the beginning of your upkeep, create a token that's a copy of
+    enchanted artifact. Then if you control eight or more artifacts with
+    the same name as one another, you win the game." True if it won.
+
+    By the text (§0z270, `mech_text`): the copy is of what it enchants
+    (`mech_enchant`) -- a token copy of a Treasure, Clue or Food is that
+    token created, so Academy Manufactor and Anointed Procession apply; a
+    Powerstone copy enters untapped (the tapped is Dyfed's effect, not
+    copiable); a real artifact's copy is counted toward the eight, its
+    abilities not modelled (a floor). The enchanted token is the last of
+    its pile spent, so the Aura falls off when the pile is empty -- read
+    here, at the upkeep (a floor: a pile emptied and refilled since keeps
+    it). Off: a Treasure each upkeep, eight Treasures win (the old
+    rule, which assumed an enchanted Treasure never spent)."""
+    g.m["mech_upkeeps"] += 1                 # the reach, either rule
+    if not mech_text(g):
+        make_token(g, "Treasure")
+        if g.tokens["Treasure"] >= 8:
+            g.win(ROUTE_MECHANIZED)
+            return True
+        return False
+    if g.mech_target is None:
+        mech_enchant(g)
+    t = g.mech_target
+    if t is None:
+        return False
+    if isinstance(t, tuple):
+        if not g.has(t[1]):
+            t = None
+        else:
+            g.mech_real_copies += 2 if g.has("Anointed Procession") else 1
+            g.m["mech_copies"] += 1
+    elif g.tokens.get(t, 0) <= 0:
+        t = None
+    elif t == "Powerstone":
+        n = 2 if g.has("Anointed Procession") else 1
+        g.tokens["Powerstone"] += n
+        g.m["powerstones_made"] += n
+        g.m["artifacts_made"] += n
+        on_tokens_created(g, n)
+        g.m["mech_copies"] += 1
+    else:
+        make_token(g, t)
+        g.m["mech_copies"] += 1
+    if t is None:                           # the Aura fell off
+        perm = next(p for p in g.board if p.card.name == MECH)
+        g.board.remove(perm)
+        g.graveyard.append(perm.card)
+        g.mech_target = None
+        g.m["mech_fell_off"] += 1
+        return False
+    if mech_wins_now(g):
+        g.win(ROUTE_MECHANIZED)
+        return True
+    return False
+
+
 def run_etb(g, perm):
     s = perm.card.script
+    if perm.card.name == MECH and mech_text(g):
+        mech_enchant(g)                      # §0z270
     if s == "deadeye":
         # Soulbond pairs on entry with an unpaired creature; Tivit is the one
         # worth pairing with, and the pair is what grants the {1}{U} ability.
@@ -1761,9 +1873,7 @@ def upkeep(g):
         else:
             coercive_carnage(g)
     if g.has("Mechanized Production"):
-        make_token(g, "Treasure")
-        if g.tokens["Treasure"] >= 8:
-            g.win(ROUTE_MECHANIZED)
+        if mech_upkeep(g):                   # §0z270
             return
     if g.has("Revel in Riches") and g.tokens["Treasure"] >= 10:
         g.win(ROUTE_REVEL)
@@ -1877,6 +1987,7 @@ def end_step(g):
             blink_tivit(g, name)
             if g.result is not None:
                 return
+    journal_tutor(g)                         # §0z272
     havengul_end_step(g)
     treasure_vault(g)
 
@@ -1929,6 +2040,38 @@ def treasure_vault(g) -> None:
     make_token(g, "Treasure", x)
     g.m["vault_activations"] += 1
     g.m["vault_x"] += x
+
+
+JOURNAL = "Tamiyo's Journal"
+
+
+def journal_tutor(g) -> bool:
+    """TAMIYO'S JOURNAL's second ability (§0z272; Scryfall 2026-11-27):
+    "{T}, Sacrifice three Clues: Search your library for a card, put that
+    card into your hand, then shuffle." Only the upkeep investigate was
+    modelled (§0z207 item 10).
+
+    THE POLICY, said: at your end step, the Journal untapped, with three
+    Clues the turn's mana did not crack -- idle Clues become a tutor --
+    for the card Demonic Tutor would take (`_tutor`, the highest
+    priority), not while Mechanized Production enchants a Clue (its eight
+    is a win). The three are sacrificed, so the leave payoffs fire.
+    `journal_tutor=False` is the old rule (Clues cracked only)."""
+    j = next((p for p in g.board if p.card.name == JOURNAL
+              and not p.tapped), None)
+    if j is None or g.tokens["Clue"] < 3 or not g.library:
+        return False
+    if g.has(MECH) and g.mech_target == "Clue" and mech_text(g):
+        return False
+    g.m["journal_tutor_ready"] += 1          # the reach, either rule
+    if not g.cfg.get("journal_tutor", True):
+        return False
+    j.tapped = True
+    sacrifice_tokens(g, "Clue", 3)
+    _tutor(g, lambda c: True)
+    crn_shuffle(g, "journal_tutor", g.library)
+    g.m["journal_tutors"] += 1
+    return True
 
 
 def havengul_end_step(g):

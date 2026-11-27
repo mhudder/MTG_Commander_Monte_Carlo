@@ -162,7 +162,7 @@ each card below the claim is false, and the row is a floor read as evidence.
 9. **[FIXED 2026-11-27, §0z269: `soulherder_counters`, every blink and exile answer; a null, +0.0008 at T20.]** **Soulherder** — "Whenever a creature is exiled from the battlefield, put
    a +1/+1 counter on this creature." Not implemented: every blink in the
    deck exiles a creature. Only the end-step blink is. A floor.
-10. **Tamiyo's Journal** — "{T}, Sacrifice three Clues: Search your library
+10. **[FIXED 2026-11-27, §0z272: `journal_tutor`, three idle Clues at the end step; +0.0157 at T20.]** **Tamiyo's Journal** — "{T}, Sacrifice three Clues: Search your library
     for a card". Only the upkeep investigate is implemented (`upkeep`); the
     Clues are cracked for cards instead (`crack_clues`). A floor.
 11. **Havengul Laboratory // Havengul Mystery** — its own docstring
@@ -176,16 +176,16 @@ each card below the claim is false, and the row is a floor read as evidence.
     ceiling, §0z197 C) and skips the real noncreature artifacts the text
     animates (Sol Ring, the signets, Contract, Journal, Portal: a floor).
     Bounded both ways -- PARTLY by this file's own rule.
-13. **Model of Unity** — "you and each opponent who voted for a choice you
+13. **[FIXED 2026-11-27, §0z271: `engine.scry`, a null.]** **Model of Unity** — "you and each opponent who voted for a choice you
     voted for may scry 2." `voting._vote_payoffs` increments `unity_scrys`
     and nothing reads it: the comment says "a small draw-quality nudge",
     and there is none. The mana half is modelled. A floor.
-14. **Monologue Tax** — a flat `monologue_tax_rate` (2) Treasures a round,
+14. **[FIXED 2026-11-22 by §0z246: the Treasures come from the pod's own second spells (`monologue_from_pod`).]** **Monologue Tax** — a flat `monologue_tax_rate` (2) Treasures a round,
     in the upkeep. That is Rhystic Study's shape -- a social rate this model
     cannot see -- and Rhystic Study is KNOWN_BLIND/BLIND_BUT_LIVE for it
     ("The row is that knob, not the card"). Two cards, one shape, two
     labels (§0u). Say the knob, or move it.
-15. **Mechanized Production** — "create a token that's a copy of enchanted
+15. **[FIXED 2026-11-27, §0z270: `mech_text`, any eight of a name; +0.0071 at T20.]** **Mechanized Production** — "create a token that's a copy of enchanted
     artifact. Then if you control eight or more artifacts with the same
     name as one another, you win." Modelled as a Treasure each upkeep and
     a win at eight Treasures. The enchanted artifact is assumed to be a

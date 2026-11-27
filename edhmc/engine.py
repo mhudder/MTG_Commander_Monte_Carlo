@@ -1572,6 +1572,33 @@ def drew_from_empty(g) -> None:
         g.m["loss_route"] = 3          # decked: drew from an empty library
 
 
+def scry_bottoms(g, card) -> bool:
+    """THE SCRY RULE, one function (§0z271; it was written twice, as
+    trostani's `scry1` and shilgengar's `seer_scry`, §0u): bottom a land
+    once there are `scry_land_bottom` (5) lands out, and a spell the deck
+    cannot yet cast -- two over the land count -- while there are few."""
+    lands = sum(1 for p in g.board if p.card.is_land)
+    return ((card.is_land and lands >= g.cfg.get("scry_land_bottom", 5))
+            or (not card.is_land and card.mv > lands + 2))
+
+
+def scry(g, n) -> int:
+    """Scry n by `scry_bottoms`: of the top n, each it names goes to the
+    bottom; the rest stay on top in their order. Returns how many went."""
+    n = min(int(n), len(g.library))
+    if n <= 0:
+        return 0
+    top = g.library[-n:]
+    gone = [c for c in top if scry_bottoms(g, c)]
+    if not gone:
+        return 0
+    del g.library[-n:]
+    g.library.extend(c for c in top if not any(c is x for x in gone))
+    g.library[:0] = gone
+    g.m["scry_bottomed"] += len(gone)
+    return len(gone)
+
+
 def draw_is_safe(g, n) -> bool:
     """A PILOT'S check before an OPTIONAL draw: would it leave fewer than
     `decking_reserve` cards in the library?
