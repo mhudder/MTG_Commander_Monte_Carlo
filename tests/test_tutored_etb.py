@@ -70,6 +70,11 @@ def check(label, got, want):
 
 
 def fresh(**cfg):
+    # return_by_row=False (§0z277): this test's subject is WHEN a tutored
+    # Witness's ETB resolves (the spell already in the graveyard), read
+    # through the old pick, the highest mana value; the new pick is
+    # tests/test_return_rank.py's.
+    cfg = {"return_by_row": False, **cfg}
     g = AzusaGame(list(DECK), CMD,
                   dict(DEFAULT_CFG, turns=20, watch=frozenset(),
                        **{**EXTRA_CFG, **cfg}), 1234)

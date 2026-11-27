@@ -23457,7 +23457,10 @@ writes `edhmc/decks/_return_rank.py` from azusa's ablation cache, and
 (§0z195), and today's are from 2026-11-23 (SUSPECT).
 
 Pinned: `tests/test_return_rank.py`, 6 cases, 4 mutations exact (one set
-fixed BEFORE the first run).
+fixed BEFORE the first run). The neighbour `test_tutored_etb` B and C
+(when a tutored Witness's ETB resolves) read the old pick, and failed in
+the full suite: they pin `return_by_row=False` now, their subject being
+the timing.
 
 **Measured** (`run_knob_ab azusa return_by_row return_rule_differs`,
 N=15,000, `results/knob_ab_azusa_return_by_row_20261127.txt`): won T10
