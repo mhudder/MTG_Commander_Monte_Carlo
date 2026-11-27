@@ -289,7 +289,8 @@ LANDS = (
         L("Archway of Innovation", "U", tapped=True),
         # "{T}: Add {C}. {4}, {T}: Investigate." A Clue source that is also a
         # land. {C} ONLY (§0z112): the {B} belongs to the transformed face,
-        # Havengul Mystery, whose transform is not modelled. It was "BC".
+        # Havengul Mystery, which `tivit.havengul_sync` taps for {B} once
+        # the land has transformed (§0z274). It was "BC".
         L("Havengul Laboratory // Havengul Mystery", "C",
           script="havengul"),
         L("Bojuka Bog", "B", tapped=True),

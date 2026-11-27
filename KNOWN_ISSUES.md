@@ -325,6 +325,11 @@ Each row is a headline and its key number, at most 250 characters
 | [0z270](#0z270) | FIXED | **Mechanized Production by its text** (tivit, §0z207 item 15): it copies what it enchants and any eight of a name win; +0.0178 T10 / +0.0071 T20 -- most wins are eight Clues |
 | [0z271](#0z271) | FIXED | **One scry rule (`engine.scry`), and Model of Unity's scry 2** (tivit, §0z207 item 13): trostani's and shilgengar's copies merged, bit-identical; a null |
 | [0z272](#0z272) | FIXED | **Tamiyo's Journal's tutor** (tivit, §0z207 item 10): three idle Clues at the end step for the best card; +0.0287 T10 / +0.0157 T20 -- it fetches Time Sieve and Mirkwood Bats |
+| [0z273](#0z273) | FIXED | **Cyberdrive Awakener by its text** (tivit, §0z207 item 12): the old untapped tokens attack as real 4/4 fliers on its ETB turn, the static flying read; +0.0031 T10 / +0.0025 T20 |
+| [0z274](#0z274) | FIXED | **Havengul Laboratory transforms** (tivit, §0z207 item 11): three Clues sacrificed, the Mystery returns the best creature card and taps for {B} at 1 life; +0.0026 T10 / +0.0021 T20 |
+| [0z275](#0z275) | FIXED | **Quirion Ranger untaps a blocker on the pod's turn** (azusa, Tier 4 item 19): a tapped Forest for your toughest tapped creature; a null |
+| [0z276](#0z276) | MEASURED | **Nissa, Sage Animist's -2 when doomed** (azusa, Tier 4 item 18, the owner's rule (a)): -0.0043 at T20 -- the prediction overcalls 7x and costs the -7; built, OFF |
+| [0z277](#0z277) | FIXED | **Eternal Witness and Regrowth return the highest win-rate row** (azusa, Tier 4 item 15): generated from the table (`tools.return_rank`); a null -- regenerate after the rebuild |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -18592,7 +18597,8 @@ Treasures from Tempting Contract and Master of Ceremonies are made in code
 2026-11-27 (§0z267)**: hooked there and at tivit's own sites; +0.0012 at
 T20. **Item 9 FIXED 2026-11-27 (§0z269)**, a null; **items 10, 13 and
 15 FIXED (§0z272, §0z271, §0z270)**; item 14 was fixed by §0z246 (Monologue
-Tax reads the pod's own second spells). Left: 11 and 12. Items 9-15's
+Tax reads the pod's own second spells); **item 12 FIXED (§0z273)**.
+**Item 11 FIXED (§0z274)**: items 1-15 are all closed. Items 9-15's
 missing clauses, under their PARTLY labels. Tier 4, items 23-29: seven
 piloting choices nobody argued.
 
@@ -23284,6 +23290,183 @@ The size is a fact about this policy and the deck's priority order, so
 
 **Only tivit moved** across §0z270-§0z272 (`check_unchanged_decks`,
 N=2,000, against `c7e994b`: the other five active decks BIT-IDENTICAL).
+
+<a id="0z273"></a>
+
+## 0z273. FIXED -- Cyberdrive Awakener by its text: the animated tokens attack as 4/4 fliers (tivit, §0z207 item 12)
+
+**The owner, 2026-11-27**: "go ahead with cyberdrive awakener next".
+
+    "Flying. Other artifact creatures you control have flying. When this
+    creature enters, each noncreature artifact you control becomes a 4/4
+    artifact creature until end of turn."  ({5}{U} 4/4; Scryfall 2026-11-27)
+
+The ETB was `4 x` every token as a SCALE on whatever else attacked
+(§0z207 item 12, "bounded both ways"): summoning-sick tokens counted (a
+ceiling); with nothing else attacking it did nothing (a floor); the
+blockers that met it were the other attackers'; and the static grant of
+flying was read nowhere. **Built** behind `cyberdrive_text` (True):
+
+- **The static** (`TivitGame.flying_granted`, the `opponents.flying_of`
+  hook): every other artifact creature you control flies -- Academy
+  Manufactor, and the animated tokens.
+- **The ETB's attackers** (`cyberdrive_animate`, on the turn it entered):
+  each TOKEN under your control since the turn began (`tokens_at_start`,
+  snapshotted at your untap) and untapped is a real 4/4 flying artifact
+  creature attacker for that combat, taken out of its pile meanwhile (so
+  `artifact_count` is unchanged). **A POLICY, said**: they all attack, past
+  the hold-back -- they stop being creatures at end of turn, so they guard
+  nothing on the pod's turns, and a token that dies is a payoff. The REAL
+  noncreature artifacts (rocks, artifact lands, Contract, Journal, Sieve)
+  are animated too and **stay home** -- a mana base is not sent into
+  blockers (a floor).
+- **After combat** (`cyberdrive_revert`): a survivor goes back to its pile,
+  tapped (a Treasure or Powerstone that attacked makes no mana until your
+  untap); one that died is an artifact token going to the graveyard
+  (Disciple, Marionette Master; Nightblade hears its death through
+  `on_creature_death`).
+
+Pinned: `tests/test_cyberdrive.py`, 7 cases, 5 mutations exact on the
+first run.
+
+**Measured** (`run_knob_ab tivit cyberdrive_text cyberdrive_seen`, staged
+list, N=15,000 paired, seeds 5000..,
+`results/knob_ab_tivit_cyberdrive_text_20261127.txt`): **won T10 +0.0031
+±0.0014, T20 +0.0025 ±0.0014**. IDENTITY clean (13,049 games); reach 13.0%,
+and there +0.024 / +0.020. `cyberdrive_animated` 2.39 a game, 0.015 of them
+dying; `combat_damage` +0.85 a game. Fewer attackers than the old count
+(only the old, untapped tokens) but real fliers, attacking even alone:
+the floors outweighed the ceiling.
+
+<a id="0z274"></a>
+
+## 0z274. FIXED -- Havengul Laboratory transforms; Havengul Mystery returns a creature and taps for {B} (tivit, §0z207 item 11)
+
+**The owner, 2026-11-27**: "go ahead with havengul laboratory next".
+
+    Havengul Laboratory: "{T}: Add {C}. {4}, {T}: Investigate. At the
+    beginning of your end step, if you sacrificed three or more Clues this
+    turn, transform Havengul Laboratory."
+    Havengul Mystery: "When this land transforms into Havengul Mystery,
+    return target creature card from your graveyard to the battlefield.
+    When the creature put onto the battlefield with Havengul Mystery leaves
+    the battlefield, transform Havengul Mystery. {T}, Pay 1 life: Add {B}."
+                                                    (Scryfall 2026-11-27)
+
+`havengul_end_step`'s docstring said the transform was "NOT MODELLED".
+**Built** behind `havengul_transform` (True):
+
+- **The count**: `clues_sacrificed_turn`, every Clue `sacrifice_tokens`
+  removes (cracked, the Journal, Time Sieve, the pile), reset at your
+  untap. **The condition is read as the end step begins** -- the Journal's
+  three, sacrificed IN the end step (§0z272), do not count that turn.
+- **The transform** (`havengul_transform`): the return's target, **A
+  POLICY** -- the creature card of highest priority; it enters as a cast
+  creature does (`run_etb`). With none, it transforms and returns nothing.
+- **The Mystery** (`havengul_sync`, the state, read lazily): it taps for
+  {B} in `mana_units` and `pay` charges the 1 life; it has no investigate;
+  when the returned creature leaves the battlefield, by any path, it is the
+  Laboratory again.
+- `on_board`, an identity test, for this and §0z273: `Board`'s `in` also
+  takes an EQUAL permanent, and two animated Clue tokens are equal.
+
+Pinned: `tests/test_havengul_mystery.py`, 8 cases, 5 mutations exact on
+the first run.
+
+**Measured** (`run_knob_ab tivit havengul_transform
+havengul_transform_due`, staged list, N=15,000 paired,
+`results/knob_ab_tivit_havengul_transform_20261127.txt`): **won T10
++0.0026 ±0.0012, T20 +0.0021 ±0.0013**. IDENTITY clean (13,294 games);
+reach 11.4%, and there +0.023 / +0.019. 0.12 transforms a game, 0.078 of
+them returning a creature; the Mystery's {B} paid 0.25 life a game; the
+Laboratory's investigates -0.075 (it is the Mystery meanwhile).
+
+<a id="0z275"></a>
+
+## 0z275. FIXED -- Quirion Ranger untaps a blocker on the pod's turn (azusa, Tier 4 item 19): a null
+
+**The owner, 2026-11-27**, reviewing the azusa audit's Tier 4: "19) go
+ahead with this fix" (16, 17 and 20 kept as they are).
+
+    "Return a Forest you control to its owner's hand: Untap target
+    creature. Activate only once each turn."   (Scryfall 2026-10-13)
+
+"Once each turn" is every opponent's turn too; a creature that tapped to
+attack does not block on them (§0z184). **Built** as
+`AzusaGame.quirion_block_untap`, from `pod_upkeep(i)`, behind
+`quirion_block` (True), **A POLICY**: once that opponent's combat is live
+and it has a combat body, untap your tapped creature with the most
+toughness (then power), returning a Forest ALREADY TAPPED (it makes no
+mana until your untap either way, and is a land drop and a landfall on
+your turn); never an untapped Forest, a token or a creature-land. The
+once-a-turn key is now your turn or the pod seat's (`quirion_key`; your
+own turn's bounce is unchanged).
+
+Pinned: `tests/test_quirion_block.py`, 7 cases, 4 mutations exact (the
+first run raised in the setup -- the hand emptied before the takes; fixed,
+the sets as written).
+
+**Measured** (`run_knob_ab azusa quirion_block quirion_block_seen`,
+N=15,000, `results/knob_ab_azusa_quirion_block_20261127.txt`): won T10
+-0.0020 ±0.0023, T20 +0.0007 ±0.0026 -- **a null**. IDENTITY clean (12,065
+games); reach 19.6%. 0.69 untaps a game; your blocks barely move
+(`your_block_safe` +0.005), and the Forests it returns replace your own
+turn's bounces (`quirion_bounces` -0.089). Kept on: it is the card's text.
+
+<a id="0z276"></a>
+
+## 0z276. MEASURED -- Nissa, Sage Animist's -2 when she is doomed (azusa, Tier 4 item 18): it loses; built, OFF
+
+**The owner, 2026-11-27**, rule (a): "use the -2 when the pod's next round
+is predicted to kill Nissa anyway". Her docstring's reason for never
+taking the -2 -- "no opponent ever attacks a planeswalker, so loyalty only
+goes up" -- stopped being true with A5 (§0z221): a policy written while a
+gap was open (§0z5).
+
+**Built** as `AzusaGame.nissa_doomed` (the pod's combat power, every
+living opponent's combat bodies summed, against her loyalty after a +1;
+no blocks of yours counted) and the -2 (a 4/4 Ashaya token; at 0 she dies),
+behind `nissa_minus_two`. Pinned: `tests/test_nissa_minus_two.py`, 7
+cases, 4 mutations exact (one set fixed BEFORE the first run).
+
+**Measured** (`run_knob_ab azusa nissa_minus_two nissa_doomed_seen`,
+N=15,000, `results/knob_ab_azusa_nissa_minus_two_20261127.txt`): **won
+T10 -0.0052 ±0.0025, T20 -0.0043 ±0.0029** -- it LOSES. IDENTITY clean;
+reach 22.9%. **Why**: the prediction reads her doomed 0.45 times a game
+(the B leg's `nissa_doomed_seen`) against 0.065 real deaths
+(`walkers_killed`) -- the pod sends bodies at a walker only 0.13 times a
+game -- and every -2 gives up the march to the -7: `pw_ultimates` 0.031
+-> 0.0015. **So `nissa_minus_two` is OFF by default**, the rule kept for a
+tighter predictor (the pod's attack rate, your blockers): the owner's call.
+
+<a id="0z277"></a>
+
+## 0z277. FIXED -- Eternal Witness and Regrowth return the highest win-rate row (azusa, Tier 4 item 15): a null
+
+**The owner, 2026-11-27**: "lets try highest winrate card instead of
+highest CMC". **Built** as `AzusaGame.return_pick`, behind `return_by_row`
+(True): the nonland card with the highest T20 win-rate row in azusa's
+table; a card with no row (staged since the table) after every card with
+one, by mana value; a land only when no nonland is there, as before.
+
+**The rows are GENERATED, never typed** (§0q): `tools/return_rank.py`
+writes `edhmc/decks/_return_rank.py` from azusa's ablation cache, and
+`tests/test_return_rank.py` E fails when the file and the cache disagree.
+**Regenerate it after the rebuild** (`python -m tools.return_rank
+--write`): a row is a fact about the list and pod it was measured at
+(§0z195), and today's are from 2026-11-23 (SUSPECT).
+
+Pinned: `tests/test_return_rank.py`, 6 cases, 4 mutations exact (one set
+fixed BEFORE the first run).
+
+**Measured** (`run_knob_ab azusa return_by_row return_rule_differs`,
+N=15,000, `results/knob_ab_azusa_return_by_row_20261127.txt`): won T10
++0.0003 ±0.0017, T20 +0.0007 ±0.0023 -- **a null**. IDENTITY clean (12,639
+games); the pick differs from the old one in 15.7% of games.
+
+**Only tivit and azusa moved** across §0z273-§0z277
+(`check_unchanged_decks`, N=2,000, against `a92401f`: the other four
+active decks BIT-IDENTICAL).
 
 ## How to read an ablation table
 

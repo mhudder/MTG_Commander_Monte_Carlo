@@ -97,6 +97,12 @@ class TivitGame(BaseGame):
         self.pile_digging = False       # §0z218: no dig inside a dig
         self.deadeye_paired = False
         self.cyberdrive_turn = -1       # turn Cyberdrive Awakener entered
+        self.tokens_at_start = {}       # §0z273: the piles as the turn began
+        self.animated = {}              # id -> (Permanent, pile) (§0z273)
+        # §0z274: Havengul Laboratory's transform.
+        self.clues_sacrificed_turn = 0  # since your untap
+        self.havengul_mystery = None    # the land, while it is the Mystery
+        self.havengul_creature = None   # the creature the Mystery returned
         self.result = None
         # Token piles. Ints rather than Permanents: none of them is a creature
         # and nothing in this deck reads an individual one.
@@ -181,6 +187,20 @@ class TivitGame(BaseGame):
         if dry:
             return can_pay(cost, mana_units(self)) is not None
         return pay(self, cost)
+
+    def flying_granted(self, perm) -> bool:
+        """CYBERDRIVE AWAKENER (§0z273): "Other artifact creatures you
+        control have flying." The `opponents.flying_of` hook: Academy
+        Manufactor, and the artifacts its ETB animates (`cyberdrive_
+        animate`). `cyberdrive_text=False`: not read, the old rule."""
+        if not self.has(CYBERDRIVE):
+            return False
+        c = perm.card
+        if (c.name == CYBERDRIVE or "Artifact" not in c.types
+                or not OPP.is_creature_now(self, perm)):
+            return False
+        self.m["cyberdrive_seen"] += 1          # the reach, either rule
+        return bool(self.cfg.get("cyberdrive_text", True))
 
     def on_creature_exiled(self, n):
         """A creature exiled from the battlefield, from shared code
@@ -463,6 +483,8 @@ def sacrifice_tokens(g, kind, n, tapped_first=True) -> int:
     if kind == "Treasure":
         g.treasures_tapped = (max(0, g.treasures_tapped - n) if tapped_first
                               else min(g.treasures_tapped, g.tokens[kind]))
+    elif kind == "Clue":
+        g.clues_sacrificed_turn += n         # Havengul's count (§0z274)
     per = 0.0
     if g.has("Nadier's Nightblade"):
         per += 1.0                     # "whenever a token you control leaves"
@@ -607,12 +629,15 @@ def mana_units(g, powerstones: bool = False) -> list[frozenset]:
     """
     any_col = frozenset({"W", "U", "B", "C"})
     units = []
+    mystery = havengul_sync(g)
     for p in g.board:
         if p.tapped:
             continue
         c = p.card
         if c.is_land:
-            units.append(frozenset(c.produces))
+            # §0z274: Havengul Mystery taps for {B}, paying 1 life (`pay`).
+            units.append(MYSTERY_MANA if p is mystery
+                         else frozenset(c.produces))
         elif c.mana_ability:
             # CR 302.6: a CREATURE's {T} ability waits until you have
             # controlled it since your most recent turn began (§0z184 finding
@@ -655,6 +680,8 @@ def pay(g, cost, powerstones: bool = False) -> bool:
         g.m["powerstone_mana"] += used_stones
 
     # tap the real sources
+    mystery = havengul_sync(g)
+    mystery_was = mystery.tapped if mystery is not None else True
     real = sorted(i for i in idx if i < first_stone)
     pos = 0
     for p in g.board:
@@ -668,6 +695,9 @@ def pay(g, cost, powerstones: bool = False) -> bool:
             p.tapped = True
         pos += width
 
+    if mystery is not None and not mystery_was and mystery.tapped:
+        g.your_life -= 1                     # "{T}, Pay 1 life: Add {B}."
+        g.m["mystery_life_paid"] += 1
     g.m["mana_spent"] += len(idx)
     if used_treasures:
         sacrifice_tokens(g, "Treasure", used_treasures, tapped_first=False)
@@ -1973,6 +2003,10 @@ def _artifacts_left(g, n) -> None:
 
 def end_step(g):
     """End-step blinks. Each is a fresh Tivit ETB, so a fresh dilemma."""
+    # §0z274: Havengul Laboratory's "at the beginning of your end step, if
+    # you sacrificed three or more Clues this turn" -- read as the step
+    # begins, before anything in it sacrifices more (the Journal).
+    havengul_due = g.clues_sacrificed_turn >= 3
     # VENSER's +1: "At the beginning of the next end step, return that card to
     # the battlefield" (§0z74). Tivit went to exile in `walker_step`, AFTER
     # combat, so it attacked this turn and comes back now.
@@ -1988,7 +2022,7 @@ def end_step(g):
             if g.result is not None:
                 return
     journal_tutor(g)                         # §0z272
-    havengul_end_step(g)
+    havengul_end_step(g, havengul_due)
     treasure_vault(g)
 
 
@@ -2074,7 +2108,60 @@ def journal_tutor(g) -> bool:
     return True
 
 
-def havengul_end_step(g):
+HAVENGUL = "Havengul Laboratory // Havengul Mystery"
+MYSTERY_MANA = frozenset({"B"})
+
+
+def havengul_sync(g):
+    """The land while it is Havengul Mystery, or None. "When the creature
+    put onto the battlefield with Havengul Mystery leaves the battlefield,
+    transform Havengul Mystery" -- read lazily here, whatever path took it
+    (§0z274); the land itself gone, the state goes with it."""
+    m = g.havengul_mystery
+    if m is None:
+        return None
+    if not on_board(g, m):
+        g.havengul_mystery = g.havengul_creature = None
+        return None
+    c = g.havengul_creature
+    if c is not None and not on_board(g, c):
+        g.havengul_mystery = g.havengul_creature = None
+        g.m["mystery_reverted"] += 1
+        return None
+    return m
+
+
+def havengul_transform(g, lab) -> None:
+    """HAVENGUL LABORATORY // HAVENGUL MYSTERY (§0z274; Scryfall
+    2026-11-27): "At the beginning of your end step, if you sacrificed three
+    or more Clues this turn, transform Havengul Laboratory." -- "When this
+    land transforms into Havengul Mystery, return target creature card from
+    your graveyard to the battlefield. When the creature put onto the
+    battlefield with Havengul Mystery leaves the battlefield, transform
+    Havengul Mystery. {T}, Pay 1 life: Add {B}."
+
+    The target, A POLICY: the creature card of highest priority (the
+    deck's own ranking, Demonic Tutor's). It enters as a cast creature
+    does -- its ETB runs (`run_etb`). The Mystery taps for {B} and charges
+    the life in `pay`; it has no investigate. With no creature card, it
+    transforms and returns nothing, and stays the Mystery."""
+    g.havengul_mystery = lab
+    g.havengul_creature = None
+    g.m["havengul_transforms"] += 1
+    pool = [c for c in g.graveyard if c.is_creature]
+    if not pool:
+        return
+    pick = max(pool, key=lambda c: c.priority)
+    remove_card(g.graveyard, pick)
+    perm = Permanent(card=pick, sick=True)
+    enter_loyalty(perm)
+    g.board.append(perm)
+    g.havengul_creature = perm
+    g.m["havengul_returns"] += 1
+    run_etb(g, perm)
+
+
+def havengul_end_step(g, due=False):
     """Havengul Laboratory: "{T}: Add {C}. {4}, {T}: Investigate." (Scryfall,
     2026-10-06; §0z112.) AT THE END STEP, ON MANA THE TURN LEFT -- the
     Shigeki and Burnished Hart policy (§0z85). It ran in the UPKEEP, before
@@ -2083,14 +2170,22 @@ def havengul_end_step(g):
     ablation measured the card at -0.058 against a Swamp at T20.
 
     The land taps FIRST, so its own {C} cannot pay for it. The transform to
-    Havengul Mystery (three Clues sacrificed in a turn) is NOT MODELLED, so
-    neither is the Mystery's "{T}, Pay 1 life: Add {B}" -- the deck module
-    lists the Laboratory as {C} only. `havengul_at="upkeep"` restores the old
+    Havengul Mystery is modelled since §0z274 (`havengul_transform`, read
+    at the top of this step; the Mystery has no investigate). Before it,
+    the transform was NOT MODELLED, so neither was the Mystery's "{T}, Pay
+    1 life: Add {B}"; the deck module lists the Laboratory as {C}, and
+    `mana_units` reads the Mystery's {B}. `havengul_at="upkeep"` restores the old
     timing."""
     if g.cfg.get("havengul_at", "end") != "end":
         return
+    if due:
+        face = next((p for p in g.board if p.card.name == HAVENGUL), None)
+        if face is not None and havengul_sync(g) is not face:
+            g.m["havengul_transform_due"] += 1    # the reach, either rule
+            if g.cfg.get("havengul_transform", True):
+                havengul_transform(g, face)       # §0z274
     lab = next((p for p in g.board if not p.tapped and p.card.name
-                == "Havengul Laboratory // Havengul Mystery"), None)
+                == HAVENGUL and p is not havengul_sync(g)), None)
     if lab is None:
         return
     lab.tapped = True
@@ -2101,11 +2196,88 @@ def havengul_end_step(g):
         lab.tapped = False
 
 
+def on_board(g, perm) -> bool:
+    """Is THIS permanent on the battlefield -- by identity. `Board`'s `in`
+    also takes an EQUAL one, and two animated Clue tokens are equal
+    (§0z273, §0z274)."""
+    return any(q is perm for q in g.board)
+
+
+CYBERDRIVE = "Cyberdrive Awakener"
+ANIMATED_KINDS = ("Treasure", "Clue", "Food", "Powerstone")
+
+
+def cyberdrive_now(g) -> bool:
+    """The turn Cyberdrive Awakener entered, with it on the battlefield."""
+    return g.has(CYBERDRIVE) and g.turn == getattr(g, "cyberdrive_turn", -1)
+
+
+def cyberdrive_animate(g) -> list:
+    """CYBERDRIVE AWAKENER's ETB (§0z273; Scryfall 2026-11-27): "When this
+    creature enters, each noncreature artifact you control becomes a 4/4
+    artifact creature until end of turn." The TOKENS that can attack, as
+    real 4/4 artifact creature attackers for this combat: those under your
+    control since the turn began (`tokens_at_start`; one made this turn is
+    summoning sick) and untapped. Taken out of their piles while they are
+    creatures, so `artifact_count` is unchanged. A POLICY, said: they
+    attack, all of them, past the hold-back -- they stop being creatures at
+    end of turn, so they guard nothing on the pod's turns, and a token that
+    dies is a payoff (Disciple, Marionette, Nightblade). The REAL
+    noncreature artifacts are animated too and stay home -- a mana base is
+    not sent into blockers (a floor). Returns the attackers."""
+    out = []
+    for kind in ANIMATED_KINDS:
+        tapped = (g.treasures_tapped if kind == "Treasure" else
+                  g.powerstones_tapped if kind == "Powerstone" else 0)
+        k = max(0, min(g.tokens[kind], g.tokens_at_start.get(kind, 0))
+                - tapped)
+        if k <= 0:
+            continue
+        g.tokens[kind] -= k
+        for _ in range(k):
+            perm = Permanent(card=Card(name=f"{kind} token",
+                                       types=frozenset({"Artifact",
+                                                        "Creature"}),
+                                       power=4, toughness=4),
+                             sick=False, is_token=True)
+            g.board.append(perm)
+            g.animated[id(perm)] = (perm, kind)
+            out.append(perm)
+    g.m["cyberdrive_animated"] += len(out)
+    return out
+
+
+def cyberdrive_revert(g, animated) -> None:
+    """End of the animation: a survivor is a token of its pile again (a
+    Treasure or Powerstone that attacked is TAPPED -- no mana until your
+    untap); one that died left as an artifact going to the graveyard
+    (`_artifacts_left`: Disciple, Marionette; Nightblade heard its death in
+    `on_creature_death`)."""
+    for perm in animated:
+        _, kind = g.animated.pop(id(perm))
+        if on_board(g, perm):
+            g.board.remove(perm)
+            g.tokens[kind] += 1
+            if perm.tapped and kind == "Treasure":
+                g.treasures_tapped += 1
+            elif perm.tapped and kind == "Powerstone":
+                g.powerstones_tapped += 1
+        else:
+            g.m["cyberdrive_animated_died"] += 1
+            _artifacts_left(g, 1)
+
+
 def combat(g):
     OPP.held_answer_window(g, "combat")   # A6, §0z221: beginning of combat
     attackers = [p for p in g.board
                  if p.card.is_creature and not p.tapped and not p.sick]
     attackers = OPP.hold_back(g, attackers)    # blockers for the pod, §0z186
+    animated = []
+    if cyberdrive_now(g):
+        g.m["cyberdrive_seen"] += 1             # the reach, either rule
+        if g.cfg.get("cyberdrive_text", True):
+            animated = cyberdrive_animate(g)    # §0z273
+            attackers = attackers + animated
     if not attackers:
         g.damage_by_turn.append(0.0)
         return
@@ -2149,9 +2321,12 @@ def combat(g):
     # summoning sick and cannot attack. Counting the whole pile overstates the
     # burst by however much of it Tivit made this turn -- which, on the turn
     # you would want to do this, is most of it. Treat the number as a ceiling.
+    # §0z273: that was the old rule; under `cyberdrive_text` the burst is the
+    # attackers `cyberdrive_animate` adds, and this lump is not used.
+    # §0z273 (`cyberdrive_text`): the burst is real attackers now
+    # (`cyberdrive_animate`), so this is the old rule only.
     bonus = 0
-    if g.has("Cyberdrive Awakener") and g.turn == getattr(
-            g, "cyberdrive_turn", -1):
+    if cyberdrive_now(g) and not g.cfg.get("cyberdrive_text", True):
         bonus = 4 * sum(g.tokens.values())
     dmg = raw + bonus
     if g.cfg.get("derived_blocking", True):
@@ -2174,6 +2349,8 @@ def combat(g):
         # Legacy flat-haircut pod: no per-defender blockers to plan against.
         dmg *= (1.0 - g.cfg.get("block_rate", 0.30))
         dmg = OPP.damage_each(g, dmg / max(1, len(OPP.living(g))))
+    if animated:
+        cyberdrive_revert(g, animated)
     g.damage_by_turn.append(dmg)
     g.m["damage"] += dmg
     g.m["combat_damage"] += dmg
@@ -2415,6 +2592,8 @@ def take_turn(g, extra=False):
         p.sick = False
     g.powerstones_tapped = 0            # the Powerstone pile untaps (§0z74)
     g.treasures_tapped = 0              # and Kambal's copies (§0z267)
+    g.tokens_at_start = dict(g.tokens)  # under your control since (§0z273)
+    g.clues_sacrificed_turn = 0         # Havengul's "this turn" (§0z274)
     g.land_drops = 1
     g.land_drops_used = 0
 

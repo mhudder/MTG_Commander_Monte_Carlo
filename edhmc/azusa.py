@@ -112,7 +112,10 @@ ability per walker per turn at sorcery speed, which is the whole rule. It runs
 twice a turn so a walker cast this turn still activates the turn it lands.
 
 Two deliberate omissions, both of which make these two cards a FLOOR. Nissa,
-Sage Animist's -2 (a 4/4 Ashaya token) is never taken, because the +1 is a
+Sage Animist's -2 (a 4/4 Ashaya token) was never taken (since §0z276 it is,
+when the pod's next round is predicted to kill her: `nissa_doomed`), and NO
+OPPONENT EVER ATTACKED A PLANESWALKER (since A5, §0z221, it does). The old
+reason, kept for the record: the +1 is a
 land drop and a card every turn in a 40-land deck and the -7 is the plan. And
 NO OPPONENT EVER ATTACKS A PLANESWALKER, because the pod's combat is a float
 and not a set of attackers, so loyalty here only ever goes up and the
@@ -2502,7 +2505,7 @@ class AzusaGame(BaseGame):
         never block"). `quirion_bounce=False` is the old blank."""
         if (not self.cfg.get("quirion_bounce", True)
                 or not self.has("Quirion Ranger")
-                or getattr(self, "quirion_turn", None) == self.turn):
+                or getattr(self, "quirion_turn", None) == self.quirion_key()):
             return False
         pool = [p for p in self.board
                 if p.card.is_land and is_forest(p.card) and not p.is_token
@@ -2513,9 +2516,80 @@ class AzusaGame(BaseGame):
         pick = max(pool, key=lambda p: (p.tapped, p.card.name == "Forest"))
         self.board.remove(pick)
         self.hand.append(pick.card)
-        self.quirion_turn = self.turn
+        self.quirion_turn = self.quirion_key()
         self.m["quirion_bounces"] += 1
         self.m["quirion_tapped_bounces"] += int(pick.tapped)
+        return True
+
+    def return_pick(self, pool):
+        """ETERNAL WITNESS and REGROWTH's "return target card from your
+        graveyard to your hand" (§0z277; the owner, 2026-11-27, Tier 4
+        item 15: "lets try highest winrate card instead of highest CMC").
+        The nonland card with the highest T20 win-rate row in azusa's
+        table (`decks/_return_rank.py`, GENERATED from the ablation cache);
+        a card with no row (one staged since the table) after every card
+        with one, by mana value; a land only when no nonland is there, as
+        before. `return_by_row=False` is the old rule, the highest mana
+        value. Both picks are made, so the reach is counted in both legs."""
+        from edhmc.decks._return_rank import RANK
+        rank = RANK.get("azusa", {})
+
+        def by_row(c):
+            r = rank.get(c.name)
+            return (not c.is_land, r is not None,
+                    r if r is not None else 0.0, c.mv)
+        new = max(pool, key=by_row)
+        old = max(pool, key=lambda c: c.mv)
+        self.m["return_rule_differs"] += int(new is not old)   # the reach
+        return new if self.cfg.get("return_by_row", True) else old
+
+    def quirion_key(self):
+        """"Activate only once each turn": your turn, or the pod seat's
+        whose turn it is (§0z275) -- every opponent's turn is a turn."""
+        return (self.turn, getattr(self, "pod_seat", None))
+
+    def quirion_block_untap(self, i: int) -> bool:
+        """QUIRION RANGER on opponent `i`'s turn (§0z275, Tier 4 item 19):
+        "Return a Forest you control to its owner's hand: Untap target
+        creature. Activate only once each turn." Your creature that tapped
+        to attack does not block on the pod's turns (§0z184); the Ranger
+        untaps one.
+
+        THE POLICY, said: at that opponent's upkeep, once its combat is
+        live (`first_attack_turn`) and it has a combat body, untap your
+        tapped creature with the most toughness (then power), returning a
+        Forest that is ALREADY TAPPED -- it makes no mana until your untap
+        either way, and comes back as a land drop and a landfall on your
+        turn. Never an untapped Forest (the mana held for your responses),
+        a token, or a land that is a creature. `quirion_block=False` is
+        the old rule (never on the pod's turn)."""
+        if (not self.has("Quirion Ranger")
+                or getattr(self, "quirion_turn", None) == self.quirion_key()
+                or not OPP.you_block_on(self)
+                or OPP.pod_turn(self) < self.cfg.get("first_attack_turn", 3)):
+            return False
+        o = self.opponents[i]
+        if not o.alive or not OPP.combat_bodies(OPP.pod_bodies(self, o)):
+            return False
+        tapped = [p for p in self.board if p.tapped
+                  and OPP.is_creature_now(self, p) and not p.card.is_land]
+        forests = [p for p in self.board
+                   if p.card.is_land and is_forest(p.card) and p.tapped
+                   and not p.is_token and not p.card.is_creature
+                   and self.animation_of(p) is None]
+        if not tapped or not forests:
+            return False
+        self.m["quirion_block_seen"] += 1           # the reach, either rule
+        if not self.cfg.get("quirion_block", True):
+            return False
+        target = max(tapped, key=lambda p: (self.toughness_of(p),
+                                            self.power_of(p)))
+        pick = forests[0]
+        self.board.remove(pick)
+        self.hand.append(pick.card)
+        target.tapped = False
+        self.quirion_turn = self.quirion_key()
+        self.m["quirion_block_untaps"] += 1
         return True
 
     def land_step(self):
@@ -2678,7 +2752,7 @@ class AzusaGame(BaseGame):
             self.draw(3)
         elif script == "regrowth1":
             if self.graveyard:
-                best = max(self.graveyard, key=lambda c: c.mv)
+                best = self.return_pick(self.graveyard)      # §0z277
                 remove_card(self.graveyard, best)
                 self.hand.append(best)
         elif script == "splendid_reclamation":
@@ -2890,7 +2964,7 @@ class AzusaGame(BaseGame):
                         e[1] += n
         elif card.name == "Eternal Witness":
             if self.graveyard:
-                best = max(self.graveyard, key=lambda c: c.mv)
+                best = self.return_pick(self.graveyard)      # §0z277
                 remove_card(self.graveyard, best)
                 self.hand.append(best)
         elif card.name == "Woodland Bellower":
@@ -3495,6 +3569,7 @@ class AzusaGame(BaseGame):
             self.verdant_kraken_tokens(1)
             self.empty_mana_pool("pod_upkeep")
         self.minds_eye(i)
+        self.quirion_block_untap(i)                  # §0z275
 
     def minds_eye(self, i: int) -> None:
         """MIND'S EYE (§0z246, item 52): "Whenever an opponent draws a card,
@@ -4498,6 +4573,27 @@ class AzusaGame(BaseGame):
         self.animate_lands(0, 0, targets=[target], haste=True,
                            source="Nissa, Who Shakes the World +1")
 
+    def nissa_doomed(self, perm) -> bool:
+        """Is Nissa predicted to die in the pod's next round, after a +1
+        (§0z276)? A5's attack at a walker (`opponents.split_for_walker`)
+        sends the fewest, biggest bodies whose power reaches its loyalty, so
+        the prediction is the pod's combat power, every living opponent's
+        combat bodies (`combat_bodies`) summed, against her loyalty + 1.
+        A JUDGEMENT, said: it counts no blocks of yours and no attack at you
+        that is lethal (A5 then sends everything at you), so it reads her
+        doomed a little more often than she is. Off under A5's switch: the
+        pod never attacks a walker there."""
+        if not (OPP.pod_knob(self.cfg, "pod_attacks_walkers")
+                and OPP.you_block_on(self)):
+            return False
+        if OPP.pod_turn(self) + 1 < self.cfg.get("first_attack_turn", 3):
+            return False
+        power = 0
+        for o in OPP.living(self):
+            bodies = OPP.pod_bodies(self, o)
+            power += sum(bodies[k].power for k in OPP.combat_bodies(bodies))
+        return power >= perm.counters + 1
+
     def _nissa_sage_animist(self, perm):
         """Nissa, Sage Animist, loyalty 3 — the back face. Verified 2026-09-07.
 
@@ -4508,7 +4604,8 @@ class AzusaGame(BaseGame):
             -7: Untap up to six target lands. They become 6/6 Elemental
                 creatures. They're still lands.
 
-        The -2 is never taken; see the module docstring. In a 40-land deck the
+        The -2 is taken since §0z276 when she is predicted to die anyway
+        (`nissa_doomed`, the owner's rule); otherwise as below. In a 40-land deck the
         +1 is a free land drop three times in five and a card the rest of the
         time, and spending to 1 loyalty gives up the -7 that untaps six lands
         as 6/6s — which, unlike the -2, can end the game on the spot.
@@ -4523,6 +4620,23 @@ class AzusaGame(BaseGame):
                                source="Nissa, Sage Animist -7")
             self.m["pw_ultimates"] += 1
             return
+
+        if perm.counters >= 2 and self.nissa_doomed(perm):
+            # §0z276, the owner's rule (a): "use the -2 when the pod's next
+            # round is predicted to kill Nissa anyway" -- a 4/4 kept instead
+            # of a walker lost for nothing.
+            self.m["nissa_doomed_seen"] += 1         # the reach, either rule
+            # OFF BY DEFAULT (§0z276): measured -0.0043 at T20 -- this
+            # prediction reads her doomed 0.45 times a game against 0.065
+            # real deaths, and every -2 gives up the march to the -7.
+            if self.cfg.get("nissa_minus_two", False):
+                perm.counters -= 2
+                self.make_tokens(1, 4, 4, "Ashaya, the Awoken World")
+                self.m["nissa_ashaya"] += 1
+                if perm.counters <= 0:
+                    from edhmc.engine import walker_dies_at_zero
+                    walker_dies_at_zero(self, perm)
+                return
 
         perm.counters += 1
         if not self.library:

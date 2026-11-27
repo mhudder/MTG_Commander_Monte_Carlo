@@ -458,3 +458,6 @@ cloud container has no scipy), `python -m edhmc.pending`, and
       inside its bar. `experiment.POD_PRE_0Z266` restores the pod before.
     - **Left in this item: the rebuild of every active deck**, the
       owner's call. Both decisions are in; all six caches are SUSPECT.
+      After it, `python -m tools.return_rank --write`: azusa's returns
+      read its table's rows (§0z277), and `test_return_rank` E fails
+      until they are the new ones.

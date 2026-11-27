@@ -165,11 +165,11 @@ each card below the claim is false, and the row is a floor read as evidence.
 10. **[FIXED 2026-11-27, §0z272: `journal_tutor`, three idle Clues at the end step; +0.0157 at T20.]** **Tamiyo's Journal** — "{T}, Sacrifice three Clues: Search your library
     for a card". Only the upkeep investigate is implemented (`upkeep`); the
     Clues are cracked for cards instead (`crack_clues`). A floor.
-11. **Havengul Laboratory // Havengul Mystery** — its own docstring
+11. **[FIXED 2026-11-27, §0z274: `havengul_transform`, the Mystery's return and {B}; +0.0021 at T20.]** **Havengul Laboratory // Havengul Mystery** — its own docstring
     (`havengul_end_step`) says the transform is "NOT MODELLED, so neither is
     the Mystery's '{T}, Pay 1 life: Add {B}'" and the return of a creature
     card. SCRIPTED anyway. A floor.
-12. **Cyberdrive Awakener** — "Other artifact creatures you control have
+12. **[FIXED 2026-11-27, §0z273: `cyberdrive_text`, real 4/4 flying attackers, the grant read; +0.0025 at T20.]** **Cyberdrive Awakener** — "Other artifact creatures you control have
     flying." Not read: `opponents.flying_of` asks the card's tag and named
     conditions, and tivit defines no `flying_granted`. The ETB burst is
     `4 x` the token piles only, so it counts summoning-sick tokens (a
