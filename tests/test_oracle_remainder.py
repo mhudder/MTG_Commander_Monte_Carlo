@@ -281,9 +281,10 @@ def run_cases():
         o.bodies = [OPP.PodBody(2, 2), OPP.PodBody(5, 4)]
         o.creatures = 2.0
     g.make_permanent(card("shilgengar", "Elesh Norn, Grand Cenobite"))
+    # §0z268: the survivor, toughness 5, reads her -2/-2 -- 3.
     check("Q Elesh Norn entering kills the toughness-2 bodies",
           [[b.toughness for b in o.bodies] for o in g.opponents],
-          [[5], [5], [5]])
+          [[3], [3], [3]])
     g = fresh("karlov", board=[card("karlov", "Kalitas, Traitor of Ghet"),
                                card("karlov", "Blood Artist")])
     o = g.opponents[0]

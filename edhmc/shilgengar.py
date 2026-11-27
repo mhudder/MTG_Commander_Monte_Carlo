@@ -215,6 +215,9 @@ def bat_token():
                 power=2, toughness=2, flying=True)
 
 
+NORN = "Elesh Norn, Grand Cenobite"     # §0z268
+
+
 class ShilgengarGame(BaseGame):
     def __init__(self, deck, commander, cfg, seed):
         # A PRIVATE copy: the cfg.setdefault block below stamps this
@@ -347,6 +350,20 @@ class ShilgengarGame(BaseGame):
             p += 2
         return p
 
+    def pod_static_pt(self):
+        """ELESH NORN, GRAND CENOBITE (§0z268; Scryfall 2026-11-27):
+        "Creatures your opponents control get -2/-2." A static: every pod
+        body reads it while she is on the battlefield (`opponents.
+        pod_pt_shift`), so a survivor is a 2-smaller blocker and attacker,
+        and dies to 2 less damage. `norn_shrink=False` is the old rule:
+        only the bodies of toughness 2 or less, killed, were touched."""
+        if not (self.has(NORN) and self.cfg.get("norn_text", True)):
+            return OPP.NO_SHIFT
+        self.m["norn_static_reads"] += 1       # the reach, either rule
+        if not self.cfg.get("norn_shrink", True):
+            return OPP.NO_SHIFT
+        return (-2, -2)
+
     def pumped(self, perm) -> int:
         """§0z261: Resplendent Angel's "+2/+2 and lifelink until end of
         turn", read by power, toughness and lifelink alike."""
@@ -444,7 +461,8 @@ class ShilgengarGame(BaseGame):
             # so what it kills dies as she enters -- cast or reanimated, which
             # is why it is here -- and again at each of your upkeeps for what
             # the pod cast meanwhile (`upkeep`).
-            self.m["norn_kills"] += OPP.minus_two_pod(self, card)
+            self.m["norn_kills"] += OPP.minus_two_pod(self, card,
+                                                      static=True)
         if not cast and card.name in ETB_RETURN_KNOBS:
             # §0z252: an answer creature's ETB on every entry but its cast,
             # whose ETB `OPP.countered` resolves (`answer_pod_threat`). Here,
@@ -1841,7 +1859,8 @@ class ShilgengarGame(BaseGame):
                 and self.cfg.get("norn_text", True):
             norn = next(p.card for p in self.board
                         if p.card.name == "Elesh Norn, Grand Cenobite")
-            self.m["norn_kills"] += OPP.minus_two_pod(self, norn)
+            self.m["norn_kills"] += OPP.minus_two_pod(self, norn,
+                                                      static=True)
         if self.has("Phyrexian Arena"):
             self.draw(1)
             self.your_life -= 1

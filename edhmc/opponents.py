@@ -501,16 +501,59 @@ def pod_bodies_on(g) -> bool:
     return bool(pod_knob(g.cfg, "pod_bodies"))
 
 
+NO_SHIFT = (0, 0)
+
+
+def pod_pt_shift(g) -> tuple:
+    """A STATIC power/toughness change to every creature the pod controls
+    (§0z268): the game's optional `pod_static_pt()` -- shilgengar's Elesh
+    Norn, (-2, -2) -- else none."""
+    hook = getattr(g, "pod_static_pt", None)
+    return hook() if hook is not None else NO_SHIFT
+
+
+def _shift_body(o, base, shift):
+    """`base` under `shift`, power floored at 0 (a negative power deals no
+    damage, 510.1a); the original kept on `o.pt_base` to come back when the
+    shift ends -- keyed by id, the shifted body held so the id stays its
+    (§0z98)."""
+    dp, dt = shift
+    b = base._replace(power=max(0, base.power + dp),
+                      toughness=base.toughness + dt)
+    o.pt_base[id(b)] = (b, base)
+    return b
+
+
+def _reshift(o, shift) -> None:
+    """Every body on `o`'s battlefield from its old shift to `shift`, in
+    place: the list's order, and `body_tapped` beside it, are unchanged."""
+    if not hasattr(o, "pt_base"):
+        o.pt_base = {}
+    for i, b in enumerate(o.bodies):
+        base = o.pt_base.pop(id(b), (b, b))[1]
+        o.bodies[i] = base if shift == NO_SHIFT else _shift_body(o, base,
+                                                                  shift)
+    o.pt_shift = shift
+
+
 def pod_bodies(g, o) -> list:
     """This opponent's creatures as bodies, reconciled to the COUNT: a body
     per whole creature. New creatures take the next bodies of the pool; when
     the count falls by a path that names no body (an elimination, a legacy
     write), the newest leave first. Callers read; they kill through
-    `kill_pod_bodies`."""
+    `kill_pod_bodies`.
+
+    Every body is read under the game's static shift (`pod_pt_shift`,
+    §0z268): the ones on the battlefield when it changes, and each new one
+    as it enters -- here, the one place a body enters or is read from."""
+    shift = pod_pt_shift(g)
+    if shift != getattr(o, "pt_shift", NO_SHIFT):
+        _reshift(o, shift)
     n = int(o.creatures + 1e-9)
     pool = o.body_pool
     while len(o.bodies) < n and pool:
-        o.bodies.append(pool[o.next_body % len(pool)])
+        b = pool[o.next_body % len(pool)]
+        o.bodies.append(b if shift == NO_SHIFT else _shift_body(o, b, shift))
         o.next_body += 1
     del o.bodies[n:]
     del o.body_tapped[n:]                     # §0z199: the flags follow
@@ -2879,18 +2922,27 @@ def own_wipe_body_rule(g, card):
     return None
 
 
-def minus_two_pod(g, card) -> int:
+def minus_two_pod(g, card, static=False) -> int:
     """"Creatures your opponents control get -2/-2" -- Massacre Wurm's ETB in
     shilgengar and Elesh Norn's static (§0z151). Under `pod_bodies` the bodies
     of toughness 2 or less die, each a death event, and the creature route
     pieces it reaches go (`wipe_threat_pieces`, scope "minus_2") -- the rule
-    rendmaw's Wurm already got through `resolve_own_wipe`. The survivors'
-    smaller toughness is not modelled. Off `pod_bodies`, nothing: each caller
-    keeps its own count rule. Returns the bodies killed."""
+    rendmaw's Wurm already got through `resolve_own_wipe`. Norn's survivors
+    read the -2/-2 through `pod_pt_shift` (§0z268); a Wurm's survivors' -2/-2
+    until end of turn is not modelled. Off `pod_bodies`, nothing: each caller
+    keeps its own count rule. Returns the bodies killed.
+
+    `static` (§0z268): Elesh Norn's -2/-2, which the bodies already carry
+    when `pod_pt_shift` reads it -- so it kills what that shift took to 0
+    or less, the same bodies; a survivor keeps the -2/-2. Massacre Wurm's
+    is not static: it kills toughness 2 or less as the bodies stand (on top
+    of Norn's), and its survivors' -2/-2 until end of turn is not
+    modelled."""
     if not pod_bodies_on(g):
         return 0
     wipe_threat_pieces(g, card, scope="minus_2")
-    return sum(kill_pod_bodies(g, o, lambda b: b.toughness <= 2)
+    limit = 2 + pod_pt_shift(g)[1] if static else 2
+    return sum(kill_pod_bodies(g, o, lambda b: b.toughness <= limit)
                for o in living(g))
 
 
@@ -6599,9 +6651,15 @@ def kill_force(g, opp, size) -> list:
     if not pool:
         return out
     start = getattr(opp, "next_body", 0)
+    dp, dt = pod_pt_shift(g)                  # §0z268: Norn's -2/-2 too
     while power < size and j < len(pool):
         b = pool[(start + j) % len(pool)]
         j += 1
+        if (dp, dt) != NO_SHIFT:
+            if b.toughness + dt <= 0:
+                continue                      # it dies as it enters
+            b = b._replace(power=max(0, b.power + dp),
+                           toughness=b.toughness + dt)
         if b.utility or b.power <= 0:
             continue
         out.append(b)

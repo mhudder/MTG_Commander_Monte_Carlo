@@ -109,7 +109,7 @@ a floor read as evidence -- §0z206's Woe Strider, thirteen times.
 11. **Voldaren Bloodcaster // Bloodbat Summoner** -- the transform at five
     Blood and the back face's Bat are not modelled (§0z184 finding 8, item
     37). The Blood on a nontoken death is.
-12. **Elesh Norn, Grand Cenobite** -- "Creatures your opponents control get
+12. **[FIXED 2026-11-27, §0z268: the survivors read -2/-2 (`pod_pt_shift`); +0.0033 at T20.]** **Elesh Norn, Grand Cenobite** -- "Creatures your opponents control get
     -2/-2": `minus_two_pod` kills the bodies of toughness 2 or less, as she
     enters and at each upkeep, and "the survivors' smaller toughness is not
     modelled" (its docstring) -- nor their power. Since A1 and A2 a body's

@@ -320,6 +320,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z265](#0z265) | BUILT | **The cost cap taken; the growth rate a knob** (item 52): the cap's first cut reconciled the body pool -- fixed; growth alone saturates at +0.032 over today, but moves the decks evenly |
 | [0z266](#0z266) | FLIPPED | **Item 52's gate on, no reserve before bodies, growth 0.91** (item 53): the re-fit crosses at 0.911; on fresh seeds +0.0083 against the old pod, every deck inside its bar |
 | [0z267](#0z267) | FIXED | **Kambal, Profiteering Mayor copies the pod's tokens** (tivit, §0z207 item 7): once a turn, tapped; +0.0012 ±0.0009 at T20, in 5.1% of games -- rare, not large |
+| [0z268](#0z268) | FIXED | **Elesh Norn's -2/-2 reaches the pod's survivors** (shilgengar, §0z208 item 12): a static shift read in `pod_bodies`; +0.0033 ±0.0014 at T20 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -18654,7 +18655,9 @@ re-measure: nothing was run against it.
 (items 1-3) is fixed by text (§0z215), every one a null on this list.
 Tier 2's thirteen labels and Tier 3's nine reasons are fixed (above).
 **Open**: items 4-15's missing clauses, under their PARTLY labels
-(Priest of Fell Rites' unearth among them, §0z197 C), and Tier 4, items
+(Priest of Fell Rites' unearth among them, §0z197 C) -- since fixed but
+11: 4-10 and 14 (§0z261), 13 (§0z262), 15 (§0z254), 12 (§0z268) -- and
+Tier 4, items
 25-29: five piloting choices, every return picking the highest mana value
 first.
 
@@ -23049,6 +23052,73 @@ has to be out with one of four cards.
 **Only tivit moved** (`tools.check_unchanged_decks`, N=2,000, against
 `27b7343`): the other five active decks BIT-IDENTICAL on all 8 metrics.
 Tivit's cache was SUSPECT already (§0z266).
+
+<a id="0z268"></a>
+
+## 0z268. FIXED -- Elesh Norn's -2/-2 reaches the pod's survivors (shilgengar, §0z208 item 12)
+
+**The owner, 2026-11-27**: "go ahead with elesh norn next".
+
+    "Vigilance. Other creatures you control get +2/+2. Creatures your
+    opponents control get -2/-2."          ({5}{W}{W}; Scryfall 2026-11-27)
+
+§0z151 killed the pod's bodies of toughness 2 or less, as she enters and
+at each of your upkeeps; the survivors kept their power and toughness
+("not modelled", `minus_two_pod`'s docstring). Since A1 and A2 (§0z198,
+§0z200) a body's power and toughness decide every block and every attack
+at you, so the gap was live both ways.
+
+**Built** in shared code, behind shilgengar's `norn_shrink` (True):
+
+- `opponents.pod_pt_shift(g)` reads the game's optional
+  `pod_static_pt()` -- shilgengar's: (-2, -2) while Norn is on the
+  battlefield (with `norn_text`), else none.
+- `pod_bodies`, where every body enters and the one place any code reads
+  them from, applies it: the bodies on the battlefield when the shift
+  changes (`_reshift`, in place, so `body_tapped` stays aligned) and each
+  new body as it enters. The original is kept on `o.pt_base`, keyed by id
+  with the shifted body held (§0z98), and comes back when Norn leaves --
+  read lazily, at the next `pod_bodies`, whatever path removed her.
+- Power floors at 0 (510.1a: negative power deals no damage).
+- A combat kill's force (`kill_force`, §0z221) is read under the shift:
+  a body it would kill on entry is skipped, each other is 2 smaller.
+- **The kill is unchanged**: `minus_two_pod(..., static=True)` kills what
+  the shift took to 0 or less -- the same bodies as before. Massacre Wurm
+  (not static) kills what reads 2 or less as the bodies stand, so under
+  Norn it reaches base toughness 4: the rules' answer. Its own survivors'
+  -2/-2 until end of turn is still not modelled.
+- **Left as it was**: a body that enters under Norn with toughness 2 or
+  less dies at your next upkeep, not as it enters (§0z151's timing); in
+  between it reads 0 power and toughness 0 or less, on the pod's turns,
+  where it neither attacks you (it is new) nor blocks you. Route pieces'
+  sizes are not shifted (their kill rule `minus_2` is §0z151's).
+
+**Pinned**: `tests/test_norn_shrink.py`, 10 cases, 5 mutations exact
+(four slips in the sets caught by re-reading them BEFORE the first run;
+the code's copy of the first set then missed one of the fixes, aligned to
+the written set after the run). The neighbour `test_oracle_remainder` Q
+(§0z151's kill) read a survivor's toughness as 5; it reads 3 now, its
+want updated -- the full suite caught it.
+
+**Measured** (`diagnostics.run_knob_ab shilgengar norn_shrink
+norn_static_reads`, staged list, N=15,000 paired, seeds 5000..,
+`results/knob_ab_shilgengar_norn_shrink_20261127.txt`):
+
+| | A - B |
+|---|---|
+| won T10 | +0.0007 ±0.0010 |
+| won T20 | **+0.0033 ±0.0014** |
+
+IDENTITY: the 12,562 games where `norn_static_reads` is 0 in both legs
+are bit-identical. Reach: 2,438 games (16.3%) read a body under Norn, and
+there the rule is worth +0.021 at T20. The mechanism: `attackers_died`
+-0.012 (your attackers survive the smaller blockers), `pod_bodies_killed`
++0.105 (a body with 2 less toughness dies to damage it survived), and
+`your_block_safe` -0.063 (fewer pod attacks for your blockers to meet).
+
+**Only shilgengar moved** (`tools.check_unchanged_decks`, N=2,000, against
+`b550154`): the other five active decks BIT-IDENTICAL on all 8 metrics.
+Its cache was SUSPECT already (§0z266).
 
 ## How to read an ablation table
 
