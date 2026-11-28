@@ -1,8 +1,8 @@
 {
   "ablation_cache_azusa_10-20_n15000_medblank.json": {
-    "built_at": "d658977844ccfb9a",
-    "built_commit": "80cb14f",
-    "built_utc": "2026-11-23T01:33:43Z",
+    "built_at": "0856e51dbc2adda8",
+    "built_commit": "6c9a661",
+    "built_utc": "2026-11-28T07:49:24Z",
     "deck": "azusa",
     "superseded": [
       {
@@ -757,14 +757,21 @@
             "utc": "2026-11-22T04:14:48Z"
           }
         ]
+      },
+      {
+        "built_at": "d658977844ccfb9a",
+        "built_commit": "80cb14f",
+        "built_utc": "2026-11-23T01:33:43Z",
+        "deck": "azusa",
+        "verified": []
       }
     ],
     "verified": []
   },
   "ablation_cache_karlov_10-20_n15000_medblank.json": {
-    "built_at": "46746b4e21740503",
-    "built_commit": "80cb14f",
-    "built_utc": "2026-11-23T01:29:44Z",
+    "built_at": "0f2b997b7b1b0602",
+    "built_commit": "6c9a661",
+    "built_utc": "2026-11-28T02:10:03Z",
     "deck": "karlov",
     "superseded": [
       {
@@ -1438,105 +1445,112 @@
             "utc": "2026-11-22T12:55:27Z"
           }
         ]
+      },
+      {
+        "built_at": "46746b4e21740503",
+        "built_commit": "80cb14f",
+        "built_utc": "2026-11-23T01:29:44Z",
+        "deck": "karlov",
+        "verified": [
+          {
+            "commit": "e220bf7",
+            "evidence": "2026-11-23: fingerprint moved with experiment.py (PRE_ITEM45_REST, \u00a70z248's last flip) and opponents.py (Malakir's PROTECTION entry and protection_life, \u00a70z251). check_unchanged_decks --n=2000 BIT-IDENTICAL against a77fb7a and against 63cd636 (modules), and the STAGED list (build_pending) played 2,000 seeds at both a77fb7a and e220bf7+, every game's whole output hashed: 0 of 2,000 differ.",
+            "fingerprint": "ababbaf19cbb3579",
+            "utc": "2026-11-23T22:11:25Z"
+          },
+          {
+            "commit": "e48ad7a",
+            "evidence": "2026-11-24: fingerprint moved with opponents.py only (\u00a70z252: _answer_pieces split out of answer_pod_threat, ETB_ANSWERS and answer_on_entry added; only shilgengar calls the new function). check_unchanged_decks --n=2000 BIT-IDENTICAL against e48ad7a (modules), and the STAGED list (build_pending) played 2,000 seeds at both e48ad7a and e48ad7a+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
+            "fingerprint": "0bfbb3ccf6be4591",
+            "utc": "2026-11-24T03:13:48Z"
+          },
+          {
+            "commit": "9eadfbc",
+            "evidence": "2026-11-25: fingerprint moved with tools/ablation.py only (\u00a70z253: Journey of Discovery from azusa's PARTLY_MODELLED to SCRIPTED_AZUSA; no other deck's entries touched). This deck's table re-renders byte-identical from this cache (tests.test_metrics_and_render C), check_unchanged_decks --n=2000 BIT-IDENTICAL against 9eadfbc (modules), and the STAGED list (build_pending) played 2,000 seeds at both 9eadfbc and 9eadfbc+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
+            "fingerprint": "4611cdc3ab2abf36",
+            "utc": "2026-11-25T03:21:55Z"
+          },
+          {
+            "commit": "4f5c238",
+            "evidence": "2026-11-25: fingerprint moved with tools/ablation.py only (\u00a70z254: Massacre Wurm, Sun Titan, Avacyn from shilgengar's PARTLY_MODELLED to SCRIPTED_SHILGENGAR; no other deck's entries touched). This deck's table re-renders byte-identical from this cache (tests.test_metrics_and_render C), check_unchanged_decks --n=2000 BIT-IDENTICAL against 4f5c238 (modules), and the STAGED list (build_pending) played 2,000 seeds at both 4f5c238 and 4f5c238+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
+            "fingerprint": "88c36cde90071fd0",
+            "utc": "2026-11-25T03:57:41Z"
+          },
+          {
+            "commit": "ea7dccf",
+            "evidence": "2026-11-25: fingerprint moved with opponents.py (\u00a70z255: _answer_pieces made public as answer_pieces, docstring only otherwise) and tools/ablation.py (Angel of Serenity's shilgengar note). check_unchanged_decks --n=2000 BIT-IDENTICAL against ea7dccf (modules), the table re-renders byte-identical from this cache, and the STAGED list (build_pending) played 2,000 seeds at both ea7dccf and ea7dccf+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
+            "fingerprint": "58431e86ea9ff1ff",
+            "utc": "2026-11-25T16:51:15Z"
+          },
+          {
+            "commit": "228f784",
+            "evidence": "2026-11-25: fingerprint moved with tools/ablation.py only (\u00a70z256: Nylea's Intervention's azusa note; no other deck's entries touched). The table re-renders byte-identical from this cache, check_unchanged_decks --n=2000 BIT-IDENTICAL against 228f784 (modules), and the STAGED list (build_pending) played 2,000 seeds at both 228f784 and 228f784+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
+            "fingerprint": "3605b5c491aee07c",
+            "utc": "2026-11-25T18:17:11Z"
+          },
+          {
+            "commit": "84c57b6",
+            "evidence": "2026-11-25: fingerprint moved with opponents.py (\u00a70z257-\u00a70z259: the ETB_ANSWERS comment, trample_of's optional craterhoof_reaches hook, the sweeper's artifacts_enchantments scope -- reached by azusa alone) and tools/ablation.py (Bane of Progress's azusa note). check_unchanged_decks --n=2000 BIT-IDENTICAL against 84c57b6 (modules), the table re-renders byte-identical from this cache, and the STAGED list (build_pending) played 2,000 seeds at both 84c57b6 and 84c57b6+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
+            "fingerprint": "b416165a14dfdc40",
+            "utc": "2026-11-25T22:27:53Z"
+          },
+          {
+            "commit": "23ac6bd",
+            "evidence": "2026-11-26: fingerprint moved with engine.py (\u00a70z261: EOT_EFFECTS gains resplendent_pump, an attribute only shilgengar sets), opponents.py (FREE_WITH_COMMANDER and free_with_commander in _cast_response, Flawless Maneuver only; the optional self_protects hook in spot removal) and tools/ablation.py (shilgengar's notes). check_unchanged_decks --n=2000 BIT-IDENTICAL against 23ac6bd (modules), the table re-renders byte-identical from this cache, and the STAGED list (build_pending) played 2,000 seeds at both 23ac6bd and 23ac6bd+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
+            "fingerprint": "0e438dbd5903b2a4",
+            "utc": "2026-11-26T00:06:23Z"
+          },
+          {
+            "commit": "23ac6bd",
+            "evidence": "2026-11-26: fingerprint moved again with tools/ablation.py only -- Teferi's Protection's shilgengar note reworded (\u00a70z261), minutes after the record above at the same code. The table re-renders byte-identical from this cache (tests.test_metrics_and_render C); the simulation is the code the record above checked (0 of 2,000 staged-list games differ against 23ac6bd).",
+            "fingerprint": "0b675b042e118608",
+            "utc": "2026-11-26T00:13:09Z"
+          },
+          {
+            "commit": "ed9eebe",
+            "evidence": "2026-11-26: fingerprint moved with opponents.py only -- free_with_commander counts its reach before its switch (\u00a70z261), a counter. The STAGED list (build_pending) played 2,000 seeds against the hashes taken at 23ac6bd: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
+            "fingerprint": "7ec457381b410205",
+            "utc": "2026-11-26T00:25:22Z"
+          },
+          {
+            "commit": "127c4d6",
+            "evidence": "2026-11-26: fingerprint moved with opponents.py (\u00a70z262: Teferi's Protection's round -- phased_out, teferi_saves and their hooks, every one reached only with Teferi's Protection cast or in hand) and tools/ablation.py (its shilgengar note). The STAGED list (build_pending) played 2,000 seeds against the hashes taken at 23ac6bd: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
+            "fingerprint": "46de59d9d5ae4995",
+            "utc": "2026-11-26T00:37:23Z"
+          },
+          {
+            "commit": "401ec4d",
+            "evidence": "2026-11-26: fingerprint moved with opponents.py only -- teferi_seen, a reach counter in try_protect and teferi_saves (\u00a70z262). The STAGED list (build_pending) played 2,000 seeds against the hashes taken at 23ac6bd: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
+            "fingerprint": "95616b09cf54a13e",
+            "utc": "2026-11-26T01:03:55Z"
+          },
+          {
+            "commit": "c4acc99",
+            "evidence": "2026-11-26: fingerprint moved with decks/_removal.py (\u00a70z263: the census reads Angel of Serenity; DESTROY_SHARE_SPOT and _AE 0.4600 -> 0.4510), opponents.py (answer_reach's 20-character window) and tools/ablation.py (shilgengar's Serenity note). check_unchanged_decks --n=2000 against c4acc99: BIT-IDENTICAL on all 8 metrics; the STAGED list (build_pending) played 2,000 seeds at both trees, every game's whole output hashed: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
+            "fingerprint": "32d9798d1ca9c06e",
+            "utc": "2026-11-26T03:35:04Z"
+          },
+          {
+            "commit": "c0cf409",
+            "evidence": "2026-11-26: fingerprint moved with opponents.py only -- the pod_body_mv_cap switch (\u00a70z264), built OFF in POD_DEFAULTS. The STAGED list (build_pending) played 2,000 seeds against the hashes taken at c0cf409's code: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
+            "fingerprint": "407df0118a3694d1",
+            "utc": "2026-11-26T03:53:17Z"
+          },
+          {
+            "commit": "c6a0895",
+            "evidence": "2026-11-26: fingerprint moved with opponents.py only -- the diagnostic sub-switches pod_gate_pieces and pod_gate_reserve (\u00a70z264), read only under pod_develop_gated (OFF). The STAGED list played 2,000 seeds against the hashes taken at c0cf409's code: 0 of 2,000 differ. python 3.11.18.",
+            "fingerprint": "c900976c5cbfdad0",
+            "utc": "2026-11-26T04:00:41Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "e220bf7",
-        "evidence": "2026-11-23: fingerprint moved with experiment.py (PRE_ITEM45_REST, \u00a70z248's last flip) and opponents.py (Malakir's PROTECTION entry and protection_life, \u00a70z251). check_unchanged_decks --n=2000 BIT-IDENTICAL against a77fb7a and against 63cd636 (modules), and the STAGED list (build_pending) played 2,000 seeds at both a77fb7a and e220bf7+, every game's whole output hashed: 0 of 2,000 differ.",
-        "fingerprint": "ababbaf19cbb3579",
-        "utc": "2026-11-23T22:11:25Z"
-      },
-      {
-        "commit": "e48ad7a",
-        "evidence": "2026-11-24: fingerprint moved with opponents.py only (\u00a70z252: _answer_pieces split out of answer_pod_threat, ETB_ANSWERS and answer_on_entry added; only shilgengar calls the new function). check_unchanged_decks --n=2000 BIT-IDENTICAL against e48ad7a (modules), and the STAGED list (build_pending) played 2,000 seeds at both e48ad7a and e48ad7a+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
-        "fingerprint": "0bfbb3ccf6be4591",
-        "utc": "2026-11-24T03:13:48Z"
-      },
-      {
-        "commit": "9eadfbc",
-        "evidence": "2026-11-25: fingerprint moved with tools/ablation.py only (\u00a70z253: Journey of Discovery from azusa's PARTLY_MODELLED to SCRIPTED_AZUSA; no other deck's entries touched). This deck's table re-renders byte-identical from this cache (tests.test_metrics_and_render C), check_unchanged_decks --n=2000 BIT-IDENTICAL against 9eadfbc (modules), and the STAGED list (build_pending) played 2,000 seeds at both 9eadfbc and 9eadfbc+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
-        "fingerprint": "4611cdc3ab2abf36",
-        "utc": "2026-11-25T03:21:55Z"
-      },
-      {
-        "commit": "4f5c238",
-        "evidence": "2026-11-25: fingerprint moved with tools/ablation.py only (\u00a70z254: Massacre Wurm, Sun Titan, Avacyn from shilgengar's PARTLY_MODELLED to SCRIPTED_SHILGENGAR; no other deck's entries touched). This deck's table re-renders byte-identical from this cache (tests.test_metrics_and_render C), check_unchanged_decks --n=2000 BIT-IDENTICAL against 4f5c238 (modules), and the STAGED list (build_pending) played 2,000 seeds at both 4f5c238 and 4f5c238+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
-        "fingerprint": "88c36cde90071fd0",
-        "utc": "2026-11-25T03:57:41Z"
-      },
-      {
-        "commit": "ea7dccf",
-        "evidence": "2026-11-25: fingerprint moved with opponents.py (\u00a70z255: _answer_pieces made public as answer_pieces, docstring only otherwise) and tools/ablation.py (Angel of Serenity's shilgengar note). check_unchanged_decks --n=2000 BIT-IDENTICAL against ea7dccf (modules), the table re-renders byte-identical from this cache, and the STAGED list (build_pending) played 2,000 seeds at both ea7dccf and ea7dccf+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
-        "fingerprint": "58431e86ea9ff1ff",
-        "utc": "2026-11-25T16:51:15Z"
-      },
-      {
-        "commit": "228f784",
-        "evidence": "2026-11-25: fingerprint moved with tools/ablation.py only (\u00a70z256: Nylea's Intervention's azusa note; no other deck's entries touched). The table re-renders byte-identical from this cache, check_unchanged_decks --n=2000 BIT-IDENTICAL against 228f784 (modules), and the STAGED list (build_pending) played 2,000 seeds at both 228f784 and 228f784+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
-        "fingerprint": "3605b5c491aee07c",
-        "utc": "2026-11-25T18:17:11Z"
-      },
-      {
-        "commit": "84c57b6",
-        "evidence": "2026-11-25: fingerprint moved with opponents.py (\u00a70z257-\u00a70z259: the ETB_ANSWERS comment, trample_of's optional craterhoof_reaches hook, the sweeper's artifacts_enchantments scope -- reached by azusa alone) and tools/ablation.py (Bane of Progress's azusa note). check_unchanged_decks --n=2000 BIT-IDENTICAL against 84c57b6 (modules), the table re-renders byte-identical from this cache, and the STAGED list (build_pending) played 2,000 seeds at both 84c57b6 and 84c57b6+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
-        "fingerprint": "b416165a14dfdc40",
-        "utc": "2026-11-25T22:27:53Z"
-      },
-      {
-        "commit": "23ac6bd",
-        "evidence": "2026-11-26: fingerprint moved with engine.py (\u00a70z261: EOT_EFFECTS gains resplendent_pump, an attribute only shilgengar sets), opponents.py (FREE_WITH_COMMANDER and free_with_commander in _cast_response, Flawless Maneuver only; the optional self_protects hook in spot removal) and tools/ablation.py (shilgengar's notes). check_unchanged_decks --n=2000 BIT-IDENTICAL against 23ac6bd (modules), the table re-renders byte-identical from this cache, and the STAGED list (build_pending) played 2,000 seeds at both 23ac6bd and 23ac6bd+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
-        "fingerprint": "0e438dbd5903b2a4",
-        "utc": "2026-11-26T00:06:23Z"
-      },
-      {
-        "commit": "23ac6bd",
-        "evidence": "2026-11-26: fingerprint moved again with tools/ablation.py only -- Teferi's Protection's shilgengar note reworded (\u00a70z261), minutes after the record above at the same code. The table re-renders byte-identical from this cache (tests.test_metrics_and_render C); the simulation is the code the record above checked (0 of 2,000 staged-list games differ against 23ac6bd).",
-        "fingerprint": "0b675b042e118608",
-        "utc": "2026-11-26T00:13:09Z"
-      },
-      {
-        "commit": "ed9eebe",
-        "evidence": "2026-11-26: fingerprint moved with opponents.py only -- free_with_commander counts its reach before its switch (\u00a70z261), a counter. The STAGED list (build_pending) played 2,000 seeds against the hashes taken at 23ac6bd: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
-        "fingerprint": "7ec457381b410205",
-        "utc": "2026-11-26T00:25:22Z"
-      },
-      {
-        "commit": "127c4d6",
-        "evidence": "2026-11-26: fingerprint moved with opponents.py (\u00a70z262: Teferi's Protection's round -- phased_out, teferi_saves and their hooks, every one reached only with Teferi's Protection cast or in hand) and tools/ablation.py (its shilgengar note). The STAGED list (build_pending) played 2,000 seeds against the hashes taken at 23ac6bd: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
-        "fingerprint": "46de59d9d5ae4995",
-        "utc": "2026-11-26T00:37:23Z"
-      },
-      {
-        "commit": "401ec4d",
-        "evidence": "2026-11-26: fingerprint moved with opponents.py only -- teferi_seen, a reach counter in try_protect and teferi_saves (\u00a70z262). The STAGED list (build_pending) played 2,000 seeds against the hashes taken at 23ac6bd: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
-        "fingerprint": "95616b09cf54a13e",
-        "utc": "2026-11-26T01:03:55Z"
-      },
-      {
-        "commit": "c4acc99",
-        "evidence": "2026-11-26: fingerprint moved with decks/_removal.py (\u00a70z263: the census reads Angel of Serenity; DESTROY_SHARE_SPOT and _AE 0.4600 -> 0.4510), opponents.py (answer_reach's 20-character window) and tools/ablation.py (shilgengar's Serenity note). check_unchanged_decks --n=2000 against c4acc99: BIT-IDENTICAL on all 8 metrics; the STAGED list (build_pending) played 2,000 seeds at both trees, every game's whole output hashed: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
-        "fingerprint": "32d9798d1ca9c06e",
-        "utc": "2026-11-26T03:35:04Z"
-      },
-      {
-        "commit": "c0cf409",
-        "evidence": "2026-11-26: fingerprint moved with opponents.py only -- the pod_body_mv_cap switch (\u00a70z264), built OFF in POD_DEFAULTS. The STAGED list (build_pending) played 2,000 seeds against the hashes taken at c0cf409's code: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
-        "fingerprint": "407df0118a3694d1",
-        "utc": "2026-11-26T03:53:17Z"
-      },
-      {
-        "commit": "c6a0895",
-        "evidence": "2026-11-26: fingerprint moved with opponents.py only -- the diagnostic sub-switches pod_gate_pieces and pod_gate_reserve (\u00a70z264), read only under pod_develop_gated (OFF). The STAGED list played 2,000 seeds against the hashes taken at c0cf409's code: 0 of 2,000 differ. python 3.11.18.",
-        "fingerprint": "c900976c5cbfdad0",
-        "utc": "2026-11-26T04:00:41Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_lorehold_10-20_n15000_medblank.json": {
-    "built_at": "8b7fe7cbffe26ea7",
-    "built_commit": "120cc9a",
-    "built_utc": "2026-11-22T01:12:42Z",
+    "built_at": "6ab523943d3d9e2c",
+    "built_commit": "6c9a661",
+    "built_utc": "2026-11-28T02:10:53Z",
     "deck": "lorehold",
     "superseded": [
       {
@@ -2210,21 +2224,28 @@
             "utc": "2026-11-21T17:43:45Z"
           }
         ]
+      },
+      {
+        "built_at": "8b7fe7cbffe26ea7",
+        "built_commit": "120cc9a",
+        "built_utc": "2026-11-22T01:12:42Z",
+        "deck": "lorehold",
+        "verified": [
+          {
+            "commit": "4b72b3f",
+            "evidence": "2026-11-22, \u00a70z245 (Tempting Contract and Master of Ceremonies hand the pod Treasure: _pod_mana.POD_GIFTS gains them, voting.tempting_takers, tivit's upkeep; pod_gifts_symmetric default True): check_unchanged_decks --n=2000 against a clean worktree at 6ca318b, BIT-IDENTICAL on all 8 metrics, and the staged list (build_pending) at 2,000 seeds BIT-IDENTICAL too (\u00a70z126), python 3.13.18; only tivit moved, and with pod_gifts_symmetric=False tivit is BIT-IDENTICAL as well; no baseline list moved",
+            "fingerprint": "e686dacfe2891389",
+            "utc": "2026-11-22T04:14:47Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "4b72b3f",
-        "evidence": "2026-11-22, \u00a70z245 (Tempting Contract and Master of Ceremonies hand the pod Treasure: _pod_mana.POD_GIFTS gains them, voting.tempting_takers, tivit's upkeep; pod_gifts_symmetric default True): check_unchanged_decks --n=2000 against a clean worktree at 6ca318b, BIT-IDENTICAL on all 8 metrics, and the staged list (build_pending) at 2,000 seeds BIT-IDENTICAL too (\u00a70z126), python 3.13.18; only tivit moved, and with pod_gifts_symmetric=False tivit is BIT-IDENTICAL as well; no baseline list moved",
-        "fingerprint": "e686dacfe2891389",
-        "utc": "2026-11-22T04:14:47Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_rendmaw_10-20_n15000_medblank.json": {
-    "built_at": "fdea4aaa6a1a7d13",
-    "built_commit": "80cb14f",
-    "built_utc": "2026-11-23T01:30:39Z",
+    "built_at": "63a9aedce350cf98",
+    "built_commit": "6c9a661",
+    "built_utc": "2026-11-28T02:10:48Z",
     "deck": "rendmaw",
     "superseded": [
       {
@@ -2889,87 +2910,94 @@
             "utc": "2026-11-22T12:55:27Z"
           }
         ]
+      },
+      {
+        "built_at": "fdea4aaa6a1a7d13",
+        "built_commit": "80cb14f",
+        "built_utc": "2026-11-23T01:30:39Z",
+        "deck": "rendmaw",
+        "verified": [
+          {
+            "commit": "e220bf7",
+            "evidence": "2026-11-23: fingerprint moved with experiment.py (PRE_ITEM45_REST, \u00a70z248's last flip) and opponents.py (Malakir's PROTECTION entry and protection_life, \u00a70z251). check_unchanged_decks --n=2000 BIT-IDENTICAL against a77fb7a and against 63cd636 (modules), and the STAGED list (build_pending) played 2,000 seeds at both a77fb7a and e220bf7+, every game's whole output hashed: 0 of 2,000 differ.",
+            "fingerprint": "c74400abd36f6571",
+            "utc": "2026-11-23T22:11:25Z"
+          },
+          {
+            "commit": "e48ad7a",
+            "evidence": "2026-11-24: fingerprint moved with opponents.py only (\u00a70z252: _answer_pieces split out of answer_pod_threat, ETB_ANSWERS and answer_on_entry added; only shilgengar calls the new function). check_unchanged_decks --n=2000 BIT-IDENTICAL against e48ad7a (modules), and the STAGED list (build_pending) played 2,000 seeds at both e48ad7a and e48ad7a+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
+            "fingerprint": "f7b3e4bd9d4589dc",
+            "utc": "2026-11-24T03:13:47Z"
+          },
+          {
+            "commit": "9eadfbc",
+            "evidence": "2026-11-25: fingerprint moved with tools/ablation.py only (\u00a70z253: Journey of Discovery from azusa's PARTLY_MODELLED to SCRIPTED_AZUSA; no other deck's entries touched). This deck's table re-renders byte-identical from this cache (tests.test_metrics_and_render C), check_unchanged_decks --n=2000 BIT-IDENTICAL against 9eadfbc (modules), and the STAGED list (build_pending) played 2,000 seeds at both 9eadfbc and 9eadfbc+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
+            "fingerprint": "904e87b93868570b",
+            "utc": "2026-11-25T03:21:54Z"
+          },
+          {
+            "commit": "4f5c238",
+            "evidence": "2026-11-25: fingerprint moved with tools/ablation.py only (\u00a70z254: Massacre Wurm, Sun Titan, Avacyn from shilgengar's PARTLY_MODELLED to SCRIPTED_SHILGENGAR; no other deck's entries touched). This deck's table re-renders byte-identical from this cache (tests.test_metrics_and_render C), check_unchanged_decks --n=2000 BIT-IDENTICAL against 4f5c238 (modules), and the STAGED list (build_pending) played 2,000 seeds at both 4f5c238 and 4f5c238+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
+            "fingerprint": "707aad85de09a61d",
+            "utc": "2026-11-25T03:57:41Z"
+          },
+          {
+            "commit": "ea7dccf",
+            "evidence": "2026-11-25: fingerprint moved with opponents.py (\u00a70z255: _answer_pieces made public as answer_pieces, docstring only otherwise) and tools/ablation.py (Angel of Serenity's shilgengar note). check_unchanged_decks --n=2000 BIT-IDENTICAL against ea7dccf (modules), the table re-renders byte-identical from this cache, and the STAGED list (build_pending) played 2,000 seeds at both ea7dccf and ea7dccf+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
+            "fingerprint": "5086e0683d01dc42",
+            "utc": "2026-11-25T16:51:15Z"
+          },
+          {
+            "commit": "228f784",
+            "evidence": "2026-11-25: fingerprint moved with tools/ablation.py only (\u00a70z256: Nylea's Intervention's azusa note; no other deck's entries touched). The table re-renders byte-identical from this cache, check_unchanged_decks --n=2000 BIT-IDENTICAL against 228f784 (modules), and the STAGED list (build_pending) played 2,000 seeds at both 228f784 and 228f784+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
+            "fingerprint": "0dff0dc44c863e58",
+            "utc": "2026-11-25T18:17:11Z"
+          },
+          {
+            "commit": "84c57b6",
+            "evidence": "2026-11-25: fingerprint moved with opponents.py (\u00a70z257-\u00a70z259: the ETB_ANSWERS comment, trample_of's optional craterhoof_reaches hook, the sweeper's artifacts_enchantments scope -- reached by azusa alone) and tools/ablation.py (Bane of Progress's azusa note). check_unchanged_decks --n=2000 BIT-IDENTICAL against 84c57b6 (modules), the table re-renders byte-identical from this cache, and the STAGED list (build_pending) played 2,000 seeds at both 84c57b6 and 84c57b6+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
+            "fingerprint": "2f04342c97f74490",
+            "utc": "2026-11-25T22:27:53Z"
+          },
+          {
+            "commit": "23ac6bd",
+            "evidence": "2026-11-26: fingerprint moved with engine.py (\u00a70z261: EOT_EFFECTS gains resplendent_pump, an attribute only shilgengar sets), opponents.py (FREE_WITH_COMMANDER and free_with_commander in _cast_response, Flawless Maneuver only; the optional self_protects hook in spot removal) and tools/ablation.py (shilgengar's notes). check_unchanged_decks --n=2000 BIT-IDENTICAL against 23ac6bd (modules), the table re-renders byte-identical from this cache, and the STAGED list (build_pending) played 2,000 seeds at both 23ac6bd and 23ac6bd+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
+            "fingerprint": "3ae944ab2af48c9b",
+            "utc": "2026-11-26T00:06:23Z"
+          },
+          {
+            "commit": "23ac6bd",
+            "evidence": "2026-11-26: fingerprint moved again with tools/ablation.py only -- Teferi's Protection's shilgengar note reworded (\u00a70z261), minutes after the record above at the same code. The table re-renders byte-identical from this cache (tests.test_metrics_and_render C); the simulation is the code the record above checked (0 of 2,000 staged-list games differ against 23ac6bd).",
+            "fingerprint": "aa55f63b09266987",
+            "utc": "2026-11-26T00:13:09Z"
+          },
+          {
+            "commit": "ed9eebe",
+            "evidence": "2026-11-26: fingerprint moved with opponents.py only -- free_with_commander counts its reach before its switch (\u00a70z261), a counter. The STAGED list (build_pending) played 2,000 seeds against the hashes taken at 23ac6bd: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
+            "fingerprint": "0c2b8a90e9fba9fb",
+            "utc": "2026-11-26T00:25:22Z"
+          },
+          {
+            "commit": "127c4d6",
+            "evidence": "2026-11-26: fingerprint moved with opponents.py (\u00a70z262: Teferi's Protection's round -- phased_out, teferi_saves and their hooks, every one reached only with Teferi's Protection cast or in hand) and tools/ablation.py (its shilgengar note). The STAGED list (build_pending) played 2,000 seeds against the hashes taken at 23ac6bd: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
+            "fingerprint": "f4f7d54806ca2b79",
+            "utc": "2026-11-26T00:37:23Z"
+          },
+          {
+            "commit": "401ec4d",
+            "evidence": "2026-11-26: fingerprint moved with opponents.py only -- teferi_seen, a reach counter in try_protect and teferi_saves (\u00a70z262). The STAGED list (build_pending) played 2,000 seeds against the hashes taken at 23ac6bd: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
+            "fingerprint": "7302fc1acd517d94",
+            "utc": "2026-11-26T01:03:54Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "e220bf7",
-        "evidence": "2026-11-23: fingerprint moved with experiment.py (PRE_ITEM45_REST, \u00a70z248's last flip) and opponents.py (Malakir's PROTECTION entry and protection_life, \u00a70z251). check_unchanged_decks --n=2000 BIT-IDENTICAL against a77fb7a and against 63cd636 (modules), and the STAGED list (build_pending) played 2,000 seeds at both a77fb7a and e220bf7+, every game's whole output hashed: 0 of 2,000 differ.",
-        "fingerprint": "c74400abd36f6571",
-        "utc": "2026-11-23T22:11:25Z"
-      },
-      {
-        "commit": "e48ad7a",
-        "evidence": "2026-11-24: fingerprint moved with opponents.py only (\u00a70z252: _answer_pieces split out of answer_pod_threat, ETB_ANSWERS and answer_on_entry added; only shilgengar calls the new function). check_unchanged_decks --n=2000 BIT-IDENTICAL against e48ad7a (modules), and the STAGED list (build_pending) played 2,000 seeds at both e48ad7a and e48ad7a+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
-        "fingerprint": "f7b3e4bd9d4589dc",
-        "utc": "2026-11-24T03:13:47Z"
-      },
-      {
-        "commit": "9eadfbc",
-        "evidence": "2026-11-25: fingerprint moved with tools/ablation.py only (\u00a70z253: Journey of Discovery from azusa's PARTLY_MODELLED to SCRIPTED_AZUSA; no other deck's entries touched). This deck's table re-renders byte-identical from this cache (tests.test_metrics_and_render C), check_unchanged_decks --n=2000 BIT-IDENTICAL against 9eadfbc (modules), and the STAGED list (build_pending) played 2,000 seeds at both 9eadfbc and 9eadfbc+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
-        "fingerprint": "904e87b93868570b",
-        "utc": "2026-11-25T03:21:54Z"
-      },
-      {
-        "commit": "4f5c238",
-        "evidence": "2026-11-25: fingerprint moved with tools/ablation.py only (\u00a70z254: Massacre Wurm, Sun Titan, Avacyn from shilgengar's PARTLY_MODELLED to SCRIPTED_SHILGENGAR; no other deck's entries touched). This deck's table re-renders byte-identical from this cache (tests.test_metrics_and_render C), check_unchanged_decks --n=2000 BIT-IDENTICAL against 4f5c238 (modules), and the STAGED list (build_pending) played 2,000 seeds at both 4f5c238 and 4f5c238+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
-        "fingerprint": "707aad85de09a61d",
-        "utc": "2026-11-25T03:57:41Z"
-      },
-      {
-        "commit": "ea7dccf",
-        "evidence": "2026-11-25: fingerprint moved with opponents.py (\u00a70z255: _answer_pieces made public as answer_pieces, docstring only otherwise) and tools/ablation.py (Angel of Serenity's shilgengar note). check_unchanged_decks --n=2000 BIT-IDENTICAL against ea7dccf (modules), the table re-renders byte-identical from this cache, and the STAGED list (build_pending) played 2,000 seeds at both ea7dccf and ea7dccf+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
-        "fingerprint": "5086e0683d01dc42",
-        "utc": "2026-11-25T16:51:15Z"
-      },
-      {
-        "commit": "228f784",
-        "evidence": "2026-11-25: fingerprint moved with tools/ablation.py only (\u00a70z256: Nylea's Intervention's azusa note; no other deck's entries touched). The table re-renders byte-identical from this cache, check_unchanged_decks --n=2000 BIT-IDENTICAL against 228f784 (modules), and the STAGED list (build_pending) played 2,000 seeds at both 228f784 and 228f784+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
-        "fingerprint": "0dff0dc44c863e58",
-        "utc": "2026-11-25T18:17:11Z"
-      },
-      {
-        "commit": "84c57b6",
-        "evidence": "2026-11-25: fingerprint moved with opponents.py (\u00a70z257-\u00a70z259: the ETB_ANSWERS comment, trample_of's optional craterhoof_reaches hook, the sweeper's artifacts_enchantments scope -- reached by azusa alone) and tools/ablation.py (Bane of Progress's azusa note). check_unchanged_decks --n=2000 BIT-IDENTICAL against 84c57b6 (modules), the table re-renders byte-identical from this cache, and the STAGED list (build_pending) played 2,000 seeds at both 84c57b6 and 84c57b6+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
-        "fingerprint": "2f04342c97f74490",
-        "utc": "2026-11-25T22:27:53Z"
-      },
-      {
-        "commit": "23ac6bd",
-        "evidence": "2026-11-26: fingerprint moved with engine.py (\u00a70z261: EOT_EFFECTS gains resplendent_pump, an attribute only shilgengar sets), opponents.py (FREE_WITH_COMMANDER and free_with_commander in _cast_response, Flawless Maneuver only; the optional self_protects hook in spot removal) and tools/ablation.py (shilgengar's notes). check_unchanged_decks --n=2000 BIT-IDENTICAL against 23ac6bd (modules), the table re-renders byte-identical from this cache, and the STAGED list (build_pending) played 2,000 seeds at both 23ac6bd and 23ac6bd+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
-        "fingerprint": "3ae944ab2af48c9b",
-        "utc": "2026-11-26T00:06:23Z"
-      },
-      {
-        "commit": "23ac6bd",
-        "evidence": "2026-11-26: fingerprint moved again with tools/ablation.py only -- Teferi's Protection's shilgengar note reworded (\u00a70z261), minutes after the record above at the same code. The table re-renders byte-identical from this cache (tests.test_metrics_and_render C); the simulation is the code the record above checked (0 of 2,000 staged-list games differ against 23ac6bd).",
-        "fingerprint": "aa55f63b09266987",
-        "utc": "2026-11-26T00:13:09Z"
-      },
-      {
-        "commit": "ed9eebe",
-        "evidence": "2026-11-26: fingerprint moved with opponents.py only -- free_with_commander counts its reach before its switch (\u00a70z261), a counter. The STAGED list (build_pending) played 2,000 seeds against the hashes taken at 23ac6bd: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
-        "fingerprint": "0c2b8a90e9fba9fb",
-        "utc": "2026-11-26T00:25:22Z"
-      },
-      {
-        "commit": "127c4d6",
-        "evidence": "2026-11-26: fingerprint moved with opponents.py (\u00a70z262: Teferi's Protection's round -- phased_out, teferi_saves and their hooks, every one reached only with Teferi's Protection cast or in hand) and tools/ablation.py (its shilgengar note). The STAGED list (build_pending) played 2,000 seeds against the hashes taken at 23ac6bd: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
-        "fingerprint": "f4f7d54806ca2b79",
-        "utc": "2026-11-26T00:37:23Z"
-      },
-      {
-        "commit": "401ec4d",
-        "evidence": "2026-11-26: fingerprint moved with opponents.py only -- teferi_seen, a reach counter in try_protect and teferi_saves (\u00a70z262). The STAGED list (build_pending) played 2,000 seeds against the hashes taken at 23ac6bd: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
-        "fingerprint": "7302fc1acd517d94",
-        "utc": "2026-11-26T01:03:54Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_shilgengar_10-20_n15000_medblank.json": {
-    "built_at": "af5e7632010a237f",
-    "built_commit": "120cc9a",
-    "built_utc": "2026-11-22T01:12:12Z",
+    "built_at": "e15753b18376f0f5",
+    "built_commit": "6c9a661",
+    "built_utc": "2026-11-28T02:10:08Z",
     "deck": "shilgengar",
     "superseded": [
       {
@@ -3646,21 +3674,28 @@
             "utc": "2026-11-21T17:43:46Z"
           }
         ]
+      },
+      {
+        "built_at": "af5e7632010a237f",
+        "built_commit": "120cc9a",
+        "built_utc": "2026-11-22T01:12:12Z",
+        "deck": "shilgengar",
+        "verified": [
+          {
+            "commit": "4b72b3f",
+            "evidence": "2026-11-22, \u00a70z245 (Tempting Contract and Master of Ceremonies hand the pod Treasure: _pod_mana.POD_GIFTS gains them, voting.tempting_takers, tivit's upkeep; pod_gifts_symmetric default True): check_unchanged_decks --n=2000 against a clean worktree at 6ca318b, BIT-IDENTICAL on all 8 metrics, and the staged list (build_pending) at 2,000 seeds BIT-IDENTICAL too (\u00a70z126), python 3.13.18; only tivit moved, and with pod_gifts_symmetric=False tivit is BIT-IDENTICAL as well; no baseline list moved",
+            "fingerprint": "4e9f90932f221f6a",
+            "utc": "2026-11-22T04:14:47Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "4b72b3f",
-        "evidence": "2026-11-22, \u00a70z245 (Tempting Contract and Master of Ceremonies hand the pod Treasure: _pod_mana.POD_GIFTS gains them, voting.tempting_takers, tivit's upkeep; pod_gifts_symmetric default True): check_unchanged_decks --n=2000 against a clean worktree at 6ca318b, BIT-IDENTICAL on all 8 metrics, and the staged list (build_pending) at 2,000 seeds BIT-IDENTICAL too (\u00a70z126), python 3.13.18; only tivit moved, and with pod_gifts_symmetric=False tivit is BIT-IDENTICAL as well; no baseline list moved",
-        "fingerprint": "4e9f90932f221f6a",
-        "utc": "2026-11-22T04:14:47Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_tivit_10-20_n15000_medblank.json": {
-    "built_at": "51a0b8675a6c4ba9",
-    "built_commit": "80cb14f",
-    "built_utc": "2026-11-23T01:29:48Z",
+    "built_at": "16ab6307c3d50c53",
+    "built_commit": "6c9a661",
+    "built_utc": "2026-11-28T02:10:34Z",
     "deck": "tivit",
     "superseded": [
       {
@@ -4297,100 +4332,107 @@
         "built_utc": "2026-11-22T01:12:01Z",
         "deck": "tivit",
         "verified": []
+      },
+      {
+        "built_at": "51a0b8675a6c4ba9",
+        "built_commit": "80cb14f",
+        "built_utc": "2026-11-23T01:29:48Z",
+        "deck": "tivit",
+        "verified": [
+          {
+            "commit": "e220bf7",
+            "evidence": "2026-11-23: fingerprint moved with experiment.py (PRE_ITEM45_REST, \u00a70z248's last flip) and opponents.py (Malakir's PROTECTION entry and protection_life, \u00a70z251). check_unchanged_decks --n=2000 BIT-IDENTICAL against a77fb7a and against 63cd636 (modules), and the STAGED list (build_pending) played 2,000 seeds at both a77fb7a and e220bf7+, every game's whole output hashed: 0 of 2,000 differ.",
+            "fingerprint": "cceff3097287d5ef",
+            "utc": "2026-11-23T22:11:25Z"
+          },
+          {
+            "commit": "e48ad7a",
+            "evidence": "2026-11-24: fingerprint moved with opponents.py only (\u00a70z252: _answer_pieces split out of answer_pod_threat, ETB_ANSWERS and answer_on_entry added; only shilgengar calls the new function). check_unchanged_decks --n=2000 BIT-IDENTICAL against e48ad7a (modules), and the STAGED list (build_pending) played 2,000 seeds at both e48ad7a and e48ad7a+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
+            "fingerprint": "5c9d4fa98ff62190",
+            "utc": "2026-11-24T03:13:48Z"
+          },
+          {
+            "commit": "9eadfbc",
+            "evidence": "2026-11-25: fingerprint moved with tools/ablation.py only (\u00a70z253: Journey of Discovery from azusa's PARTLY_MODELLED to SCRIPTED_AZUSA; no other deck's entries touched). This deck's table re-renders byte-identical from this cache (tests.test_metrics_and_render C), check_unchanged_decks --n=2000 BIT-IDENTICAL against 9eadfbc (modules), and the STAGED list (build_pending) played 2,000 seeds at both 9eadfbc and 9eadfbc+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
+            "fingerprint": "70539ff057f56d48",
+            "utc": "2026-11-25T03:21:55Z"
+          },
+          {
+            "commit": "4f5c238",
+            "evidence": "2026-11-25: fingerprint moved with tools/ablation.py only (\u00a70z254: Massacre Wurm, Sun Titan, Avacyn from shilgengar's PARTLY_MODELLED to SCRIPTED_SHILGENGAR; no other deck's entries touched). This deck's table re-renders byte-identical from this cache (tests.test_metrics_and_render C), check_unchanged_decks --n=2000 BIT-IDENTICAL against 4f5c238 (modules), and the STAGED list (build_pending) played 2,000 seeds at both 4f5c238 and 4f5c238+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
+            "fingerprint": "308055fea9d6ae84",
+            "utc": "2026-11-25T03:57:41Z"
+          },
+          {
+            "commit": "ea7dccf",
+            "evidence": "2026-11-25: fingerprint moved with opponents.py (\u00a70z255: _answer_pieces made public as answer_pieces, docstring only otherwise) and tools/ablation.py (Angel of Serenity's shilgengar note). check_unchanged_decks --n=2000 BIT-IDENTICAL against ea7dccf (modules), the table re-renders byte-identical from this cache, and the STAGED list (build_pending) played 2,000 seeds at both ea7dccf and ea7dccf+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
+            "fingerprint": "e1e66597d1fe67e3",
+            "utc": "2026-11-25T16:51:15Z"
+          },
+          {
+            "commit": "228f784",
+            "evidence": "2026-11-25: fingerprint moved with tools/ablation.py only (\u00a70z256: Nylea's Intervention's azusa note; no other deck's entries touched). The table re-renders byte-identical from this cache, check_unchanged_decks --n=2000 BIT-IDENTICAL against 228f784 (modules), and the STAGED list (build_pending) played 2,000 seeds at both 228f784 and 228f784+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
+            "fingerprint": "476a6b5f0540db57",
+            "utc": "2026-11-25T18:17:11Z"
+          },
+          {
+            "commit": "84c57b6",
+            "evidence": "2026-11-25: fingerprint moved with opponents.py (\u00a70z257-\u00a70z259: the ETB_ANSWERS comment, trample_of's optional craterhoof_reaches hook, the sweeper's artifacts_enchantments scope -- reached by azusa alone) and tools/ablation.py (Bane of Progress's azusa note). check_unchanged_decks --n=2000 BIT-IDENTICAL against 84c57b6 (modules), the table re-renders byte-identical from this cache, and the STAGED list (build_pending) played 2,000 seeds at both 84c57b6 and 84c57b6+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
+            "fingerprint": "813e9b53653d0564",
+            "utc": "2026-11-25T22:27:53Z"
+          },
+          {
+            "commit": "23ac6bd",
+            "evidence": "2026-11-26: fingerprint moved with engine.py (\u00a70z261: EOT_EFFECTS gains resplendent_pump, an attribute only shilgengar sets), opponents.py (FREE_WITH_COMMANDER and free_with_commander in _cast_response, Flawless Maneuver only; the optional self_protects hook in spot removal) and tools/ablation.py (shilgengar's notes). check_unchanged_decks --n=2000 BIT-IDENTICAL against 23ac6bd (modules), the table re-renders byte-identical from this cache, and the STAGED list (build_pending) played 2,000 seeds at both 23ac6bd and 23ac6bd+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
+            "fingerprint": "30694449889f501d",
+            "utc": "2026-11-26T00:06:23Z"
+          },
+          {
+            "commit": "23ac6bd",
+            "evidence": "2026-11-26: fingerprint moved again with tools/ablation.py only -- Teferi's Protection's shilgengar note reworded (\u00a70z261), minutes after the record above at the same code. The table re-renders byte-identical from this cache (tests.test_metrics_and_render C); the simulation is the code the record above checked (0 of 2,000 staged-list games differ against 23ac6bd).",
+            "fingerprint": "934715a19b7e718b",
+            "utc": "2026-11-26T00:13:09Z"
+          },
+          {
+            "commit": "ed9eebe",
+            "evidence": "2026-11-26: fingerprint moved with opponents.py only -- free_with_commander counts its reach before its switch (\u00a70z261), a counter. The STAGED list (build_pending) played 2,000 seeds against the hashes taken at 23ac6bd: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
+            "fingerprint": "831d99a8658bc3ef",
+            "utc": "2026-11-26T00:25:22Z"
+          },
+          {
+            "commit": "127c4d6",
+            "evidence": "2026-11-26: fingerprint moved with opponents.py (\u00a70z262: Teferi's Protection's round -- phased_out, teferi_saves and their hooks, every one reached only with Teferi's Protection cast or in hand) and tools/ablation.py (its shilgengar note). The STAGED list (build_pending) played 2,000 seeds against the hashes taken at 23ac6bd: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
+            "fingerprint": "13d4d881aafbbfba",
+            "utc": "2026-11-26T00:37:23Z"
+          },
+          {
+            "commit": "401ec4d",
+            "evidence": "2026-11-26: fingerprint moved with opponents.py only -- teferi_seen, a reach counter in try_protect and teferi_saves (\u00a70z262). The STAGED list (build_pending) played 2,000 seeds against the hashes taken at 23ac6bd: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
+            "fingerprint": "81c564736afa5c33",
+            "utc": "2026-11-26T01:03:55Z"
+          },
+          {
+            "commit": "c4acc99",
+            "evidence": "2026-11-26: fingerprint moved with decks/_removal.py (\u00a70z263: the census reads Angel of Serenity; DESTROY_SHARE_SPOT and _AE 0.4600 -> 0.4510), opponents.py (answer_reach's 20-character window) and tools/ablation.py (shilgengar's Serenity note). check_unchanged_decks --n=2000 against c4acc99: BIT-IDENTICAL on all 8 metrics; the STAGED list (build_pending) played 2,000 seeds at both trees, every game's whole output hashed: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
+            "fingerprint": "b4dc3c50db242cde",
+            "utc": "2026-11-26T03:35:04Z"
+          },
+          {
+            "commit": "c0cf409",
+            "evidence": "2026-11-26: fingerprint moved with opponents.py only -- the pod_body_mv_cap switch (\u00a70z264), built OFF in POD_DEFAULTS. The STAGED list (build_pending) played 2,000 seeds against the hashes taken at c0cf409's code: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
+            "fingerprint": "1ef68a900259366d",
+            "utc": "2026-11-26T03:53:18Z"
+          },
+          {
+            "commit": "c6a0895",
+            "evidence": "2026-11-26: fingerprint moved with opponents.py only -- the diagnostic sub-switches pod_gate_pieces and pod_gate_reserve (\u00a70z264), read only under pod_develop_gated (OFF). The STAGED list played 2,000 seeds against the hashes taken at c0cf409's code: 0 of 2,000 differ. python 3.11.18.",
+            "fingerprint": "e02a2fb3cf9f15f7",
+            "utc": "2026-11-26T04:00:42Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "e220bf7",
-        "evidence": "2026-11-23: fingerprint moved with experiment.py (PRE_ITEM45_REST, \u00a70z248's last flip) and opponents.py (Malakir's PROTECTION entry and protection_life, \u00a70z251). check_unchanged_decks --n=2000 BIT-IDENTICAL against a77fb7a and against 63cd636 (modules), and the STAGED list (build_pending) played 2,000 seeds at both a77fb7a and e220bf7+, every game's whole output hashed: 0 of 2,000 differ.",
-        "fingerprint": "cceff3097287d5ef",
-        "utc": "2026-11-23T22:11:25Z"
-      },
-      {
-        "commit": "e48ad7a",
-        "evidence": "2026-11-24: fingerprint moved with opponents.py only (\u00a70z252: _answer_pieces split out of answer_pod_threat, ETB_ANSWERS and answer_on_entry added; only shilgengar calls the new function). check_unchanged_decks --n=2000 BIT-IDENTICAL against e48ad7a (modules), and the STAGED list (build_pending) played 2,000 seeds at both e48ad7a and e48ad7a+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
-        "fingerprint": "5c9d4fa98ff62190",
-        "utc": "2026-11-24T03:13:48Z"
-      },
-      {
-        "commit": "9eadfbc",
-        "evidence": "2026-11-25: fingerprint moved with tools/ablation.py only (\u00a70z253: Journey of Discovery from azusa's PARTLY_MODELLED to SCRIPTED_AZUSA; no other deck's entries touched). This deck's table re-renders byte-identical from this cache (tests.test_metrics_and_render C), check_unchanged_decks --n=2000 BIT-IDENTICAL against 9eadfbc (modules), and the STAGED list (build_pending) played 2,000 seeds at both 9eadfbc and 9eadfbc+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
-        "fingerprint": "70539ff057f56d48",
-        "utc": "2026-11-25T03:21:55Z"
-      },
-      {
-        "commit": "4f5c238",
-        "evidence": "2026-11-25: fingerprint moved with tools/ablation.py only (\u00a70z254: Massacre Wurm, Sun Titan, Avacyn from shilgengar's PARTLY_MODELLED to SCRIPTED_SHILGENGAR; no other deck's entries touched). This deck's table re-renders byte-identical from this cache (tests.test_metrics_and_render C), check_unchanged_decks --n=2000 BIT-IDENTICAL against 4f5c238 (modules), and the STAGED list (build_pending) played 2,000 seeds at both 4f5c238 and 4f5c238+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
-        "fingerprint": "308055fea9d6ae84",
-        "utc": "2026-11-25T03:57:41Z"
-      },
-      {
-        "commit": "ea7dccf",
-        "evidence": "2026-11-25: fingerprint moved with opponents.py (\u00a70z255: _answer_pieces made public as answer_pieces, docstring only otherwise) and tools/ablation.py (Angel of Serenity's shilgengar note). check_unchanged_decks --n=2000 BIT-IDENTICAL against ea7dccf (modules), the table re-renders byte-identical from this cache, and the STAGED list (build_pending) played 2,000 seeds at both ea7dccf and ea7dccf+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
-        "fingerprint": "e1e66597d1fe67e3",
-        "utc": "2026-11-25T16:51:15Z"
-      },
-      {
-        "commit": "228f784",
-        "evidence": "2026-11-25: fingerprint moved with tools/ablation.py only (\u00a70z256: Nylea's Intervention's azusa note; no other deck's entries touched). The table re-renders byte-identical from this cache, check_unchanged_decks --n=2000 BIT-IDENTICAL against 228f784 (modules), and the STAGED list (build_pending) played 2,000 seeds at both 228f784 and 228f784+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
-        "fingerprint": "476a6b5f0540db57",
-        "utc": "2026-11-25T18:17:11Z"
-      },
-      {
-        "commit": "84c57b6",
-        "evidence": "2026-11-25: fingerprint moved with opponents.py (\u00a70z257-\u00a70z259: the ETB_ANSWERS comment, trample_of's optional craterhoof_reaches hook, the sweeper's artifacts_enchantments scope -- reached by azusa alone) and tools/ablation.py (Bane of Progress's azusa note). check_unchanged_decks --n=2000 BIT-IDENTICAL against 84c57b6 (modules), the table re-renders byte-identical from this cache, and the STAGED list (build_pending) played 2,000 seeds at both 84c57b6 and 84c57b6+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
-        "fingerprint": "813e9b53653d0564",
-        "utc": "2026-11-25T22:27:53Z"
-      },
-      {
-        "commit": "23ac6bd",
-        "evidence": "2026-11-26: fingerprint moved with engine.py (\u00a70z261: EOT_EFFECTS gains resplendent_pump, an attribute only shilgengar sets), opponents.py (FREE_WITH_COMMANDER and free_with_commander in _cast_response, Flawless Maneuver only; the optional self_protects hook in spot removal) and tools/ablation.py (shilgengar's notes). check_unchanged_decks --n=2000 BIT-IDENTICAL against 23ac6bd (modules), the table re-renders byte-identical from this cache, and the STAGED list (build_pending) played 2,000 seeds at both 23ac6bd and 23ac6bd+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
-        "fingerprint": "30694449889f501d",
-        "utc": "2026-11-26T00:06:23Z"
-      },
-      {
-        "commit": "23ac6bd",
-        "evidence": "2026-11-26: fingerprint moved again with tools/ablation.py only -- Teferi's Protection's shilgengar note reworded (\u00a70z261), minutes after the record above at the same code. The table re-renders byte-identical from this cache (tests.test_metrics_and_render C); the simulation is the code the record above checked (0 of 2,000 staged-list games differ against 23ac6bd).",
-        "fingerprint": "934715a19b7e718b",
-        "utc": "2026-11-26T00:13:09Z"
-      },
-      {
-        "commit": "ed9eebe",
-        "evidence": "2026-11-26: fingerprint moved with opponents.py only -- free_with_commander counts its reach before its switch (\u00a70z261), a counter. The STAGED list (build_pending) played 2,000 seeds against the hashes taken at 23ac6bd: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
-        "fingerprint": "831d99a8658bc3ef",
-        "utc": "2026-11-26T00:25:22Z"
-      },
-      {
-        "commit": "127c4d6",
-        "evidence": "2026-11-26: fingerprint moved with opponents.py (\u00a70z262: Teferi's Protection's round -- phased_out, teferi_saves and their hooks, every one reached only with Teferi's Protection cast or in hand) and tools/ablation.py (its shilgengar note). The STAGED list (build_pending) played 2,000 seeds against the hashes taken at 23ac6bd: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
-        "fingerprint": "13d4d881aafbbfba",
-        "utc": "2026-11-26T00:37:23Z"
-      },
-      {
-        "commit": "401ec4d",
-        "evidence": "2026-11-26: fingerprint moved with opponents.py only -- teferi_seen, a reach counter in try_protect and teferi_saves (\u00a70z262). The STAGED list (build_pending) played 2,000 seeds against the hashes taken at 23ac6bd: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
-        "fingerprint": "81c564736afa5c33",
-        "utc": "2026-11-26T01:03:55Z"
-      },
-      {
-        "commit": "c4acc99",
-        "evidence": "2026-11-26: fingerprint moved with decks/_removal.py (\u00a70z263: the census reads Angel of Serenity; DESTROY_SHARE_SPOT and _AE 0.4600 -> 0.4510), opponents.py (answer_reach's 20-character window) and tools/ablation.py (shilgengar's Serenity note). check_unchanged_decks --n=2000 against c4acc99: BIT-IDENTICAL on all 8 metrics; the STAGED list (build_pending) played 2,000 seeds at both trees, every game's whole output hashed: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
-        "fingerprint": "b4dc3c50db242cde",
-        "utc": "2026-11-26T03:35:04Z"
-      },
-      {
-        "commit": "c0cf409",
-        "evidence": "2026-11-26: fingerprint moved with opponents.py only -- the pod_body_mv_cap switch (\u00a70z264), built OFF in POD_DEFAULTS. The STAGED list (build_pending) played 2,000 seeds against the hashes taken at c0cf409's code: 0 of 2,000 differ; the table re-renders byte-identical from this cache. python 3.11.18.",
-        "fingerprint": "1ef68a900259366d",
-        "utc": "2026-11-26T03:53:18Z"
-      },
-      {
-        "commit": "c6a0895",
-        "evidence": "2026-11-26: fingerprint moved with opponents.py only -- the diagnostic sub-switches pod_gate_pieces and pod_gate_reserve (\u00a70z264), read only under pod_develop_gated (OFF). The STAGED list played 2,000 seeds against the hashes taken at c0cf409's code: 0 of 2,000 differ. python 3.11.18.",
-        "fingerprint": "e02a2fb3cf9f15f7",
-        "utc": "2026-11-26T04:00:42Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_trostani_10-20_n15000_medblank.json": {
     "built_at": "f14c8abaffff896a",

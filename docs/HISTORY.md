@@ -3012,6 +3012,65 @@ left them:
 A container restart killed item 41's first run; it was re-run whole. The
 other session's §0z175 re-check (`965cb74`, docs only) was merged in.
 
+## Queued items closed 2026-11-28 — moved from `docs/QUEUE.md`
+
+**Item 53, closed by its rebuild** (the owner, 2026-11-28: "go ahead and
+rebuild the tables"): six tables at `6c9a661` on §0z266's pod, every
+active cache CURRENT, no significant row changed sign, and
+`tools.return_rank --write` run after it (§0z279). Azusa's leg could not
+finish under `regen_tables.sh`'s 30-minute budget and was finished in the
+coordinating session; the wall time was 10 h 57 min, 22 minutes without
+it. What the rebuild left for the owner is in §0z279.
+
+53. **BEFORE THE NEXT REBUILD: TWO DECISIONS THAT MOVE EVERY DECK (the
+    owner, 2026-11-25).** "decisions before the rebuild: fix the removal
+    census pattern, and turn on Item 52. Make a note of these decisions but
+    we will make other fixes before rebuilding." Both are DECIDED and NOT
+    STARTED; the owner's other fixes (§0z257 on) come first, then these,
+    then one rebuild of every active deck -- each moves all of them, so
+    doing either after the rebuild would cost a second one.
+    - **DONE 2026-11-26 (§0z263)**, the owner: "go ahead with the
+      removal census pattern fix". One card newly read (Angel of
+      Serenity), the spot share 0.46 -> 0.451, rendmaw's baseline moved.
+      **The census pattern** (§0z255): `tools/removal_census.py`'s spot
+      exile rule reads "(another )?target" and misses "other target" --
+      Angel of Serenity, read by hand since (`shilgengar.SERENITY_REACH`).
+      Fixing it regenerates `decks/_removal.py`, so `DESTROY_SHARE_SPOT`
+      moves for every deck. First list every card the fixed rule newly
+      reads (not checked yet); delete `SERENITY_REACH` and its hook once
+      the census reads the card (`check_serenity_reach` raises until then)
+      and give Serenity an `ETB_RETURN_KNOBS` switch instead.
+    - **Item 52's development gated by mana** (`pod_develop_gated`, §0z247):
+      ON. Still open inside it, the owner's to choose: the re-fit -- alone
+      it weakens the pod +0.114 on the mean, `incidental_rate` saturates
+      short of it, and `threat_clock_shift` 4.985 holds it unevenly -- or
+      first the look at why the calibrated boards outrun the pod's mana.
+      Ask before building the re-fit.
+      **LOOKED INTO FIRST, 2026-11-26 (§0z264)**, the owner: "look into why
+      the pod's boards outrun their mana first". The gate's +0.118 is
+      turn-1-3 costs (0.018; `pod_body_mv_cap`, built OFF, removes it),
+      the answer reserve before bodies (0.037), pieces (0.008), and 0.054
+      of real overcommitment. Open, the owner's: take the cap; keep or
+      drop the reserve before bodies; then re-fit what is left (+0.054 to
+      +0.100), by growth or by kill timing.
+      **CAP TAKEN, GROWTH MEASURED (§0z265)**, the owner: "take the cost
+      cap and measure the growth re-fit". The cap is the default (it moves
+      today's mean by nothing). Growth alone saturates at about +0.03 over
+      today (0.7 -> 2.0: +0.109 -> +0.032) but moves the decks evenly.
+      Open: the second lever for the last ~0.036 -- a small kill-timing
+      shift on top of growth 1.6, or dropping the reserve -- then one
+      fresh-seed re-measure (§0z170) before the rebuild.
+      **DONE 2026-11-26 (§0z266)**, the owner: "Drop the reserve before
+      bodies then push to main". The gate is ON, no reserve before bodies
+      (`pod_gate_reserve` False), `pod_growth_rate` 0.91 (the crossing,
+      0.911); on fresh seeds +0.0083 against the old pod, every deck
+      inside its bar. `experiment.POD_PRE_0Z266` restores the pod before.
+    - **Left in this item: the rebuild of every active deck**, the
+      owner's call. Both decisions are in; all six caches are SUSPECT.
+      After it, `python -m tools.return_rank --write`: azusa's returns
+      read its table's rows (§0z277), and `test_return_rank` E fails
+      until they are the new ones.
+
 ## Queued items closed 2026-11-22 — moved from `docs/QUEUE.md`
 
 **Item 37, closed by the owner the same day** ("I agree with item 37 and

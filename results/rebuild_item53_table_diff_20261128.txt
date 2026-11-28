@@ -1,0 +1,81 @@
+== rendmaw: baseline T20 0.3407 -> 0.3587 (T10 0.0979 -> 0.1065); floor +-0.0027 -> +-0.0028; rows 64 -> 64
+   moved beyond the wider bar: 9 of 64 (6 up)
+     Pygmy Kavu                             +0.0051+-0.0025 -> +0.0092+-0.0026  (+0.0041)  both->both
+     March of the World Ooze                +0.0177+-0.0034 -> +0.0217+-0.0035  (+0.0040)  both->both
+     Coat of Arms                           +0.0051+-0.0030 -> +0.0015+-0.0029  (-0.0036)  win->--
+     Massacre Wurm                          +0.0101+-0.0024 -> +0.0133+-0.0024  (+0.0032)  both->both
+     Overwhelming Stampede                  +0.0059+-0.0031 -> +0.0027+-0.0031  (-0.0032)  win->--
+     Arasta of the Endless Web              +0.0090+-0.0023 -> +0.0121+-0.0024  (+0.0031)  both->both
+     Palladium Myr                          +0.0040+-0.0027 -> +0.0011+-0.0028  (-0.0029)  both->dmg
+     Shigeki, Jukai Visionary               +0.0040+-0.0024 -> +0.0068+-0.0026  (+0.0028)  win->both
+     Woe Strider                            +0.0059+-0.0024 -> +0.0085+-0.0023  (+0.0026)  both->both
+   sign flips among rows significant in both: none
+== lorehold: baseline T20 0.4607 -> 0.4571 (T10 0.2671 -> 0.2740); floor +-0.0033 -> +-0.0033; rows 65 -> 65
+   moved beyond the wider bar: 12 of 65 (7 up)
+     Boros Signet                           +0.0049+-0.0038 -> +0.0110+-0.0038  (+0.0061)  both->both
+     Smothering Tithe                       +0.0120+-0.0038 -> +0.0068+-0.0037  (-0.0052)  both->both
+     Approach of the Second Sun             +0.0049+-0.0032 -> +0.0100+-0.0033  (+0.0051)  both->both
+     Talisman of Conviction                 +0.0059+-0.0038 -> +0.0109+-0.0038  (+0.0050)  both->both
+     Hit the Mother Lode                    +0.0141+-0.0030 -> +0.0183+-0.0030  (+0.0042)  both->both
+     Sejiri Shelter                         +0.0087+-0.0035 -> +0.0127+-0.0035  (+0.0040)  both->both
+     Goliath Daydreamer                     +0.0007+-0.0021 -> +0.0045+-0.0021  (+0.0038)  dmg->both
+     Perch Protection                       +0.0031+-0.0018 -> +0.0067+-0.0018  (+0.0036)  both->both
+     Hexing Squelcher                       +0.0063+-0.0026 -> +0.0032+-0.0023  (-0.0031)  both->both
+     Olórin's Searing Light                 +0.0171+-0.0027 -> +0.0141+-0.0027  (-0.0030)  both->both
+     Dragon's Rage Channeler                +0.0019+-0.0026 -> -0.0011+-0.0025  (-0.0030)  dmg->--
+     Mother of Runes                        +0.0055+-0.0027 -> +0.0025+-0.0026  (-0.0030)  both->--
+   sign flips among rows significant in both: none
+== karlov: baseline T20 0.5328 -> 0.5481 (T10 0.2649 -> 0.2930); floor +-0.0026 -> +-0.0026; rows 64 -> 64
+   moved beyond the wider bar: 8 of 64 (7 up)
+     Suture Priest                          -0.0009+-0.0027 -> +0.0033+-0.0026  (+0.0042)  dmg->both
+     Damnation                              +0.0059+-0.0023 -> +0.0093+-0.0025  (+0.0034)  both->both
+     Phyrexian Arena                        +0.0067+-0.0023 -> +0.0101+-0.0025  (+0.0034)  both->both
+     Blood Artist                           +0.0009+-0.0025 -> +0.0041+-0.0025  (+0.0032)  dmg->both
+     Sunscorch Regent                       +0.0123+-0.0023 -> +0.0093+-0.0023  (-0.0030)  both->both
+     Benevolent Offering                    +0.0113+-0.0026 -> +0.0140+-0.0027  (+0.0027)  both->both
+     Debt to the Deathless                  +0.0084+-0.0019 -> +0.0111+-0.0021  (+0.0027)  both->both
+     Cliffhaven Vampire                     +0.0086+-0.0025 -> +0.0111+-0.0025  (+0.0025)  both->both
+   sign flips among rows significant in both: none
+== tivit: baseline T20 0.5411 -> 0.5859 (T10 0.3109 -> 0.3960); floor +-0.0028 -> +-0.0027; rows 64 -> 64
+   moved beyond the wider bar: 18 of 64 (11 up)
+     Tamiyo's Journal                       +0.0038+-0.0017 -> +0.0190+-0.0026  (+0.0152)  both->both
+     Demonic Tutor                          +0.0321+-0.0036 -> +0.0245+-0.0034  (-0.0076)  both->both
+     Model of Unity                         +0.0092+-0.0030 -> +0.0147+-0.0031  (+0.0055)  both->both
+     Expropriate                            +0.0212+-0.0026 -> +0.0161+-0.0023  (-0.0051)  both->both
+     Sol Ring                               +0.0323+-0.0038 -> +0.0374+-0.0039  (+0.0051)  both->both
+     Orzhov Signet                          +0.0162+-0.0033 -> +0.0211+-0.0033  (+0.0049)  both->both
+     Torment of Hailfire                    +0.0139+-0.0028 -> +0.0095+-0.0025  (-0.0044)  both->both
+     Rhystic Study                          +0.0178+-0.0034 -> +0.0221+-0.0035  (+0.0043)  both->both
+     Mechanized Production                  +0.0097+-0.0026 -> +0.0139+-0.0023  (+0.0042)  both->both
+     Counterspell                           +0.0075+-0.0026 -> +0.0034+-0.0026  (-0.0041)  both->both
+     Ghostly Prison                         +0.0186+-0.0028 -> +0.0223+-0.0029  (+0.0037)  both->both
+     Grudge Keeper                          +0.0047+-0.0026 -> +0.0010+-0.0023  (-0.0037)  both->dmg
+   sign flips among rows significant in both: none
+== shilgengar: baseline T20 0.4301 -> 0.4801 (T10 0.0568 -> 0.0718); floor +-0.0028 -> +-0.0029; rows 64 -> 64
+   moved beyond the wider bar: 20 of 64 (17 up)
+     Fellwar Stone                          +0.0106+-0.0031 -> +0.0173+-0.0033  (+0.0067)  both->both
+     Teferi's Protection                    +0.0059+-0.0027 -> +0.0125+-0.0026  (+0.0066)  both->both
+     Angel of the Ruins                     +0.0139+-0.0031 -> +0.0204+-0.0032  (+0.0065)  both->both
+     Angel of Serenity                      +0.0089+-0.0022 -> +0.0149+-0.0026  (+0.0060)  both->both
+     Malakir Rebirth // Malakir Mire        +0.0049+-0.0027 -> +0.0107+-0.0031  (+0.0058)  both->both
+     Black Market Connections               +0.0043+-0.0030 -> +0.0094+-0.0032  (+0.0051)  win->both
+     Flawless Maneuver                      +0.0065+-0.0025 -> +0.0116+-0.0027  (+0.0051)  both->both
+     Mind Stone                             +0.0078+-0.0031 -> +0.0125+-0.0033  (+0.0047)  both->both
+     Lyra Dawnbringer                       +0.0348+-0.0036 -> +0.0393+-0.0037  (+0.0045)  both->both
+     Angel of Suffering                     +0.0185+-0.0030 -> +0.0227+-0.0032  (+0.0042)  both->both
+     Revel in Riches                        +0.0058+-0.0022 -> +0.0100+-0.0025  (+0.0042)  both->both
+     Grim Haruspex                          +0.0052+-0.0029 -> +0.0010+-0.0028  (-0.0042)  both->dmg
+   sign flips among rows significant in both: none
+== azusa: baseline T20 0.5503 -> 0.5817 (T10 0.3489 -> 0.3808); floor +-0.0033 -> +-0.0034; rows 58 -> 58
+   moved beyond the wider bar: 10 of 58 (9 up)
+     Tireless Tracker                       +0.0143+-0.0037 -> +0.0029+-0.0035  (-0.0114)  both->--
+     Avenger of Zendikar                    +0.0203+-0.0034 -> +0.0281+-0.0036  (+0.0078)  both->both
+     Ancient Greenwarden                    +0.0150+-0.0033 -> +0.0202+-0.0035  (+0.0052)  both->both
+     Journey of Discovery                   +0.0089+-0.0031 -> +0.0129+-0.0035  (+0.0040)  both->both
+     Bane of Progress                       +0.0015+-0.0025 -> +0.0053+-0.0028  (+0.0038)  dmg->both
+     Sylvan Library                         +0.0065+-0.0034 -> +0.0101+-0.0034  (+0.0036)  both->both
+     Exploration                            +0.0029+-0.0033 -> +0.0064+-0.0033  (+0.0035)  dmg->both
+     Terastodon                             +0.0065+-0.0022 -> +0.0099+-0.0023  (+0.0034)  both->both
+     Kozilek, Butcher of Truth              +0.0169+-0.0030 -> +0.0203+-0.0030  (+0.0034)  both->both
+     Momentous Fall                         +0.0118+-0.0030 -> +0.0151+-0.0029  (+0.0033)  both->both
+   sign flips among rows significant in both: none

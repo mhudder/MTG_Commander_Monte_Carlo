@@ -1,0 +1,65 @@
+=== shilgengar / Fellwar Stone   (python 3.13.18, numpy 2.4.6)
+  T10: row NEW pod +0.0047+-0.0014 (= cache)   row OLD pod +0.0044+-0.0013   NEW-OLD +0.0003+-0.0016
+  T20: row NEW pod +0.0173+-0.0033 (= cache)   row OLD pod +0.0128+-0.0031   NEW-OLD +0.0045+-0.0039
+  new pod, keep leg: countered/game 0.5413 (tally 0.5413); THIS CARD countered/game 0.0000
+  old pod, keep leg: countered/game 0.8189 (tally 0.8189); THIS CARD countered/game 0.0000
+  keep-drop countered        new  +0.0071  old  +0.0082  shift  -0.0011 (z  -0.6)
+  keep-drop turns_played     new  +0.0163  old  +0.0020  shift  +0.0143 (z  +1.7)
+  keep-drop mana_spent       new  +1.9599  old  +1.7404  shift  +0.2195 (z  +1.6)
+  keep-drop cards_drawn      new  +0.0641  old  +0.0332  shift  +0.0309 (z  +1.9)
+  keep-drop damage           new  +1.4573  old  +1.2505  shift  +0.2068 (z  +2.2)
+  keep-drop pod_spent_body   new  -0.0502  old  -0.0208  shift  -0.0294 (z  -1.0)
+  reproduces cache: YES
+=== lorehold / Approach of the Second Sun   (python 3.13.18, numpy 2.4.6)
+  T10: row NEW pod +0.0163+-0.0029 (= cache)   row OLD pod +0.0145+-0.0028   NEW-OLD +0.0018+-0.0029
+  T20: row NEW pod +0.0100+-0.0033 (= cache)   row OLD pod +0.0061+-0.0032   NEW-OLD +0.0039+-0.0038
+  new pod, keep leg: countered/game 0.4118 (tally 0.4118); THIS CARD countered/game 0.0151
+  old pod, keep leg: countered/game 0.6242 (tally 0.6242); THIS CARD countered/game 0.0174
+  keep-drop countered        new  +0.0091  old  +0.0092  shift  -0.0001 (z  -0.1)
+  keep-drop turns_played     new  -0.0889  old  -0.0938  shift  +0.0049 (z  +0.8)
+  keep-drop mana_spent       new  -1.7693  old  -1.6499  shift  -0.1194 (z  -1.0)
+  keep-drop cards_drawn      new  -0.6566  old  -0.5999  shift  -0.0567 (z  -1.5)
+  keep-drop damage           new  -1.8157  old  -1.8621  shift  +0.0464 (z  +0.5)
+  keep-drop pod_spent_body   new  -0.2159  old  -0.1731  shift  -0.0427 (z  -2.0)
+  keep-drop approach_casts   new  +0.3255  old  +0.3133  shift  +0.0122 (z  +2.3)
+  keep-drop approach_wins    new  +0.0551  old  +0.0521  shift  +0.0029 (z  +1.6)
+  reproduces cache: YES
+=== lorehold / Boros Signet   (python 3.13.18, numpy 2.4.6)
+  T10: row NEW pod +0.0119+-0.0034 (= cache)   row OLD pod +0.0117+-0.0033   NEW-OLD +0.0003+-0.0035
+  T20: row NEW pod +0.0110+-0.0038 (= cache)   row OLD pod +0.0052+-0.0038   NEW-OLD +0.0058+-0.0044
+  new pod, keep leg: countered/game 0.4118 (tally 0.4118); THIS CARD countered/game 0.0000
+  old pod, keep leg: countered/game 0.6242 (tally 0.6242); THIS CARD countered/game 0.0000
+  keep-drop countered        new  +0.0007  old  +0.0004  shift  +0.0003 (z  +0.1)
+  keep-drop turns_played     new  -0.0012  old  -0.0303  shift  +0.0291 (z  +3.5)
+  keep-drop mana_spent       new  +1.5459  old  +1.1570  shift  +0.3889 (z  +2.4)
+  keep-drop cards_drawn      new  +0.3208  old  +0.2087  shift  +0.1121 (z  +2.3)
+  keep-drop damage           new  +1.3574  old  +1.0151  shift  +0.3423 (z  +3.0)
+  keep-drop pod_spent_body   new  -0.0898  old  -0.1390  shift  +0.0492 (z  +1.6)
+  keep-drop approach_casts   new  +0.0119  old  +0.0085  shift  +0.0034 (z  +0.9)
+  keep-drop approach_wins    new  +0.0017  old  +0.0013  shift  +0.0004 (z  +0.3)
+  reproduces cache: YES
+=== tivit / Sol Ring   (python 3.13.18, numpy 2.4.6)
+  T10: row NEW pod +0.0413+-0.0038 (= cache)   row OLD pod +0.0360+-0.0037   NEW-OLD +0.0053+-0.0038
+  T20: row NEW pod +0.0374+-0.0039 (= cache)   row OLD pod +0.0329+-0.0039   NEW-OLD +0.0045+-0.0042
+  new pod, keep leg: countered/game 0.5422 (tally 0.5422); THIS CARD countered/game 0.0049
+  old pod, keep leg: countered/game 0.8371 (tally 0.8371); THIS CARD countered/game 0.0087
+  keep-drop countered        new  +0.0037  old  +0.0095  shift  -0.0059 (z  -2.2)
+  keep-drop turns_played     new  -0.0227  old  -0.0253  shift  +0.0026 (z  +0.2)
+  keep-drop mana_spent       new  +4.0544  old  +3.1429  shift  +0.9115 (z  +1.8)
+  keep-drop cards_drawn      new  +0.3342  old  +0.3202  shift  +0.0140 (z  +0.5)
+  keep-drop damage           new  +3.8147  old  +3.3427  shift  +0.4720 (z  +3.6)
+  keep-drop pod_spent_body   new  -0.6359  old  -0.4993  shift  -0.1366 (z  -3.8)
+  reproduces cache: YES
+=== rendmaw / Palladium Myr   (python 3.13.18, numpy 2.4.6)
+  T10: row NEW pod +0.0031+-0.0016 (= cache)   row OLD pod +0.0019+-0.0015   NEW-OLD +0.0013+-0.0020
+  T20: row NEW pod +0.0011+-0.0028 (= cache)   row OLD pod +0.0041+-0.0027   NEW-OLD -0.0029+-0.0038
+  new pod, keep leg: countered/game 0.3971 (tally 0.3971); THIS CARD countered/game 0.0000
+  old pod, keep leg: countered/game 0.6118 (tally 0.6118); THIS CARD countered/game 0.0000
+  keep-drop countered        new  +0.0001  old  +0.0010  shift  -0.0009 (z  -0.5)
+  keep-drop turns_played     new  -0.0234  old  -0.0216  shift  -0.0018 (z  -0.2)
+  keep-drop mana_spent       new  +0.1838  old  +0.1675  shift  +0.0163 (z  +0.2)
+  keep-drop cards_drawn      new  -0.0523  old  -0.0603  shift  +0.0079 (z  +0.3)
+  keep-drop damage           new  +0.3158  old  +0.3238  shift  -0.0080 (z  -0.1)
+  keep-drop pod_spent_body   new  -0.1296  old  -0.0680  shift  -0.0616 (z  -2.6)
+  reproduces cache: YES
+exit 0

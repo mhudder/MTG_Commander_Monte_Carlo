@@ -331,6 +331,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z276](#0z276) | MEASURED | **Nissa, Sage Animist's -2 when doomed** (azusa, Tier 4 item 18, the owner's rule (a)): -0.0043 at T20 -- the prediction overcalls 7x and costs the -7; superseded by §0z278 |
 | [0z277](#0z277) | FIXED | **Eternal Witness and Regrowth return the highest win-rate row** (azusa, Tier 4 item 15): generated from the table (`tools.return_rank`); a null -- regenerate after the rebuild |
 | [0z278](#0z278) | FIXED | **Nissa's -2 with a tighter predictor** (azusa, §0z276): the expected swing at her through your blocks (`opponents.predicted_at_walker`); a null, +0.0010 at T20; ON |
+| [0z279](#0z279) | REBUILT | **Item 53's rebuild: six tables on §0z266's pod**: no sign flips; the rocks' rise is not the pod (fresh seeds); azusa 6x slower since §0z260 and its leg unable to finish under the 30-minute budget; the return ranking outside the fingerprint |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -23503,6 +23504,184 @@ games); the pick differs from the old one in 15.7% of games.
 **Only tivit and azusa moved** across §0z273-§0z277
 (`check_unchanged_decks`, N=2,000, against `a92401f`: the other four
 active decks BIT-IDENTICAL).
+
+<a id="0z279"></a>
+
+## 0z279. REBUILT -- item 53's rebuild: six tables on §0z266's pod; azusa's run 6x slower, and why it could not finish as a leg
+
+**The owner, 2026-11-28: "go ahead and rebuild the tables"** -- the
+rebuild item 53 left as the owner's call. Parallel (`parallel-rebuild`),
+one cloud session per active deck, all at `6c9a661`, every `Interpreter:`
+line python 3.13.18, numpy 2.4.6. Coordinated on python 3.13.18 (§0z119):
+`tools.repro_row` IDENTICAL on a karlov and a tivit row. `--merge-shards`
+accepted all six; every active cache CURRENT; under 3.13.18, `check_docs`
+green on all 21 checks, `python -m tests` 182/182, `tools.validate` +0.00
+on every metric, every deck legal. `python -m tools.return_rank --write`
+regenerated azusa's return ranking from its new rows (§0z277).
+
+**Wall time: 10 h 57 min** (legs launched 02:08 UTC; azusa's table at
+13:05). Without azusa it was **22 minutes**: shilgengar 02:19, karlov
+02:22, rendmaw 02:24, tivit 02:29, lorehold 02:30. Azusa's leg was killed
+at the cloud's 2-hour background cap (04:08) with its cache part-filled,
+and the table was finished in the coordinating session, at the same
+commit, interpreter and command, with one change of budget (below).
+
+**Baselines and noise floors**, the table before (at `80cb14f`, the pod
+before §0z266 and before §0z246-§0z278's engine changes) -> after:
+
+| deck | baseline T10 | baseline T20 | floor |
+|---|---|---|---|
+| rendmaw | 0.0979 -> 0.1065 | 0.3407 -> 0.3587 | ±0.0027 -> ±0.0028 |
+| lorehold | 0.2671 -> 0.2740 | 0.4607 -> 0.4571 | ±0.0033 -> ±0.0033 |
+| karlov | 0.2649 -> 0.2930 | 0.5328 -> 0.5481 | ±0.0026 -> ±0.0026 |
+| tivit | 0.3109 -> 0.3960 | 0.5411 -> 0.5859 | ±0.0028 -> ±0.0027 |
+| shilgengar | 0.0568 -> 0.0718 | 0.4301 -> 0.4801 | ±0.0028 -> ±0.0029 |
+| azusa | 0.3489 -> 0.3808 | 0.5503 -> 0.5817 | ±0.0033 -> ±0.0034 |
+
+The baselines carry every engine change since the last tables, not only
+the pod, so they are not a reading of §0z266's fit; §0z266's own
+out-of-sample figure stands.
+
+**What moved** (T20, beyond the wider of the two bars;
+`results/rebuild_item53_table_diff_20261128.txt`,
+`diagnostics/diff_rebuild_tables.py`): rendmaw 9 of 64 (6 up), lorehold 12
+of 65 (7 up), karlov 8 of 64 (7 up), tivit 18 of 64 (11 up), shilgengar 20
+of 64 (17 up), azusa 10 of 58 (9 up) -- 77 of 379. **Not one row
+significant in both tables changed sign, in any deck** (§0z195). No row
+entered or left a table.
+
+The largest movers, and what is on record for each. **"Traced" means a
+change on record explains the direction, not that the size was
+re-measured**: only the four rows in the next subsection were.
+- **tivit**: Tamiyo's Journal +0.0038 -> +0.0190, traced (§0z272's tutor,
+  measured +0.0157 there); Demonic Tutor +0.0321 -> +0.0245, the same
+  change from the other side (a second tutor makes the first less
+  needed, §0z27); Model of Unity +0.0092 -> +0.0147 (§0z271's scry rule, a null by its own A/B, so the size is not traced);
+  Mechanized Production +0.0097 -> +0.0139 (§0z270); Expropriate,
+  Torment of Hailfire, Counterspell, Grudge Keeper down, not traced; Sol
+  Ring, Orzhov Signet, Ghostly Prison up, not traced (Sol Ring
+  re-measured below: not the pod); Rhystic Study +0.0178 -> +0.0221, traced
+  (§0z246: it reads the pod's casts).
+- **shilgengar, 17 of 20 up**: Teferi's Protection +0.0059 -> +0.0125
+  (§0z262's whole round), Angel of the Ruins +0.0139 -> +0.0204 (§0z252),
+  Angel of Serenity +0.0089 -> +0.0149 (§0z255, §0z263), Malakir Rebirth
+  (§0z251), Black Market Connections (§0z261), Flawless Maneuver and Mind
+  Stone (§0z261's fix-6 clauses), all traced; Fellwar Stone +0.0106 ->
+  +0.0173, not traced (re-measured below: not the pod); Grim Haruspex the
+  one large fall, not traced.
+- **lorehold**: Smothering Tithe +0.0120 -> +0.0068, traced (§0z246: it
+  is paid from the pod's spare mana now); Boros Signet +0.0049 -> +0.0110
+  and Talisman of Conviction +0.0059 -> +0.0109, not traced (the Signet
+  re-measured below: not the pod); Approach of the Second Sun +0.0049 ->
+  +0.0100 (below: a little of it is the pod); Hit the Mother Lode, Sejiri
+  Shelter, Goliath Daydreamer, Perch Protection up, Olórin's Searing Light,
+  Hexing Squelcher, Dragon's Rage Channeler, Mother of Runes down, not
+  traced.
+- **azusa**: Tireless Tracker +0.0143 -> +0.0029 (both -> --), traced
+  (§0z259: every Clue was cracked with the same {2}; the old row was a
+  ceiling, and `clue_pay_once` cost the deck -0.0064 at T20); Journey of
+  Discovery +0.0089 -> +0.0129 (§0z253's second mode), Bane of Progress
+  dmg -> both (§0z258), Terastodon +0.0065 -> +0.0099 (§0z257), all
+  traced; Avenger of Zendikar +0.0203 -> +0.0281, Ancient Greenwarden,
+  Sylvan Library, Exploration, Kozilek, Momentous Fall up, not traced.
+- **rendmaw**: Pygmy Kavu +0.0051 -> +0.0092, traced in direction (it
+  reads the pod's black bodies, and §0z266's pod lands about four more
+  mana of bodies a game, below); March of the World Ooze, Massacre Wurm,
+  Arasta, Shigeki, Woe Strider up, Coat of Arms (win -> --), Overwhelming
+  Stampede (win -> --), Palladium Myr (both -> dmg) down, not traced.
+- **karlov**: Suture Priest -0.0009 -> +0.0033 (dmg -> both), **not
+  traceable**: karlov's pod ETB payoffs fire on a flat rate
+  (`opp_creatures_per_turn`), not on the pod's bodies, so nothing in
+  §0z266 reaches them (queued as item 54); Damnation, Phyrexian Arena,
+  Blood Artist, Benevolent Offering, Debt to the Deathless, Cliffhaven
+  Vampire up, Sunscorch Regent down, not traced.
+
+### What §0z266's pod changed in the games
+
+`diagnostics/run_pod_shift_0z266.py`, the code at `6c9a661` against
+`experiment.POD_PRE_0Z266`, paired, N=1,500 a deck, five decks
+(`results/rebuild_item53_pod_shift_20261128.txt`; keys with |z| >= 3):
+your spells countered 0.19-0.31 a game LESS (z -12 to -18; 0.60-0.86 ->
+0.41-0.55), since a counterspell needs the mana left over
+(`opponents._countered`) and the pod no longer holds a reserve before
+bodies; the pod spends +2.7 to +4.2 more mana a game on bodies (z +11 to
++17), kills +0.7 to +1.2 more of your bodies, attacks +0.5 to +0.6 more
+often; games are 0.2-0.3 turns shorter in tivit, karlov and lorehold
+(inside |z| 3 in rendmaw and shilgengar).
+
+### The movers re-measured (§0z170)
+
+`diagnostics/run_pod_rows_0z266.py`: a row under both pods on the SAME
+seeds, so the part of its move that is the pod is paired and has its own
+bar. It reproduces the cache on the tables' seeds first (every card:
+YES). T20, the change in the row from `POD_PRE_0Z266` to the pod at the
+rebuild:
+
+| card | the tables' seeds (5000..) | fresh seeds (20000..) |
+|---|---|---|
+| lorehold Boros Signet | +0.0058 ±0.0044 | +0.0004 ±0.0045 |
+| tivit Sol Ring | +0.0045 ±0.0042 | -0.0011 ±0.0041 |
+| shilgengar Fellwar Stone | +0.0045 ±0.0039 | -0.0011 ±0.0040 |
+| lorehold Approach of the Second Sun | +0.0039 ±0.0038 | +0.0029 ±0.0038 |
+| rendmaw Palladium Myr | -0.0029 ±0.0038 | -- |
+
+(`results/rebuild_item53_pod_rows_tables_20261128.txt`,
+`results/rebuild_item53_pod_rows_fresh_20261128.txt`.) **The mana rocks'
+rise is not the pod**: on the tables' seeds every rock looked as if
+§0z266 had added +0.004 to +0.006, and on fresh seeds all three are zero.
+A first reading in this session said otherwise, from the tables' seeds
+alone; it was wrong, and this is the correction. Approach is the one with
+a mechanism: on fresh seeds its T10 row rises +0.0036 ±0.0029 with the
+pod, it is cast +0.021 more a game (z 4.0) and wins by its own text
++0.0049 more (z 2.7). Approach itself is countered 0.018 -> 0.015 a game,
+so fewer counters are a small part of that.
+
+### Azusa: 6x slower since the last tables, and a budget that cannot finish
+
+Azusa's leg ran 52 minutes at `120cc9a` and 48 at `80cb14f`; at
+`6c9a661` it could not finish in two hours. **Bisected**, milliseconds a
+game on azusa's list: 28 at `80cb14f`, 47 at `e48ad7a`, 55 at `5a64f23`,
+**149 at `23ac6bd`** (§0z260: the utility land step), 178 at `6c9a661`.
+The hot spot is `engine.Board.__contains__` (`pm not in self.board` in
+`AzusaGame.utility_land_step`, inside a loop over the board), which
+compares each same-named entry with the dataclass `==`. An identity-first
+check (`q is perm` before `==`) plays the same games, 120 of 120, and is
+not committed: it is a change to `engine.py`, which is in every deck's
+fingerprint, and it was found mid-rebuild.
+
+**Why the leg could not finish, at any cap**: `regen_tables.sh` runs
+`tools.ablation` with `ABLATE_BUDGET=1800` and restarts it, resuming from
+the saved rows, until the table prints. Every restart re-plays the
+baseline with read tracking (§0z145) -- the cache keeps only the baseline's
+summary -- and tracked play is ~9x untracked (956 against 110 ms a game).
+At azusa's new speed the baseline alone takes about an hour, so each
+30-minute run saved about one card: 58 cards, about 60 hours. **The table
+was finished** with `ABLATE_BUDGET` set past the run's length (no code
+changed), from an empty cache at 06:13 (the baseline done 07:35, about 5
+minutes a card after that on four processes); the container restarted
+twice while this session was idle (06:12 and 11:24), the second time at
+49 of 58 cards, and the run resumed from the saved rows at 11:25 and
+finished at 13:05. The table is one run's numbers: a resumed card is read
+from the cache it was saved to, and the baseline is re-measured on the
+same seeds and code.
+
+**Left as the owner's call**: the identity-first `__contains__` (it would
+cost a check that every deck is BIT-IDENTICAL, §0z126, and it moves no
+number), and the budget's restart cost (keeping the tracked baseline's
+reads in the cache, or a budget scaled to the deck). Neither is queued.
+
+### A gap this rebuild shows: the return ranking is outside the fingerprint
+
+`edhmc/decks/_return_rank.py` is generated from azusa's table and read by
+`AzusaGame` when Eternal Witness or Regrowth picks a card (§0z277), but it
+is in no cache's fingerprint (`cache_manifest.SHARED` and the registry's
+per-deck files). Regenerating it after this rebuild changed 55 of its
+58 ranks, so azusa now plays its returns by the new rows while its cache,
+measured with the old ones, reads CURRENT. The size is bounded by
+§0z277's own A/B (the rule against the highest-MV pick: +0.0007 ±0.0023
+at T20, the pick different in 15.7% of games), so it is small, and the
+loop is inherent (the ranking is read from the table it changes). The
+check is blind to it; this note is the record.
 
 ## How to read an ablation table
 
