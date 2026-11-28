@@ -70,6 +70,9 @@ items below this section are in the order they were queued, not this one.
 8. **When the owner picks them back up**: item 28 (paused), item 29's
    leftovers, item 32. Item 34's deletes are the owner's, on github.com.
    Items 18 and 5 wait on trostani (SUSPENDED).
+9. **Item 54: the pod's permanents and spells as objects** -- written down
+   2026-11-28 as the prerequisite for a spellslinger (Riku of Many Paths);
+   item-50 scale, one re-fit and one rebuild. Not scheduled; the owner's.
 
 **Before starting any step**, run the gates and compare with the last
 session's: `python -m tests` and `--mutate`, `python -m tools.validate`
@@ -461,3 +464,75 @@ cloud container has no scipy), `python -m edhmc.pending`, and
       After it, `python -m tools.return_rank --write`: azusa's returns
       read its table's rows (§0z277), and `test_return_rank` E fails
       until they are the new ones.
+
+54. **THE POD'S PERMANENTS AND SPELLS AS OBJECTS YOUR INTERACTION CAN HIT
+    (the owner, 2026-11-28).** Written down as the prerequisite for
+    modelling a spellslinger -- the owner's candidate is Riku of Many Paths
+    ({G}{U}{R}: "Whenever you cast a modal spell, choose up to X ..."),
+    whose payoff counts the MODES chosen -- and NOT STARTED: the owner's to
+    schedule. No Riku deck is queued; whether to build one first on today's
+    pod is a separate decision.
+    **Why.** A rough census this session (Scryfall, the 56 most-played
+    modal instants and sorceries in Temur colours by EDHREC rank, modes
+    sorted by regex and corrected by hand; not committed, not a
+    measurement) put about half their modes on your own side -- draw,
+    impulse, ramp, tokens, pumps, damage to each opponent -- and the rest
+    at the pod: creatures ~14%, artifacts and enchantments ~21%, the stack
+    ~11%, hands, graveyards and control ~9%. Today the pod can be hit in
+    four places: its bodies (§0z130, §0z198), its route pieces (§0z131),
+    its removal, wipes and pieces on the stack (§0z134), and its mana
+    creatures, which are utility bodies and so die (§0z247). Since the
+    development gate went on (§0z266) a pod short of mana delays its route
+    pieces (`delay_piece`), so **mana is already a channel to the kill
+    turn**. What has no object to hit: its mana ROCKS (a count in each
+    `PodMana` row, §0z236, never a permanent), its value engines, its
+    value spells (it casts only interaction and pieces; `casts` counts for
+    Rhystic, §0z246), its commander, its hand and its graveyard. A
+    removal or counter aimed at any of these has no target and no effect,
+    so "destroy target artifact" or "counter target spell" are worth only
+    what a route piece is (`threat_rebuild_max` 3, no data). Every
+    existing answer row is a floor for the same reason (§4, §0z140).
+    **The pieces, each behind its own switch, OFF and bit-identical until
+    measured (item 24's and item 50's way):**
+    - **Rocks as permanents.** The census's `POD_ROCKS` (§0z235) on the
+      battlefield as objects; your artifact removal destroys one and the
+      pod's `sources` lose it from the next row. The development gate
+      turns that into later pieces -- no new channel to the kill turn.
+      Legality falls out: "target artifact" has a target when an opponent
+      has a rock, an artifact piece, or you have an artifact yourself.
+    - **Value engines.** Noncreature permanents (draw and ramp engines)
+      that land from the pod's own library and speed it up while they
+      stay. What "speeds it up" means is the first owner decision: more
+      mana a turn (through the gate), a shorter lead on its pieces, or
+      more interaction. Removing one ends the effect.
+    - **Value spells on the stack.** Some of the pod's `casts` become
+      spells you can counter in its main phase -- a tutor for a piece
+      (countered: the piece is delayed by the existing rule), ramp
+      (countered: the source never arrives). How many, and of what, is a
+      census question, read from the lists the way `_pod_mana.py` is,
+      not typed.
+    - **The opponents' commanders.** One body per opponent is its
+      commander, with tax: bounced or killed, it costs {2} more each recast
+      (903.8), charged through the gate. This is the one hit a real table
+      makes most often and the model cannot see at all.
+    - **Optional, a hand size.** The library model (§0z236) already draws
+      for the pod and plays its lands; a hand count would be the draws
+      less lands and spells. Wanted only for Jeska's Will's first mode
+      (lorehold, a floor today) and discard; it could stay out.
+    - **Shared, and small: a response is a CAST.** §0z134's NOT DONE says
+      a spell cast in a response window does not fire your own "whenever
+      you cast" payoffs (prowess, Sai, lorehold's `on_cast_triggers`).
+      Riku needs it. It moves tivit and lorehold, so it belongs in this
+      batch's rebuild, not before.
+    **What it costs.** Every table: the pod gets weaker against decks that
+    run answers, so it is re-fitted (§0z195: signs and order compare, sizes
+    do not) and every active deck is rebuilt once, `parallel-rebuild`
+    (§0z94). The owner decisions to ask before building: what an engine
+    does for the pod; whether the rates (`pod_rate_scale`, §0z242) are
+    held at today's interaction counts; the re-fit's lever (growth or kill
+    timing, §0z265); and whether holding mana up is re-measured after it
+    (§0z134: "hold" loses in every deck today, because little is worth
+    holding for). **What it is blind to, said in advance**: the pod's
+    graveyard, its stolen permanents, a redirected spell, and any engine
+    the census cannot read; and every rate it adds is a judgement until
+    a list says otherwise.
