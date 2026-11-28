@@ -461,3 +461,31 @@ cloud container has no scipy), `python -m edhmc.pending`, and
       After it, `python -m tools.return_rank --write`: azusa's returns
       read its table's rows (§0z277), and `test_return_rank` E fails
       until they are the new ones.
+
+54. **KARLOV'S POD PAYOFFS READ FLAT RATES, NOT THE POD (the owner,
+    2026-11-28: "queue the Suture Priest gap"; found reading the movers
+    of item 53's rebuild at `6c9a661`).** `karlov.opponent_activity` / `seat_activity` fire
+    `creature_entered(g, mine=False)` on `opp_creatures_per_turn` (0.7 a
+    living opponent a round) and `_opponent_spell` on `opp_spells_per_turn`
+    (1.2), both never swept. So `OPP_ETB_PAYOFFS` (Soul Warden, Soul's
+    Attendant, Auriok Champion, Suture Priest's lose-1 clause, Authority of
+    the Consuls) and the spell payoffs (Kambal, Consul of Allocation;
+    Sunscorch Regent) never see the pod's real bodies (§0z200, cast under
+    §0z266's gate) or its real casts (`opponents.pod_cast`, §0z246). The
+    same pod under two rules (§0z30): under §0z266 karlov's pod spends +3.5
+    mana a game more on bodies and none of those cards can tell. Suture
+    Priest's row moved -0.0009 -> +0.0033 in that rebuild, and it is not
+    traceable to its text.
+    - **The fix**: drive `creature_entered(g, mine=False)` from the pod's
+      body entries (each body as it is cast, the Orchard Spirit and
+      Benevolent Offering paths unchanged) and `_opponent_spell` from
+      `pod_cast`, behind a switch, OFF until measured; the flat knobs kept
+      for the switch's OFF leg. Say the judgement: whether a pod token
+      counts as an entering creature for the soul sisters (it does at a
+      table).
+    - **Before building**: grep the other engines for the same shape (a
+      per-turn opponent rate where the pod now has an event): Pygmy Kavu
+      reads the real bodies already; March of the World Ooze and Arasta
+      read counterspells only (their own floors, said in their docstrings).
+    - **Cost**: moves karlov's baseline -- a karlov rebuild, one deck. The
+      owner's to schedule.

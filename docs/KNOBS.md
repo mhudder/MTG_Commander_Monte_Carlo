@@ -7,7 +7,7 @@ be renamed without this file changing. That is §0q's rule (a
 hand-maintained name set is a claim, and claims rot) applied to
 configuration.
 
-Derived at `a28ea92` from 34 engine sources.
+Derived at `faeb386` from 34 engine sources.
 
 **509 knobs, 754 call sites.**
 
@@ -348,11 +348,11 @@ show up first.
 | `nylea_x` | `True` | 1 | `edhmc/azusa.py:4364` | §0z248 | yes | yes |
 | `on_the_draw` | `True` | 1 | `edhmc/engine.py:5879` |  | **no** | **never** |
 | `opp_avg_power` | `2.5` | 1 | `edhmc/lorehold.py:1537` | §0z116 | **no** | **never** |
-| `opp_creatures_per_turn` | `0.7` | 2 | `edhmc/karlov.py:1050` | §0z179 | **no** | **never** |
+| `opp_creatures_per_turn` | `0.7` | 2 | `edhmc/karlov.py:1050` | §0z179 | yes | **never** |
 | `opp_death_rate` | `0.55` | 2 | `edhmc/engine.py:4263` | §0z132 | yes | yes |
 | `opp_instant_rate` | `0.8` | 2 | `edhmc/engine.py:4126` | §0z47 | yes | yes |
 | `opp_land_plateau` | `8` | 3 | `edhmc/engine.py:4576` | §0z151 | yes | yes |
-| `opp_spells_per_turn` | `1.2` | 2 | `edhmc/karlov.py:1055` | §0z179 | **no** | **never** |
+| `opp_spells_per_turn` | `1.2` | 2 | `edhmc/karlov.py:1055` | §0z179 | yes | **never** |
 | `opp_vote_policy` | `'adversarial'` | 1 | `edhmc/voting.py:101` |  | yes | yes |
 | `opp_vote_selfish_agree` | `0.6` | 1 | `edhmc/voting.py:109` |  | **no** | **never** |
 | `opponents` | `True` | 13 | `edhmc/azusa.py:5147` | §0z171 | yes | yes |
@@ -619,12 +619,12 @@ passes the liveness run (§0z126).
 
 ## The knobs no document mentions
 
-**57 of 509.** Not an error — most knobs are
+**55 of 509.** Not an error — most knobs are
 ordinary internals — but this is exactly the set the "say the knob out
 loud" rule cannot currently be applied to, because nobody reading the
 docs knows they exist.
 
-`altar_mana`, `angel_of_suffering`, `avacyn_text`, `castle_ardenvale`, `citadel_allin_life`, `citadel_allin_outs`, `clamp_cap`, `collective_text`, `combat_defender`, `crusher_text`, `crystal_vein`, `dawn_draws_per_turn`, `destroy_share_wipe`, `draw_lands`, `eldrazi_temple`, `elspeth_ult`, `elspeth_ult_creatures`, `extra_turn_cap`, `furygale_reduction`, `hand_cap`, `high_market`, `invoke_mv_cap`, `land_only_if`, `land_outlets`, `library_clock_mult`, `library_clock_rounds`, `locthwain`, `locthwain_life_floor`, `locthwain_max_loss`, `magistrate_token_cap`, `monument_order`, `nykthos_devotion`, `on_the_draw`, `opp_avg_power`, `opp_creatures_per_turn`, `opp_spells_per_turn`, `opp_vote_selfish_agree`, `painland_life`, `pearl_lifelink_cap`, `petrified_field`, `protect_min`, `queen_soldier`, `realms_late_lands`, `selenia_curse_target`, `shigeki_min_library`, `shilgengar_sac_policy`, `spock_text`, `starting_life`, `storm_cauldron`, `surveil_land_floor`, `thomil_lord_fodder`, `tutor_targets`, `vault_paid`, `welcome_mana`, `wildspeaker_mode`, `wipe_response`, `zuran_max_sacs`
+`altar_mana`, `angel_of_suffering`, `avacyn_text`, `castle_ardenvale`, `citadel_allin_life`, `citadel_allin_outs`, `clamp_cap`, `collective_text`, `combat_defender`, `crusher_text`, `crystal_vein`, `dawn_draws_per_turn`, `destroy_share_wipe`, `draw_lands`, `eldrazi_temple`, `elspeth_ult`, `elspeth_ult_creatures`, `extra_turn_cap`, `furygale_reduction`, `hand_cap`, `high_market`, `invoke_mv_cap`, `land_only_if`, `land_outlets`, `library_clock_mult`, `library_clock_rounds`, `locthwain`, `locthwain_life_floor`, `locthwain_max_loss`, `magistrate_token_cap`, `monument_order`, `nykthos_devotion`, `on_the_draw`, `opp_avg_power`, `opp_vote_selfish_agree`, `painland_life`, `pearl_lifelink_cap`, `petrified_field`, `protect_min`, `queen_soldier`, `realms_late_lands`, `selenia_curse_target`, `shigeki_min_library`, `shilgengar_sac_policy`, `spock_text`, `starting_life`, `storm_cauldron`, `surveil_land_floor`, `thomil_lord_fodder`, `tutor_targets`, `vault_paid`, `welcome_mana`, `wildspeaker_mode`, `wipe_response`, `zuran_max_sacs`
 
 ## The knobs nothing has ever set
 
